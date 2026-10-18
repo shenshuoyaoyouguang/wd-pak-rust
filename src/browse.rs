@@ -55,6 +55,11 @@ impl Column {
         }
     }
 
+    /// 类型只有「文件/目录」两值，而目录恒排在文件前，排序不会改变顺序。
+    pub fn sortable(self) -> bool {
+        self != Column::Type
+    }
+
     pub fn default_width(self) -> i32 {
         match self {
             Column::Name => 320,
@@ -131,6 +136,7 @@ pub fn sorted_indices(entries: &[SessionEntry], spec: SortSpec) -> Vec<usize> {
 fn compare_key(a: &SessionEntry, b: &SessionEntry, key: Column, dir: SortDir) -> Ordering {
     let ord = match key {
         Column::Name => a.path.cmp(&b.path),
+        // 非可排序列（见 [`Column::sortable`]）：保持路径兜底顺序。
         Column::Type => Ordering::Equal,
         Column::Org => a.org.cmp(&b.org),
         Column::Size => a.size.cmp(&b.size),
@@ -253,10 +259,11 @@ impl Query {
     }
 }
 
-/// 条目选中状态；`primary` 是详情面板与范围选择的锚点。
+/// 条目选中状态；`primary` 是详情面板焦点，`anchor` 是 Shift 连选的固定端。
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct Selection {
     primary: Option<usize>,
+    anchor: Option<usize>,
     items: BTreeSet<usize>,
 }
 
@@ -285,6 +292,7 @@ impl Selection {
         self.items.clear();
         self.items.insert(index);
         self.primary = Some(index);
+        self.anchor = Some(index);
     }
 
     /// Ctrl 单击：切换单项，并把主选中移到该项。
@@ -293,20 +301,24 @@ impl Selection {
             if self.primary == Some(index) {
                 self.primary = self.items.iter().next_back().copied();
             }
+            if self.anchor == Some(index) {
+                self.anchor = self.primary;
+            }
         } else {
             self.items.insert(index);
             self.primary = Some(index);
+            self.anchor = Some(index);
         }
     }
 
-    /// Shift 单击：从主选中扩展到目标（以当前可见顺序为范围）。
+    /// Shift 单击：从锚点扩展到目标（以当前可见顺序为范围）；锚点保持不变。
     pub fn extend_to(&mut self, visible: &[usize], target: usize) {
         let Some(target_pos) = visible.iter().position(|&i| i == target) else {
             return;
         };
         let anchor = self
-            .primary
-            .and_then(|p| visible.iter().position(|&i| i == p))
+            .anchor
+            .and_then(|a| visible.iter().position(|&i| i == a))
             .unwrap_or(target_pos);
         let (lo, hi) = if anchor <= target_pos {
             (anchor, target_pos)
@@ -326,11 +338,13 @@ impl Selection {
             .primary
             .filter(|p| self.items.contains(p))
             .or_else(|| visible.first().copied());
+        self.anchor = self.primary;
     }
 
     pub fn clear(&mut self) {
         self.items.clear();
         self.primary = None;
+        self.anchor = None;
     }
 
     /// 方向键移动主选中并重置为单选；到边界后夹住。
@@ -358,10 +372,12 @@ pub struct TreeRow {
     pub has_children: bool,
 }
 
-/// 树的展开状态，按包内路径保存；根层始终可见。
+/// 树的展开状态，按包内路径保存；首层目录默认展开。
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct TreeState {
     expanded: BTreeSet<String>,
+    /// 显式折叠的目录；首层靠它覆盖「默认展开」。
+    collapsed: BTreeSet<String>,
 }
 
 impl TreeState {
@@ -370,17 +386,21 @@ impl TreeState {
     }
 
     pub fn is_expanded(&self, path: &str) -> bool {
-        self.expanded.contains(path)
+        !path.is_empty()
+            && (self.expanded.contains(path)
+                || (!path.contains('/') && !self.collapsed.contains(path)))
     }
 
     pub fn expand(&mut self, path: &str) {
         if !path.is_empty() {
             self.expanded.insert(path.to_string());
+            self.collapsed.remove(path);
         }
     }
 
     pub fn collapse(&mut self, path: &str) {
         self.expanded.remove(path);
+        self.collapsed.insert(path.to_string());
     }
 
     pub fn toggle(&mut self, path: &str) {
@@ -393,12 +413,15 @@ impl TreeState {
 
     pub fn expand_all(&mut self, entries: &[SessionEntry]) {
         for entry in entries.iter().filter(|e| e.is_dir()) {
-            self.expanded.insert(entry.path.clone());
+            self.expand(&entry.path);
         }
     }
 
-    pub fn collapse_all(&mut self) {
+    pub fn collapse_all(&mut self, entries: &[SessionEntry]) {
         self.expanded.clear();
+        for entry in entries.iter().filter(|e| e.is_dir()) {
+            self.collapsed.insert(entry.path.clone());
+        }
     }
 
     /// 只返回当前可见行；目录先于文件、同层按路径升序。
@@ -422,7 +445,7 @@ impl TreeState {
         }
 
         let mut rows = Vec::new();
-        render_rows("", 0, &children, entries, &self.expanded, &mut rows);
+        render_rows("", 0, &children, entries, self, &mut rows);
         rows
     }
 }
@@ -432,7 +455,7 @@ fn render_rows(
     depth: usize,
     children: &HashMap<String, Vec<usize>>,
     entries: &[SessionEntry],
-    expanded: &BTreeSet<String>,
+    tree: &TreeState,
     rows: &mut Vec<TreeRow>,
 ) {
     let Some(list) = children.get(parent) else {
@@ -449,8 +472,8 @@ fn render_rows(
             depth,
             has_children,
         });
-        if entry.is_dir() && has_children && expanded.contains(&entry.path) {
-            render_rows(&entry.path, depth + 1, children, entries, expanded, rows);
+        if entry.is_dir() && has_children && tree.is_expanded(&entry.path) {
+            render_rows(&entry.path, depth + 1, children, entries, tree, rows);
         }
     }
 }
@@ -464,12 +487,19 @@ pub fn locate(entries: &[SessionEntry], target: &str) -> Option<usize> {
 /// 精确定位失败时，逐级回退到最近的已存在父目录；都不存在则返回 None。
 pub fn locate_nearest(entries: &[SessionEntry], target: &str) -> Option<usize> {
     let mut target = normalize_inner(target);
+    if let Some(index) = entries.iter().position(|entry| entry.path == target) {
+        return Some(index);
+    }
     loop {
-        if let Some(index) = entries.iter().position(|entry| entry.path == target) {
-            return Some(index);
-        }
         let (parent, _) = target.rsplit_once('/')?;
         target = parent.to_string();
+        // 父级必须是目录：同名文件不能当兜底目标选中。
+        if let Some(index) = entries
+            .iter()
+            .position(|entry| entry.path == target && entry.is_dir())
+        {
+            return Some(index);
+        }
     }
 }
 

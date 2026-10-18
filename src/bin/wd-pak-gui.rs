@@ -466,7 +466,8 @@ mod win {
             PakError::NameTooLong(_) => "缩短名称后重试",
             PakError::NameNonAscii(_) => "改为 ASCII 名称后重试",
             PakError::NameCaseConflict(..) => "改名后重试；Windows 解包会互相覆盖",
-            PakError::Missing(_) | PakError::NotExists(_) => "先解包 → 放入文件 → 重新打包",
+            PakError::Missing(_) => "检查包内路径，或先在列表中定位",
+            PakError::NotExists(_) => "先解包 → 放入文件 → 重新打包",
             _ => "重试一次；仍失败请复制技术详情",
         }
     }

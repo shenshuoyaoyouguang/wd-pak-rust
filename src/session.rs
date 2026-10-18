@@ -75,7 +75,8 @@ pub struct PakSession {
 impl PakSession {
     /// 打开并解析包；错误原样沿用 CLI 的错误类型与文案。
     pub fn open(path: &Path) -> Result<Self, PakError> {
-        let reader = PakReader::open(path)?;
+        // 与 CLI 同一条打开路径：I/O 错误带上文件路径（否则 GUI 只显示 `[Win32 2] …`）。
+        let reader = crate::commands_read::open_pak(path)?;
         let (mut files, mut dirs) = (0usize, 0usize);
         let (mut total_stored, mut total_org) = (0u64, 0u64);
         let mut attribs: BTreeMap<u32, usize> = BTreeMap::new();

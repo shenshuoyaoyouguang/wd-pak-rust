@@ -2,7 +2,7 @@
 //!
 //! 尺寸与断点来自 `docs/windows-ui-plan.md` §5.1；任务面板位于内容区底部（§2.5）。
 
-use wd_pak::gui::layout::{layout, LayoutInput, Rect};
+use wd_pak::gui::layout::{layout, scale, LayoutInput, Rect};
 
 fn input(width: i32, height: i32) -> LayoutInput {
     LayoutInput { width, height }
@@ -82,5 +82,17 @@ fn dip_to_pixels_rounds_at_target_dpi() {
         Rect::new(220, 48, 740, 568).scaled(144),
         Rect::new(330, 72, 1110, 852)
     );
-    assert_eq!(Rect::new(1, 1, 1, 1).scaled(120), Rect::new(1, 1, 1, 1));
+    // 边缘单独取整：1 DIP 在 125% 下左右边缘落在 1 与 3，故宽高为 2px
+    assert_eq!(Rect::new(1, 1, 1, 1).scaled(120), Rect::new(1, 1, 2, 2));
+}
+
+#[test]
+fn scaled_neighbours_share_edges_at_non_integer_scale() {
+    let nav = Rect::new(0, 48, 220, 728);
+    let content = Rect::new(220, 48, 740, 728);
+
+    let (nav, content) = (nav.scaled(105), content.scaled(105));
+    assert_eq!(nav.right(), content.x);
+    assert_eq!(nav.x, 0);
+    assert_eq!(content.right(), scale(960, 105));
 }

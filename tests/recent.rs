@@ -68,6 +68,34 @@ fn pinned_entry_survives_limit_and_sorts_first() {
 }
 
 #[test]
+fn re_recording_a_pinned_path_keeps_it_pinned() {
+    let mut list = RecentList::new(DEFAULT_LIMIT);
+    list.record(opened("a.pak", 10, 100));
+    assert!(list.set_pinned(&p("a.pak"), true));
+
+    list.record(opened("a.pak", 20, 300));
+
+    assert_eq!(list.items().len(), 1);
+    assert!(list.items()[0].pinned);
+    assert_eq!(list.items()[0].size, 20);
+    assert_eq!(list.items()[0].last_opened, 300);
+}
+
+#[test]
+fn limit_holds_even_when_every_entry_is_pinned() {
+    let mut list = RecentList::new(2);
+    for (path, at) in [("a.pak", 100), ("b.pak", 200), ("c.pak", 300)] {
+        let mut entry = opened(path, 10, at);
+        entry.pinned = true;
+        list.record(entry);
+    }
+
+    assert_eq!(list.items().len(), 2);
+    assert_eq!(list.items()[0].path, p("c.pak"));
+    assert_eq!(list.items()[1].path, p("b.pak"));
+}
+
+#[test]
 fn remove_and_clear_drop_entries() {
     let mut list = RecentList::new(DEFAULT_LIMIT);
     list.record(opened("a.pak", 10, 100));

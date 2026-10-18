@@ -1,4 +1,5 @@
 /target/dist
 /dist
 /target*
-.codebuddy/plans/
+/.codebuddy/*
+!/.codebuddy/rules/

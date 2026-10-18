@@ -56,7 +56,8 @@ pub fn startup(has_config: bool, has_session: bool, restore_session: bool) -> St
 /// 一个包标签的独立状态。
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TabState {
-    pub path: PathBuf,
+    /// 私有：标签与路径一一对应，允许改写会破坏 [`Workspace::open`] 的去重前提。
+    path: PathBuf,
     pub write_busy: bool,
     pub view: ViewState,
     pub selection: Selection,
@@ -74,6 +75,10 @@ impl TabState {
             history: vec![String::new()],
             history_pos: 0,
         }
+    }
+
+    pub fn path(&self) -> &Path {
+        &self.path
     }
 }
 
@@ -106,8 +111,15 @@ impl Workspace {
     }
 
     /// 打开路径：已存在则激活并返回原下标，否则新建标签。
+    /// 路径在入口处规范化；Windows 上再按大小写折叠比较。
     pub fn open(&mut self, path: PathBuf) -> usize {
-        if let Some(index) = self.tabs.iter().position(|tab| tab.path == path) {
+        let path = crate::platform::normpath(&path);
+        let key = path_key(&path);
+        if let Some(index) = self
+            .tabs
+            .iter()
+            .position(|tab| path_key(&tab.path) == key)
+        {
             self.active = Some(index);
             return index;
         }
@@ -151,4 +163,14 @@ impl Workspace {
         tab.write_busy = busy;
         true
     }
+}
+
+/// 路径身份键：规范化后比较；Windows 文件系统不区分大小写。
+fn path_key(path: &Path) -> String {
+    let path = crate::platform::normpath(path);
+    // shortcut: 用 Unicode 小写折叠近似 NTFS 的大小写表，极端非 ASCII 路径仍可能重复开标签。
+    #[cfg(windows)]
+    return path.to_string_lossy().to_lowercase();
+    #[cfg(not(windows))]
+    return path.to_string_lossy().into_owned();
 }

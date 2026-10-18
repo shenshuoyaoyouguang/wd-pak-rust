@@ -78,16 +78,16 @@ impl RecentList {
         self.items.clear();
     }
 
+    /// 上限是硬限：优先淘汰最久未打开的未固定项；全部固定时淘汰最久未打开的固定项。
     fn enforce_limit(&mut self) {
         while self.items.len() > self.limit {
-            let oldest_unpinned = self
+            let Some(index) = self
                 .items
                 .iter()
                 .enumerate()
-                .filter(|(_, e)| !e.pinned)
-                .min_by_key(|(_, e)| e.last_opened)
-                .map(|(index, _)| index);
-            let Some(index) = oldest_unpinned else {
+                .min_by_key(|(_, e)| (e.pinned, e.last_opened))
+                .map(|(index, _)| index)
+            else {
                 break;
             };
             self.items.remove(index);

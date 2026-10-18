@@ -179,24 +179,28 @@ fn tree_fixture() -> Vec<SessionEntry> {
 }
 
 #[test]
-fn tree_rows_expand_and_collapse_by_path() {
+fn tree_rows_start_with_first_level_expanded() {
     let entries = tree_fixture();
     let mut tree = TreeState::new();
 
-    let rows = tree.rows(&entries);
-    assert_eq!(row_paths(&tree, &entries), vec!["a", "c", "b.txt"]);
-    assert!(rows[0].has_children);
-    assert!(!rows[1].has_children);
-
-    tree.expand("a");
     let rows = tree.rows(&entries);
     assert_eq!(
         row_paths(&tree, &entries),
         vec!["a", "a/x.txt", "c", "b.txt"]
     );
-    assert_eq!(rows[1].depth, 1);
+    assert!(rows[0].has_children);
+    assert!(!rows[2].has_children);
 
     tree.collapse("a");
+    assert_eq!(row_paths(&tree, &entries), vec!["a", "c", "b.txt"]);
+
+    tree.expand("a");
+    assert_eq!(
+        row_paths(&tree, &entries),
+        vec!["a", "a/x.txt", "c", "b.txt"]
+    );
+
+    tree.collapse_all(&entries);
     assert_eq!(row_paths(&tree, &entries), vec!["a", "c", "b.txt"]);
 
     tree.expand_all(&entries);
@@ -204,6 +208,28 @@ fn tree_rows_expand_and_collapse_by_path() {
         row_paths(&tree, &entries),
         vec!["a", "a/x.txt", "c", "b.txt"]
     );
+}
+
+#[test]
+fn repeat_shift_click_keeps_the_original_anchor() {
+    let visible = [0, 1, 2, 3, 4, 5];
+    let mut selection = Selection::default();
+
+    selection.select_one(0);
+    selection.extend_to(&visible, 3);
+    assert_eq!(selection.items().collect::<Vec<_>>(), vec![0, 1, 2, 3]);
+    assert_eq!(selection.primary(), Some(3));
+
+    selection.extend_to(&visible, 1);
+    assert_eq!(selection.items().collect::<Vec<_>>(), vec![0, 1]);
+    assert_eq!(selection.primary(), Some(1));
+}
+
+#[test]
+fn type_column_is_not_sortable() {
+    assert!(!Column::Type.sortable());
+    assert!(Column::Name.sortable());
+    assert!(Column::Size.sortable());
 }
 
 #[test]
@@ -218,6 +244,9 @@ fn locate_finds_exact_path_and_falls_back_to_parent() {
     assert_eq!(locate_nearest(&entries, "a/missing.txt"), Some(0));
     assert_eq!(locate_nearest(&entries, "a/x/y/z.bin"), Some(0));
     assert_eq!(locate_nearest(&entries, "z/y"), None);
+    // 文件不能充当父目录兜底；精确命中文件仍然有效
+    assert_eq!(locate_nearest(&entries, "b.txt"), Some(2));
+    assert_eq!(locate_nearest(&entries, "b.txt/x.bin"), None);
 }
 
 #[test]

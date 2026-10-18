@@ -39,12 +39,14 @@ impl Rect {
         self.y + self.h
     }
 
+    /// 按 DPI 换算；先换算四边再求宽高，相邻区域不会因两次取整而错开 1px。
     pub fn scaled(&self, dpi: u32) -> Self {
+        let (x, y) = (scale(self.x, dpi), scale(self.y, dpi));
         Self {
-            x: scale(self.x, dpi),
-            y: scale(self.y, dpi),
-            w: scale(self.w, dpi),
-            h: scale(self.h, dpi),
+            x,
+            y,
+            w: scale(self.right(), dpi) - x,
+            h: scale(self.bottom(), dpi) - y,
         }
     }
 }
