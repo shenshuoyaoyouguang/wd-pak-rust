@@ -143,15 +143,7 @@ pub fn cmd_cat(
     err: &mut impl Write,
 ) -> Result<(), PakError> {
     let pak = open_pak(pak_path)?;
-    let node = pak
-        .find(inner)
-        // 注意：cat 的不存在消息是 `不存在: {inner}`；
-        // PakError::NotExists（`包内不存在: ...`）是 Python cmd_replace 专用消息
-        .ok_or_else(|| PakError::Manifest(format!("不存在: {inner}")))?;
-    if node.is_dir() {
-        return Err(PakError::IsDir(inner.to_string()));
-    }
-    let data = pak.read_file(node)?;
+    let data = pak.read_entry_by_path(inner)?;
     match out_file {
         Some(path) => {
             write_file(path, &data)?;

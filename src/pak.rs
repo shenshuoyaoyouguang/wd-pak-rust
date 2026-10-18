@@ -128,6 +128,18 @@ impl PakReader {
         Ok(out)
     }
 
+    /// 按包内路径读取（导出/cat 语义）：缺失为 `不存在: …`，目录为“是目录”。
+    /// 这是 GUI 与 CLI 共用的查找 + 读取序列，避免两处各写一遍。
+    pub(crate) fn read_entry_by_path(&self, inner: &str) -> Result<Vec<u8>, PakError> {
+        let node = self
+            .find(inner)
+            .ok_or_else(|| PakError::Missing(inner.to_string()))?;
+        if node.is_dir() {
+            return Err(PakError::IsDir(inner.to_string()));
+        }
+        self.read_file(node)
+    }
+
     /// 原始存储字节（不解压，对应 Python `read_stored`；含 u64 越界校验）。
     pub fn read_stored(&self, node: &TreeNode) -> Result<Vec<u8>, PakError> {
         self.read_blob(&node.entry)

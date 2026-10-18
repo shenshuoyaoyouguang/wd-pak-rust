@@ -74,6 +74,11 @@ pub enum PakError {
     #[error("包内不存在: {0}（如需新增文件请先 extract，放入文件后 pack）")]
     NotExists(String),
 
+    /// 按包内路径读取未命中（cat / 导出语义）。
+    /// 与 `NotExists`（replace 专用文案）是两条不同消息，不得合并。
+    #[error("不存在: {0}")]
+    Missing(String),
+
     /// manifest 数据非法（承载完整中文消息）
     #[error("{0}")]
     Manifest(String),
