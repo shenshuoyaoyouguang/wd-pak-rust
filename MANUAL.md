@@ -81,6 +81,14 @@ RUSTFLAGS="-C linker=rust-lld" cargo build --release --target aarch64-unknown-li
 # 产物：target/aarch64-unknown-linux-musl/release/wd-pak
 ```
 
+Windows（x64，需 VS Build Tools / MSVC + Windows SDK；产物为单 exe，无 VC 运行库依赖）：
+
+```powershell
+$env:RUSTFLAGS = "-C target-feature=+crt-static"
+cargo build --release --target x86_64-pc-windows-msvc
+# 产物：target\x86_64-pc-windows-msvc\release\wd-pak.exe
+```
+
 ### 2.3 实测产物一览
 
 | 目标平台 | 大小 | 链接方式 | 实测状态 |
@@ -88,10 +96,11 @@ RUSTFLAGS="-C linker=rust-lld" cargo build --release --target aarch64-unknown-li
 | `x86_64-unknown-linux-gnu` | 1.13 MB | 动态链接 glibc 2.39 | ✅ 112 项测试全绿 |
 | `x86_64-unknown-linux-musl` | 1.23 MB | 全静态（static-pie） | ✅ 冒烟通过（version/check/交互），`ldd` 确认零依赖 |
 | `aarch64-unknown-linux-musl` | 1.04 MB | 全静态 | ✅ 交叉编译成功（本机为 x86_64，无法运行验证，架构内逻辑相同） |
+| `x86_64-pc-windows-msvc` | 1.27 MB | 静态 CRT（仅依赖系统 DLL） | ✅ 编译 0 警告；`--version` / `check` / `extract` / `pack` 往返字节一致 / `replace` 冒烟通过 |
 
 > **提示**：aarch64 交叉编译必须用 `RUSTFLAGS="-C linker=rust-lld"`——默认 `cc` 是 x86_64 链接器会报 `linking with cc failed`；rust-lld 是 rustup 自带的跨平台链接器，无需安装交叉 gcc。
 >
-> **Windows**：源码已预留 `#[cfg(not(unix))]` 分支（见 12.4），`x86_64-pc-windows-gnu` 目标可从 Linux 交叉编译（需安装 mingw-w64）；msvc 目标建议在 Windows 上用 VS Build Tools 构建。注意 Windows 控制台默认 GBK 编码，中文输出需 `chcp 65001`，详见 12.4。
+> **Windows**：平台差异集中在 `src/platform/`（Windows 侧走 `WriteConsoleW`/`ReadConsoleW`，不改控制台代码页，中文输出**无需** `chcp 65001`）。详见 12.4 与 [docs/windows-plan.md](docs/windows-plan.md)。
 >
 > **2026-10-18 清理说明**：`target/` 已在安全清理中删除，随时按 2.2 命令重建（已实测从零离线重建 33s，产物与清理前逐字节一致）；三个已验证二进制保留在项目根 `dist/` 目录：`wd-pak-x86_64-gnu` / `wd-pak-x86_64-musl` / `wd-pak-aarch64-musl`。
 
@@ -457,9 +466,11 @@ Python 版怪癖：相邻空目录共享同一 offset。Rust 版对其读回报 
 ### 12.4 Windows 平台边界
 
 - 文件名原始字节：Unix 用 `OsStrExt` 取原始字节（保证非 UTF-8 文件名排序与 Python `listdir` 一致）；Windows 退化为 lossy 转换（design 2.11 R5）
-- 控制台编码：需 `chcp 65001`，否则中文输出乱码（Python 3 用 WriteConsoleW 无此问题——这是与 Python 版唯一的可感知差异）
-- 覆盖被占用文件：Linux 允许 rename 覆盖已打开文件，Windows 会失败
-- 交互输入 CRLF：已兼容（`trim()` 处理 `\r`）
+- 控制台编码：**已解决**。输出走 `WriteConsoleW`、交互输入走 `ReadConsoleW`，不修改控制台代码页，中文在 cp936 默认代码页下正常显示，且退出后不会污染调用方 cmd 的 `chcp`（`src/platform/windows.rs`）
+- 覆盖被占用文件：Linux 允许 rename 覆盖已打开文件；Windows 在目标被其他进程占用时报 `目标文件被其他程序占用或不可写`，退出码 2，`.tmp` 不残留
+- 错误文案：Windows 用固定中文文案（`[Win32 N] ...`），不随系统语言变化；Unix 保持 `[Errno N] strerror` 不变
+- 交互输入 CRLF：已兼容（`trim()` 处理 `\r`；控制台走 `ReadConsoleW` 后同样剥除行尾）
+- 仍待完善（见 [docs/windows-plan.md](docs/windows-plan.md)）：解包时保留设备名/非法字符的显式报错、大小写冲突在 Windows 上的默认拒绝、长路径（`\\?\`）、MSI 安装包
 
 ### 12.5 临时构建与测试产物
 

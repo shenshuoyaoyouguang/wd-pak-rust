@@ -9,7 +9,7 @@
 
 use std::collections::{BTreeMap, HashMap};
 use std::io::Write;
-use std::path::{Component, Path, PathBuf};
+use std::path::{Path, PathBuf};
 
 use crate::error::PakError;
 use crate::manifest::{FileStat, Manifest, MANIFEST_NAME};
@@ -163,10 +163,10 @@ pub fn cmd_cat(
             )?;
         }
         None => {
-            // 二进制透明写 stdout（对齐 sys.stdout.buffer.write）；
+            // 二进制透明写 stdout（对齐 sys.stdout.buffer.write）；不走控制台宽字符
+            // 转换，否则 Windows 上会把二进制当文本转码。
             // BufWriter 避开行缓冲的逐行 flush
-            let stdout = std::io::stdout();
-            let mut w = std::io::BufWriter::new(stdout.lock());
+            let mut w = std::io::BufWriter::new(crate::platform::stdout_raw());
             w.write_all(&data).map_err(write_err_to_py)?;
             w.flush().map_err(write_err_to_py)?;
         }
@@ -254,27 +254,14 @@ fn io_error_to_py(e: PakError, path: &Path) -> PakError {
     }
 }
 
-/// Python OSError 消息的 errno+strerror 部分：`[Errno {n}] {strerror}`。
-/// strerror 取自 Rust io::Error（与 C 库一致），去掉 " (os error N)" 尾巴。
-pub(crate) fn py_errno_msg(e: &std::io::Error) -> String {
-    match e.raw_os_error() {
-        Some(code) => {
-            let disp = e.to_string();
-            let suffix = format!(" (os error {code})");
-            let msg = disp.strip_suffix(&suffix).unwrap_or(&disp);
-            format!("[Errno {code}] {msg}")
-        }
-        None => e.to_string(),
-    }
-}
-
-/// Python OSError 风格消息：`[Errno {n}] {strerror}: {repr(path)}`。
+/// Python OSError 风格消息：Unix 为 `[Errno {n}] {strerror}: {repr(path)}`，
+/// Windows 为 `[Win32 {n}] {固定文案}: {repr(path)}`（见 crate::platform）。
 /// filename 按 Python repr 规则包裹（默认单引号；含 ' 不含 " 时双引号）——
 /// 交互模式对拍实测：路径含 `'` 时 Python 输出 `"/non'exist.pak"`。
 pub(crate) fn py_os_error(e: &std::io::Error, path: &Path) -> PakError {
     PakError::Os(format!(
         "{}: {}",
-        py_errno_msg(e),
+        crate::platform::io_message(e),
         crate::commands_write::py_str_repr(&path.display().to_string())
     ))
 }
@@ -282,7 +269,7 @@ pub(crate) fn py_os_error(e: &std::io::Error, path: &Path) -> PakError {
 /// 写 stdout/stderr 失败转 Python OSError 消息（print 无 filename，
 /// 如 broken pipe 时的 `[Errno 32] Broken pipe`）。
 fn write_err_to_py(e: std::io::Error) -> PakError {
-    PakError::Os(py_errno_msg(&e))
+    PakError::Os(crate::platform::io_message(&e))
 }
 
 /// 创建目录（对齐 os.makedirs(exist_ok=True)；路径是已存在文件时同样报 FileExists）。
@@ -323,45 +310,7 @@ fn abspath(p: &Path) -> PathBuf {
             .unwrap_or_else(|_| PathBuf::from("."))
             .join(p)
     };
-    normpath(&joined)
-}
-
-/// 对齐 os.path.normpath：折叠 '.'/'..'/重复斜杠，保留前导 '..'，空结果回 '.'。
-fn normpath(p: &Path) -> PathBuf {
-    let mut parts: Vec<std::ffi::OsString> = Vec::new();
-    let mut has_root = false;
-    for c in p.components() {
-        match c {
-            Component::RootDir => {
-                has_root = true;
-                parts.clear();
-            }
-            Component::CurDir => {}
-            Component::ParentDir => match parts.last() {
-                Some(last) if last != ".." => {
-                    parts.pop();
-                }
-                _ if !has_root => parts.push("..".into()),
-                _ => {}
-            },
-            Component::Normal(s) => parts.push(s.to_os_string()),
-            Component::Prefix(_) => {}
-        }
-    }
-    let mut out = PathBuf::new();
-    if has_root {
-        out.push("/");
-    }
-    if parts.is_empty() {
-        if !has_root {
-            out.push(".");
-        }
-    } else {
-        for part in parts {
-            out.push(part);
-        }
-    }
-    out
+    crate::platform::normpath(&joined)
 }
 
 // ---------------------------------------------------------------------------
@@ -371,46 +320,35 @@ fn normpath(p: &Path) -> PathBuf {
 mod tests {
     use super::*;
 
-    /// normpath 对齐 os.path.normpath 的关键行为
-    #[test]
-    fn normpath_matches_python() {
-        let cases = [
-            ("/a/b/../c", "/a/c"),
-            ("a/..", "."),
-            ("a/../..", ".."),
-            ("../a", "../a"),
-            ("a//b/./c", "a/b/c"),
-            ("/..", "/"),
-            ("..", ".."),
-            ("", "."),
-            ("./a", "a"),
-        ];
-        for (input, expect) in cases {
-            assert_eq!(
-                normpath(Path::new(input)),
-                Path::new(expect),
-                "normpath({input:?})"
-            );
-        }
-    }
-
-    /// abspath：绝对路径仅规范化，相对路径基于 cwd（不解析符号链接）
+    /// abspath：绝对路径仅规范化，相对路径基于 cwd（不解析符号链接）。
+    /// normpath 本身的用例见 crate::platform（按平台各自断言）。
     #[test]
     fn abspath_basic() {
         let cwd = std::env::current_dir().unwrap();
-        assert_eq!(abspath(Path::new("/a/./b/../c")), PathBuf::from("/a/c"));
         assert_eq!(abspath(Path::new("x/y")), cwd.join("x/y"));
-        // trailing slash 折叠
-        assert_eq!(abspath(Path::new("/tmp/a/")), PathBuf::from("/tmp/a"));
+        #[cfg(unix)]
+        {
+            assert_eq!(abspath(Path::new("/a/./b/../c")), PathBuf::from("/a/c"));
+            // trailing slash 折叠
+            assert_eq!(abspath(Path::new("/tmp/a/")), PathBuf::from("/tmp/a"));
+        }
+        #[cfg(windows)]
+        {
+            // 盘符必须保留：丢盘符会让 cat -o 打印出不可用的路径
+            assert_eq!(abspath(Path::new(r"C:\a\b\..\c")), PathBuf::from(r"C:\a\c"));
+            assert_eq!(abspath(Path::new("C:/a/./b/")), PathBuf::from(r"C:\a\b"));
+            assert!(abspath(Path::new("x/y")).is_absolute());
+        }
     }
 
-    /// OSError 风格转换
+    /// OSError 风格转换（文案按平台：Unix errno+strerror，Windows 固定 Win32 文案）
     #[test]
     fn py_os_error_format() {
         let e = std::io::Error::from_raw_os_error(2);
-        assert_eq!(
-            py_os_error(&e, Path::new("/nonexist.pak")).to_string(),
-            "[Errno 2] No such file or directory: '/nonexist.pak'"
-        );
+        #[cfg(unix)]
+        let expect = "[Errno 2] No such file or directory: '/nonexist.pak'";
+        #[cfg(windows)]
+        let expect = "[Win32 2] 系统找不到指定的文件: '/nonexist.pak'";
+        assert_eq!(py_os_error(&e, Path::new("/nonexist.pak")).to_string(), expect);
     }
 }

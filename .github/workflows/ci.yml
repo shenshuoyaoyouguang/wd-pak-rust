@@ -83,3 +83,44 @@ jobs:
           name: ${{ matrix.artifact }}
           path: out/${{ matrix.artifact }}
           if-no-files-found: error
+
+  # Windows x64：静态 CRT 单 exe（无 VC 运行库依赖），冒烟用仓库内 golden 包，
+  # 不需要 Python 与外部大包。
+  build-windows:
+    name: 编译 x86_64-pc-windows-msvc
+    needs: test
+    runs-on: windows-latest
+    env:
+      RUSTFLAGS: -C target-feature=+crt-static
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 工具链版本
+        run: rustc -vV
+
+      - name: 编译 release
+        run: cargo build --release --locked --target x86_64-pc-windows-msvc
+
+      - name: 冒烟
+        shell: pwsh
+        run: |
+          $exe = "target/x86_64-pc-windows-msvc/release/wd-pak.exe"
+          $v = & $exe --version
+          if ($v -ne "1.0") { Write-Error "版本输出不符: $v"; exit 1 }
+          & $exe check tests/golden/layout/etc_mini_nocompress.pak
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          & $exe list tests/golden/layout/etc_mini_nocompress.pak > $null
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+      - name: 按 dist/ 命名归档
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force out | Out-Null
+          Copy-Item target/x86_64-pc-windows-msvc/release/wd-pak.exe out/wd-pak-x86_64-windows.exe
+
+      - name: 上传产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: wd-pak-x86_64-windows
+          path: out/wd-pak-x86_64-windows.exe
+          if-no-files-found: error

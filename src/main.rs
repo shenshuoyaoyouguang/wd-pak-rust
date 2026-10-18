@@ -6,6 +6,7 @@
 //! 输出纯版本号 `1.0`，而 clap 自动 flag 会输出 `wd-pak 1.0`。
 
 use clap::{Parser, Subcommand};
+use std::io::Write;
 use std::path::PathBuf;
 use wd_pak::error::PakError;
 
@@ -84,7 +85,7 @@ fn main() {
     let cli = Cli::parse();
     // 对齐 argparse action='version'：解析到即打印退出（先于子命令分发）
     if cli.version {
-        println!("1.0");
+        let _ = writeln!(wd_pak::platform::stdout(), "1.0");
         return;
     }
     match cli.command {
@@ -92,7 +93,7 @@ fn main() {
         None => wd_pak::interactive::interactive(),
         Some(cmd) => {
             if let Err(e) = run(cmd) {
-                eprintln!("错误: {e}");
+                let _ = writeln!(wd_pak::platform::stderr(), "错误: {e}");
                 std::process::exit(2);
             }
         }
@@ -104,26 +105,26 @@ fn run(cmd: Command) -> Result<(), PakError> {
     use wd_pak::commands_read as cr;
     match cmd {
         Command::List { pak, long } => {
-            cr::cmd_list(&pak, long, &mut std::io::stdout().lock(), &mut std::io::stderr())
+            cr::cmd_list(&pak, long, &mut wd_pak::platform::stdout(), &mut wd_pak::platform::stderr())
         }
         Command::Find { pak, keyword } => {
-            cr::cmd_find(&pak, &keyword, &mut std::io::stdout().lock(), &mut std::io::stderr())
+            cr::cmd_find(&pak, &keyword, &mut wd_pak::platform::stdout(), &mut wd_pak::platform::stderr())
         }
         Command::Extract { pak, outdir } => {
-            cr::cmd_extract(&pak, &outdir, &mut std::io::stderr())
+            cr::cmd_extract(&pak, &outdir, &mut wd_pak::platform::stderr())
         }
         Command::Pack { indir, pak, no_compress, jobs } => {
-            wd_pak::commands_write::cmd_pack(&indir, &pak, !no_compress, jobs, &mut std::io::stderr())
+            wd_pak::commands_write::cmd_pack(&indir, &pak, !no_compress, jobs, &mut wd_pak::platform::stderr())
         }
         Command::Replace { pak, inner, newfile, no_compress, backup } => {
-            wd_pak::commands_write::cmd_replace(&pak, &inner, &newfile, !no_compress, backup, &mut std::io::stderr())
+            wd_pak::commands_write::cmd_replace(&pak, &inner, &newfile, !no_compress, backup, &mut wd_pak::platform::stderr())
         }
         Command::Cat { pak, inner, out } => {
-            cr::cmd_cat(&pak, &inner, out.as_deref(), &mut std::io::stderr())
+            cr::cmd_cat(&pak, &inner, out.as_deref(), &mut wd_pak::platform::stderr())
         }
         Command::Check { pak, deep } => {
             // check 发现问题：统计报告已写出 stdout，退出码 1（对齐 Python sys.exit(1)）
-            if cr::cmd_check(&pak, deep, &mut std::io::stdout().lock())? {
+            if cr::cmd_check(&pak, deep, &mut wd_pak::platform::stdout())? {
                 std::process::exit(1);
             }
             Ok(())

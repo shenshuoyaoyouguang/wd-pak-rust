@@ -12,12 +12,24 @@
 //! 命令逻辑 100% 复用 commands_read / commands_write，不重复实现；
 //! cmd_* 的统计/进度行仍走 err 参数（= stderr），与 CLI 一致。
 
-use std::io::{self, BufRead, Write};
+use std::io::Write;
 use std::path::Path;
+
+use crate::platform;
 
 use crate::commands_read as cr;
 use crate::commands_write as cw;
 use crate::error::PakError;
+
+/// 交互模式输出（对齐 Python print 走 stdout）。文案含中文，Windows 上由
+/// platform::stdout 转宽字符直写控制台，不受代码页影响；写失败忽略
+/// （Python 同场景抛 BrokenPipeError，这里不引入 panic）。
+macro_rules! say {
+    ($($arg:tt)*) => {{
+        let mut out = crate::platform::stdout();
+        let _ = writeln!(out, $($arg)*);
+    }};
+}
 
 /// 主菜单（Python 三引号字符串原文；print 追加换行 → 首尾均有空行）
 const MENU: &str = "\n 1) 查看包内文件列表        2) 解包到目录\n 3) 从目录打包              4) 替换包内单个文件\n 5) 导出单个文件            6) 校验 pak\n 7) 搜索文件名              0) 退出";
@@ -26,15 +38,26 @@ const MENU: &str = "\n 1) 查看包内文件列表        2) 解包到目录\n 3
 /// （顺序敏感：`"a'"` → strip('"') → `a'` → strip("'") → `a`）。
 /// prompt 无换行写出并立即 flush（对齐 input 的 prompt 特性）。
 fn ask(prompt: &str) -> String {
-    let mut out = io::stdout();
-    let _ = out.write_all(prompt.as_bytes());
-    let _ = out.flush();
-    let mut line = String::new();
-    let n = io::stdin().lock().read_line(&mut line).unwrap_or(0);
-    if n == 0 {
-        return String::new(); // EOF 对齐 EOFError → ''
+    loop {
+        {
+            let mut out = platform::stdout();
+            let _ = out.write_all(prompt.as_bytes());
+            let _ = out.flush();
+        }
+        match platform::read_line() {
+            // EOF 对齐 EOFError → ''
+            Ok(None) => return String::new(),
+            Ok(Some(line)) => {
+                return line.trim().trim_matches('"').trim_matches('\'').to_string()
+            }
+            // 编码问题（如输入被重定向且不是 UTF-8）：提示后重新询问，
+            // 不再像旧实现那样把 Err 当 EOF 直接退出程序
+            Err(msg) => {
+                let mut err = platform::stderr();
+                let _ = writeln!(err, "{msg}");
+            }
+        }
     }
-    line.trim().trim_matches('"').trim_matches('\'').to_string()
 }
 
 /// 并行压缩线程数（对齐 Python 交互模式：min(8, os.cpu_count() or 1)，不问用户）。
@@ -52,18 +75,18 @@ fn basename(s: &str) -> &str {
 
 /// 交互模式入口（Python `interactive`）。
 pub fn interactive() {
-    println!("问道 PAK 工具 v1.0 —— 交互模式");
+    say!("问道 PAK 工具 v1.0 —— 交互模式");
     loop {
-        println!("{MENU}");
+        say!("{MENU}");
         let choice = ask("请选择: ");
         if matches!(choice.as_str(), "0" | "q" | "exit" | "quit" | "") {
-            println!("已退出");
+            say!("已退出");
             return;
         }
         if let Err(e) = dispatch(&choice) {
             match &e {
-                PakError::Os(_) | PakError::Io(_) => println!("出错: {e}"),
-                _ => println!("错误: {e}"),
+                PakError::Os(_) | PakError::Io(_) => say!("出错: {e}"),
+                _ => say!("错误: {e}"),
             }
         }
     }
@@ -75,12 +98,12 @@ fn dispatch(choice: &str) -> Result<(), PakError> {
         "1" => {
             let pak = ask("pak 路径: ");
             let long = ask("显示详细信息? y/N: ").to_lowercase() == "y";
-            cr::cmd_list(Path::new(&pak), long, &mut io::stdout().lock(), &mut io::stderr())
+            cr::cmd_list(Path::new(&pak), long, &mut platform::stdout(), &mut platform::stderr())
         }
         "2" => {
             let pak = ask("pak 路径: ");
             let outdir = ask("输出目录: ");
-            cr::cmd_extract(Path::new(&pak), Path::new(&outdir), &mut io::stderr())
+            cr::cmd_extract(Path::new(&pak), Path::new(&outdir), &mut platform::stderr())
         }
         "3" => {
             let indir = ask("输入目录: ");
@@ -91,7 +114,7 @@ fn dispatch(choice: &str) -> Result<(), PakError> {
                 Path::new(&pak),
                 compress,
                 default_jobs(),
-                &mut io::stderr(),
+                &mut platform::stderr(),
             )
         }
         "4" => {
@@ -106,7 +129,7 @@ fn dispatch(choice: &str) -> Result<(), PakError> {
                 Path::new(&newfile),
                 compress,
                 true,
-                &mut io::stderr(),
+                &mut platform::stderr(),
             )
         }
         "5" => {
@@ -123,12 +146,12 @@ fn dispatch(choice: &str) -> Result<(), PakError> {
                 }
             };
             let out_opt = if out.is_empty() { None } else { Some(Path::new(&out)) };
-            cr::cmd_cat(Path::new(&pak), &inner, out_opt, &mut io::stderr())
+            cr::cmd_cat(Path::new(&pak), &inner, out_opt, &mut platform::stderr())
         }
         "6" => {
             let pak = ask("pak 路径: ");
             let deep = ask("全量解压校验(慢)? y/N: ").to_lowercase() == "y";
-            match cr::cmd_check(Path::new(&pak), deep, &mut io::stdout().lock()) {
+            match cr::cmd_check(Path::new(&pak), deep, &mut platform::stdout()) {
                 // Python cmd_check 末尾 sys.exit(1)：SystemExit 穿透交互层直接终止
                 Ok(true) => std::process::exit(1),
                 r => r.map(|_| ()),
@@ -137,10 +160,10 @@ fn dispatch(choice: &str) -> Result<(), PakError> {
         "7" => {
             let pak = ask("pak 路径: ");
             let keyword = ask("关键字: ");
-            cr::cmd_find(Path::new(&pak), &keyword, &mut io::stdout().lock(), &mut io::stderr())
+            cr::cmd_find(Path::new(&pak), &keyword, &mut platform::stdout(), &mut platform::stderr())
         }
         _ => {
-            println!("无效选择，请重试");
+            say!("无效选择，请重试");
             Ok(())
         }
     }

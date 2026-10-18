@@ -139,7 +139,7 @@ fn py_repr(v: &Value) -> String {
 fn py_oserror2(e: &io::Error, from: &Path, to: &Path) -> String {
     format!(
         "{}: {} -> {}",
-        crate::commands_read::py_errno_msg(e),
+        crate::platform::io_message(e),
         py_str_repr(&from.display().to_string()),
         py_str_repr(&to.display().to_string())
     )
@@ -741,14 +741,24 @@ fn write_to_tmp(
         // serialize 内部 IO 错误统一包为写出失败（DataOob 保留原变体）
         PakError::Io(io) => PakError::Manifest(format!(
             "写出 pak 失败: {}",
-            crate::commands_read::py_errno_msg(&io)
+            crate::platform::io_message(&io)
         )),
         other => other,
     })?;
     w.flush().map_err(write_io_err)?;
     drop(w);
+    // 显式释放源 pak 句柄再 rename：Windows 上替换被本进程打开的文件依赖
+    // 共享删除语义，不能指望 rename 自己处理（release 模式下句柄存活到这里）
+    drop(src);
     std::fs::rename(tmp, out_path).map_err(|e| {
-        PakError::Manifest(format!("写出 pak 失败: {}", py_oserror2(&e, tmp, out_path)))
+        if crate::platform::is_sharing_violation(&e, out_path) {
+            PakError::Manifest(format!(
+                "写出 pak 失败: 目标文件被其他程序占用或不可写: {}",
+                py_str_repr(&out_path.display().to_string())
+            ))
+        } else {
+            PakError::Manifest(format!("写出 pak 失败: {}", py_oserror2(&e, tmp, out_path)))
+        }
     })?;
     Ok(())
 }
@@ -757,7 +767,7 @@ fn write_to_tmp(
 fn write_io_err(e: io::Error) -> PakError {
     PakError::Manifest(format!(
         "写出 pak 失败: {}",
-        crate::commands_read::py_errno_msg(&e)
+        crate::platform::io_message(&e)
     ))
 }
 
@@ -999,12 +1009,23 @@ mod tests {
 
     #[test]
     fn py_oserror_format() {
-        let e = io::Error::from_raw_os_error(21);
-
-        assert_eq!(
-            py_oserror2(&e, Path::new("a.tmp"), Path::new("a")),
-            "[Errno 21] Is a directory: 'a.tmp' -> 'a'"
-        );
+        // 双 filename 形态：文案部分由平台层决定，这里固定「码 + repr 路径对」
+        #[cfg(unix)]
+        {
+            let e = io::Error::from_raw_os_error(21);
+            assert_eq!(
+                py_oserror2(&e, Path::new("a.tmp"), Path::new("a")),
+                "[Errno 21] Is a directory: 'a.tmp' -> 'a'"
+            );
+        }
+        #[cfg(windows)]
+        {
+            let e = io::Error::from_raw_os_error(183);
+            assert_eq!(
+                py_oserror2(&e, Path::new("a.tmp"), Path::new("a")),
+                "[Win32 183] 当文件已存在时，无法创建该文件: 'a.tmp' -> 'a'"
+            );
+        }
     }
 
     /// 空目录怪癖：相邻空目录共享 offset（node_size=0 不推进 running）。

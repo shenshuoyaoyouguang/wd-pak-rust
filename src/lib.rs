@@ -13,6 +13,7 @@
 
 pub mod error;
 pub mod format;
+pub mod platform;
 pub mod interactive; // 任务 7
 pub mod lzss;
 pub mod pak;

@@ -84,7 +84,8 @@ pub enum PakError {
     #[error("{0}")]
     Os(String),
 
-    /// IO 错误
-    #[error("{0}")]
+    /// IO 错误（消息格式统一由平台层决定：Unix `[Errno n] strerror`，
+    /// Windows `[Win32 n] 固定文案`）
+    #[error("{}", crate::platform::io_message(.0))]
     Io(#[from] std::io::Error),
 }
