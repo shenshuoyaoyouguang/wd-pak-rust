@@ -1,0 +1,112 @@
+{
+ "pak": "etc_mini",
+ "order": [
+  "100heis.list",
+  "Font1.ttf",
+  "Font2.ttf",
+  "ac_combat_answer.c",
+  "account_question.list",
+  "aiwo_zhonghua.list",
+  "aiwo_zhonghua_test.list",
+  "amend.list",
+  "basic_book.list",
+  "boss_template.list",
+  "libao007.list",
+  "luck_magic_special.list",
+  "task_score.list",
+  "zuanshi -test.list",
+  "zzz10001.list"
+ ],
+ "files": {
+  "100heis.list": {
+   "attrib": 0,
+   "mtime": 0,
+   "stored": 1506,
+   "orig": 7291
+  },
+  "Font1.ttf": {
+   "attrib": 0,
+   "mtime": 0,
+   "stored": 18018,
+   "orig": 22680
+  },
+  "Font2.ttf": {
+   "attrib": 0,
+   "mtime": 0,
+   "stored": 19862,
+   "orig": 24932
+  },
+  "ac_combat_answer.c": {
+   "attrib": 0,
+   "mtime": 0,
+   "stored": 342,
+   "orig": 610
+  },
+  "account_question.list": {
+   "attrib": 0,
+   "mtime": 0,
+   "stored": 2412,
+   "orig": 6948
+  },
+  "aiwo_zhonghua.list": {
+   "attrib": 0,
+   "mtime": 0,
+   "stored": 512,
+   "orig": 823
+  },
+  "aiwo_zhonghua_test.list": {
+   "attrib": 0,
+   "mtime": 0,
+   "stored": 510,
+   "orig": 823
+  },
+  "amend.list": {
+   "attrib": 0,
+   "mtime": 0,
+   "stored": 3493,
+   "orig": 7784
+  },
+  "basic_book.list": {
+   "attrib": 0,
+   "mtime": 0,
+   "stored": 18,
+   "orig": 16
+  },
+  "boss_template.list": {
+   "attrib": 0,
+   "mtime": 0,
+   "stored": 45397,
+   "orig": 261917
+  },
+  "libao007.list": {
+   "attrib": 0,
+   "mtime": 0,
+   "stored": 30520,
+   "orig": 233462
+  },
+  "luck_magic_special.list": {
+   "attrib": 0,
+   "mtime": 0,
+   "stored": 9,
+   "orig": 8
+  },
+  "task_score.list": {
+   "attrib": 0,
+   "mtime": 0,
+   "stored": 0,
+   "orig": 0
+  },
+  "zuanshi -test.list": {
+   "attrib": 0,
+   "mtime": 0,
+   "stored": 1229,
+   "orig": 5284
+  },
+  "zzz10001.list": {
+   "attrib": 0,
+   "mtime": 0,
+   "stored": 8548,
+   "orig": 60535
+  }
+ }
+}

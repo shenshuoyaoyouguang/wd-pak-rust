@@ -1,0 +1,2308 @@
+#FORM2
+#wzhuang.list
+#create by caijz 09/18/2006
+#奖励物品        概率
+
+[奖励等级]
+name$: 特等奖
+[特等奖]
+仙器时装奖励1 : 100
+仙器时装奖励2 : 100
+仙器时装奖励3 : 100
+仙器时装奖励4 : 100
+仙器时装奖励5 : 100
+仙器时装奖励6 : 100
+仙器时装奖励7 : 100
+仙器时装奖励8 : 100
+仙器时装奖励9 : 100
+仙器时装奖励10 : 100
+仙器时装奖励11 : 100
+仙器时装奖励12 : 100
+仙器时装奖励13 : 100
+仙器时装奖励14 : 100
+仙器时装奖励15 : 100
+仙器时装奖励16 : 100
+仙器时装奖励17 : 100
+仙器时装奖励18 : 100
+仙器时装奖励19 : 100
+仙器时装奖励20 : 100
+仙器时装奖励21 : 100
+仙器时装奖励22 : 100
+仙器时装奖励23 : 100
+仙器时装奖励24 : 100
+仙器时装奖励25 : 100
+仙器时装奖励26 : 100
+仙器时装奖励27 : 100
+仙器时装奖励28 : 100
+仙器时装奖励29 : 100
+仙器时装奖励30 : 100
+仙器时装奖励31 : 100
+仙器时装奖励32 : 100
+仙器时装奖励33 : 100
+仙器时装奖励34 : 100
+仙器时装奖励35 : 100
+仙器时装奖励36 : 100
+仙器时装奖励37 : 100
+仙器时装奖励38 : 100
+仙器时装奖励39 : 100
+仙器时装奖励40 : 100
+仙器时装奖励41 : 100
+仙器时装奖励42 : 100
+仙器时装奖励43 : 100
+仙器时装奖励44 : 100
+仙器时装奖励45 : 100
+仙器时装奖励46 : 100
+仙器时装奖励47 : 100
+仙器时装奖励48 : 100
+仙器时装奖励49 : 100
+仙器时装奖励50 : 100
+仙器时装奖励51 : 100
+仙器时装奖励52 : 100
+仙器时装奖励53 : 100
+仙器时装奖励54 : 100
+仙器时装奖励55 : 100
+仙器时装奖励56 : 100
+仙器时装奖励57 : 100
+仙器时装奖励58 : 100
+仙器时装奖励59 : 100
+仙器时装奖励60 : 100
+仙器时装奖励61 : 100
+仙器时装奖励62 : 100
+仙器时装奖励63 : 100
+仙器时装奖励64 : 100
+仙器时装奖励65 : 100
+仙器时装奖励66 : 100
+仙器时装奖励67 : 100
+仙器时装奖励68 : 100
+仙器时装奖励69 : 100
+仙器时装奖励70 : 100
+仙器时装奖励71 : 100
+仙器时装奖励72 : 100
+仙器时装奖励73 : 100
+仙器时装奖励74 : 100
+仙器时装奖励75 : 100
+仙器时装奖励76 : 100
+仙器时装奖励77 : 100
+仙器时装奖励78 : 100
+仙器时装奖励79 : 100
+仙器时装奖励80 : 100
+仙器时装奖励81 : 100
+仙器时装奖励82 : 100
+仙器时装奖励83 : 100
+仙器时装奖励84 : 100
+仙器时装奖励85 : 100
+仙器时装奖励86 : 100
+仙器时装奖励87 : 100
+仙器时装奖励88 : 100
+仙器时装奖励89 : 100
+仙器时装奖励90 : 100
+仙器时装奖励91 : 100
+仙器时装奖励92 : 100
+仙器时装奖励93 : 100
+仙器时装奖励94 : 100
+仙器时装奖励95 : 100
+仙器时装奖励96 : 100
+仙器时装奖励97 : 100
+仙器时装奖励98 : 100
+仙器时装奖励99 : 100
+仙器时装奖励100 : 100
+仙器时装奖励101 : 100
+仙器时装奖励102 : 100
+仙器时装奖励103 : 100
+仙器时装奖励104 : 100
+仙器时装奖励105 : 100
+仙器时装奖励106 : 100
+仙器时装奖励107 : 100
+仙器时装奖励108 : 100
+仙器时装奖励109 : 100
+仙器时装奖励110 : 100
+仙器时装奖励111 : 100
+仙器时装奖励112 : 100
+仙器时装奖励113 : 100
+仙器时装奖励114 : 100
+仙器时装奖励115 : 100
+仙器时装奖励116 : 100
+仙器时装奖励117 : 100
+仙器时装奖励118 : 100
+仙器时装奖励119 : 100
+仙器时装奖励120 : 100
+仙器时装奖励121 : 100
+仙器时装奖励122 : 100
+仙器时装奖励123 : 100
+仙器时装奖励124 : 100
+仙器时装奖励125 : 100
+仙器时装奖励126 : 100
+仙器时装奖励127 : 100
+仙器时装奖励128 : 100
+仙器时装奖励129 : 100
+仙器时装奖励130 : 100
+仙器时装奖励131 : 100
+仙器时装奖励132 : 100
+仙器时装奖励133 : 100
+仙器时装奖励134 : 100
+仙器时装奖励135 : 100
+仙器时装奖励136 : 100
+仙器时装奖励137 : 100
+仙器时装奖励138 : 100
+仙器时装奖励139 : 100
+仙器时装奖励140 : 100
+仙器时装奖励141 : 100
+仙器时装奖励142 : 100
+仙器时装奖励143 : 100
+仙器时装奖励144 : 100
+仙器时装奖励145 : 100
+仙器时装奖励146 : 100
+仙器时装奖励147 : 100
+仙器时装奖励148 : 100
+仙器时装奖励149 : 100
+仙器时装奖励150 : 100
+仙器时装奖励151 : 100
+仙器时装奖励152 : 100
+仙器时装奖励153 : 100
+仙器时装奖励154 : 100
+仙器时装奖励155 : 100
+仙器时装奖励156 : 100
+仙器时装奖励157 : 100
+仙器时装奖励158 : 100
+仙器时装奖励159 : 100
+仙器时装奖励160 : 100
+仙器时装奖励161 : 100
+仙器时装奖励162 : 100
+仙器时装奖励163 : 100
+仙器时装奖励164 : 100
+仙器时装奖励165 : 100
+仙器时装奖励166 : 100
+仙器时装奖励167 : 100
+仙器时装奖励168 : 100
+仙器时装奖励169 : 100
+仙器时装奖励170 : 100
+仙器时装奖励171 : 100
+仙器时装奖励172 : 100
+仙器时装奖励173 : 100
+仙器时装奖励174 : 100
+仙器时装奖励175 : 100
+仙器时装奖励176 : 100
+仙器时装奖励177 : 100
+仙器时装奖励178 : 100
+仙器时装奖励179 : 100
+仙器时装奖励180 : 100
+仙器时装奖励181 : 100
+仙器时装奖励182 : 100
+仙器时装奖励183 : 100
+仙器时装奖励184 : 100
+仙器时装奖励185 : 100
+仙器时装奖励186 : 100
+仙器时装奖励187 : 100
+仙器时装奖励188 : 100
+仙器时装奖励189 : 100
+仙器时装奖励190 : 100
+仙器时装奖励191 : 100
+仙器时装奖励192 : 100
+仙器时装奖励193 : 100
+仙器时装奖励194 : 100
+仙器时装奖励195 : 100
+仙器时装奖励196 : 100
+仙器时装奖励197 : 100
+仙器时装奖励198 : 100
+仙器时装奖励199 : 100
+仙器时装奖励200 : 100
+仙器时装奖励201 : 100
+仙器时装奖励202 : 100
+仙器时装奖励203 : 100
+仙器时装奖励204 : 100
+仙器时装奖励205 : 100
+仙器时装奖励206 : 100
+仙器时装奖励207 : 100
+仙器时装奖励208 : 100
+仙器时装奖励209 : 100
+仙器时装奖励210 : 100
+仙器时装奖励211 : 100
+仙器时装奖励212 : 100
+仙器时装奖励213 : 100
+仙器时装奖励214 : 100
+仙器时装奖励215 : 100
+仙器时装奖励216 : 100
+仙器时装奖励217 : 100
+仙器时装奖励218 : 100
+仙器时装奖励219 : 100
+仙器时装奖励220 : 100
+仙器时装奖励221 : 100
+仙器时装奖励222 : 100
+仙器时装奖励223 : 100
+仙器时装奖励224 : 100
+仙器时装奖励225 : 100
+仙器时装奖励226 : 100
+仙器时装奖励227 : 100
+仙器时装奖励228 : 100
+仙器时装奖励229 : 100
+
+
+
+[仙器时装奖励1]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森1" })
+
+[雅森1]
+name     : 乘风破浪·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/str", 5,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励2]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森2" })
+
+[雅森2]
+name     : 乘风破浪·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/str", 8,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励3]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森3" })
+
+[雅森3]
+name     : 乘风破浪·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/str", 10,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励4]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森4" })
+
+[雅森4]
+name     : 乘风破浪·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/str", 15,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励5]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森5" })
+
+[雅森5]
+name     : 乘风破浪·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/str", 40,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励6]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森6" })
+
+[雅森6]
+name     : 乘风破浪·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/str", 28,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励7]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森7" })
+
+[雅森7]
+name     : 乘风破浪·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/str", 17,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励8]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森8" })
+
+[雅森8]
+name     : 乘风破浪·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/str", 90,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励9]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森9" })
+
+[雅森9]
+name     : 乘风破浪·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/str", 27,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励10]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森10" })
+
+[雅森10]
+name     : 乘风破浪·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/str", 100,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励11]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森11" })
+
+[雅森11]
+name     : 乘风破浪·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/str", 19,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励12]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森12" })
+
+[雅森12]
+name     : 乘风破浪·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 1, "prop3/str", 17,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励13]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森13" })
+
+[雅森13]
+name     : 夏日派对·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 1, "prop3/str", 20,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励14]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森14" })
+
+[雅森14]
+name     : 夏日派对·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 1, "prop3/str", 38,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励15]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森15" })
+
+[雅森15]
+name     : 夏日派对·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 2, "prop3/str", 1,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励16]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森16" })
+
+[雅森16]
+name     : 夏日派对·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 1, "prop3/str", 50,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励17]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森17" })
+
+[雅森17]
+name     : 夏日派对·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 4, "prop3/str", 70,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励18]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森18" })
+
+
+[雅森18]
+name     : 夏日派对·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 1, "prop3/str", 5,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励19]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森19" })
+
+[雅森19]
+name     : 夏日派对·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 3, "prop3/str", 16,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励20]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森20" })
+
+[雅森20]
+name     : 乘风破浪·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 1, "prop3/str", 12,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励21]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森21" })
+
+[雅森21]
+name     : 夏日派对·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 2, "prop3/str", 11,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励22]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森22" })
+
+[雅森22]
+name     : 夏日派对·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 3, "prop3/dex", 40, "prop3/wiz", 17,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励23]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森23" })
+
+[雅森23]
+name     : 夏日派对·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 10, "prop3/dex", 15, "prop3/wiz", 80,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励24]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森24" })
+
+[雅森24]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 6, "prop3/dex", 10, "prop3/wiz", 15,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励25]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森25" })
+
+[雅森25]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 2, "prop3/dex", 70, "prop3/wiz", 16,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励26]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森26" })
+
+[雅森26]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 5, "prop3/dex", 30, "prop3/wiz", 12,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励27]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森27" })
+
+[雅森27]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 8, "prop3/dex", 80, "prop3/wiz", 15,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励28]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森28" })
+
+[雅森28]
+name     : 雀羽极
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 10, "prop3/dex", 120, "prop3/wiz", 74,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励29]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森29" })
+
+[雅森29]
+name     : 雀羽极
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 2, "prop3/dex", 66, "prop3/wiz", 83,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励30]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森30" })
+
+[雅森30]
+name     : 雀羽极
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 3, "prop3/dex", 14, "prop3/wiz", 12,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励31]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森31" })
+
+[雅森31]
+name     : 雀羽翎
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 4, "prop3/dex", 90, "prop3/wiz", 140,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励32]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森32" })
+
+[雅森32]
+name     : 雀羽翎
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 3, "prop3/metal", 1,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励33]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森33" })
+
+[雅森33]
+name     : 雀羽翎
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 5, "prop3/metal", 7,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励34]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森34" })
+
+[雅森34]
+name     : 山藏嗨
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 2, "prop3/metal", 4,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励35]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森35" })
+
+[雅森35]
+name     : 山藏嗨
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 9, "prop3/metal", 8,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励36]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森36" })
+
+[雅森36]
+name     : 山藏嗨
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 4, "prop3/metal", 6,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励37]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森37" })
+
+[雅森37]
+name     : 水牧云
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 10, "prop3/metal", 10,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励38]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森38" })
+
+[雅森38]
+name     : 水牧云
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 5, "prop3/metal", 4,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励39]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森39" })
+
+[雅森39]
+name     : 水牧云
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 3, "prop3/metal", 7,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励40]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森40" })
+
+[雅森40]
+name     : 水牧云
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 2, "prop3/metal", 10,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励41]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森41" })
+
+[雅森41]
+name     : 水牧云
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 6, "prop3/metal", 3,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励42]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森42" })
+
+[雅森42]
+name     : 望月白
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 2, "prop3/wood", 7,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励43]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森43" })
+
+[雅森43]
+name     : 望月白
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 3, "prop3/wood", 5,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励44]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森44" })
+
+[雅森44]
+name     : 望月白
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 6, "prop3/wood", 7,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励45]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森45" })
+
+[雅森45]
+name     : 望月白
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 4, "prop3/wood", 12,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励46]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森46" })
+
+[雅森46]
+name     : 望月白
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 4, "prop3/wood", 1,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励47]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森47" })
+
+[雅森47]
+name     : 霜夜雪
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 8, "prop3/wood", 7,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励48]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森48" })
+
+[雅森48]
+name     : 霜夜雪
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 4, "prop3/wood", 3,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励49]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森49" })
+
+[雅森49]
+name     : 霜夜雪
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 10, "prop3/wood", 10,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励50]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森50" })
+
+[雅森50]
+name     : 霜夜雪
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 7, "prop3/wood", 3,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励51]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森51" })
+
+[雅森51]
+name     : 霜夜雪
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 5, "prop3/wood", 4,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励52]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森52" })
+
+[雅森52]
+name     : 霜夜雪
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 2, "prop3/fire", 8,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励53]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森53" })
+
+[雅森53]
+name     : 风清扬
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 6, "prop3/fire", 1,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励54]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森54" })
+
+[雅森54]
+name     : 风清扬
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 4, "prop3/fire", 1,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励55]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森55" })
+
+[雅森55]
+name     : 风清扬
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 10, "prop3/fire", 3,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励56]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森56" })
+
+[雅森56]
+name     : 风清扬
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 2, "prop3/fire", 10,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励57]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森57" })
+
+[雅森57]
+name     : 风清扬
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 7, "prop3/fire", 4,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励58]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森58" })
+
+[雅森58]
+name     : 风清扬
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 2, "prop3/fire", 4,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励59]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森59" })
+
+[雅森59]
+name     : 碧珠玉
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 7, "prop3/fire", 4,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励60]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森60" })
+
+[雅森60]
+name     : 碧珠玉
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 5, "prop3/fire", 1,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励61]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森61" })
+
+[雅森61]
+name     : 碧珠玉
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 3, "prop3/fire", 14,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励62]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森62" })
+
+[雅森62]
+name     : 碧珠玉
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 1, "prop3/metal", 1, "prop3/dex", 10, "prop3/wiz", 10, "prop3/str", 10, "prop3/all_attrib", 10,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励63]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森63" })
+
+[雅森63]
+name     : 碧珠玉
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 2, "prop3/metal", 2, "prop3/dex", 20, "prop3/wiz", 20, "prop3/str", 20, "prop3/all_attrib", 20,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励64]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森64" })
+
+[雅森64]
+name     : 碧珠玉
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 3, "prop3/metal", 3, "prop3/dex", 30, "prop3/wiz", 30, "prop3/str", 30, "prop3/all_attrib", 30,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励65]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森65" })
+
+[雅森65]
+name     : 乘风破浪·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 4, "prop3/metal", 4, "prop3/dex", 40, "prop3/wiz", 40, "prop3/str", 40, "prop3/all_attrib", 40,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励66]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森66" })
+
+[雅森66]
+name     : 乘风破浪·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 5, "prop3/metal", 5, "prop3/dex", 50, "prop3/wiz", 50, "prop3/str", 50, "prop3/all_attrib", 50,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励67]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森67" })
+
+[雅森67]
+name     : 乘风破浪·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 6, "prop3/metal", 6, "prop3/dex", 60, "prop3/wiz", 60, "prop3/str", 60, "prop3/all_attrib", 60,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励68]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森68" })
+
+[雅森68]
+name     : 乘风破浪·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 7, "prop3/metal", 7, "prop3/dex", 70, "prop3/wiz", 70, "prop3/str", 70, "prop3/all_attrib", 70,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励69]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森69" })
+
+[雅森69]
+name     : 乘风破浪·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 8, "prop3/metal", 8, "prop3/dex", 80, "prop3/wiz", 80, "prop3/str", 80, "prop3/all_attrib", 80,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励70]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森70" })
+
+[雅森70]
+name     : 乘风破浪·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 9, "prop3/metal", 9, "prop3/dex", 90, "prop3/wiz", 90, "prop3/str", 90, "prop3/all_attrib", 90,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励71]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森71" })
+
+[雅森71]
+name     : 乘风破浪·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 10, "prop3/metal", 10, "prop3/dex", 100, "prop3/wiz", 100, "prop3/str", 100, "prop3/all_attrib", 100,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励72]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森72" })
+
+[雅森72]
+name     : 夏日派对·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 11, "prop3/metal", 11, "prop3/dex", 110, "prop3/wiz", 110, "prop3/str", 110, "prop3/all_attrib", 110,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励73]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森73" })
+
+[雅森73]
+name     : 夏日派对·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 12, "prop3/metal", 12, "prop3/dex", 120, "prop3/wiz", 120, "prop3/str", 120, "prop3/all_attrib", 120,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励74]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森74" })
+
+[雅森74]
+name     : 夏日派对·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 13, "prop3/metal", 13, "prop3/dex", 130, "prop3/wiz", 130, "prop3/str", 130, "prop3/all_attrib", 130,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励75]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森75" })
+
+[雅森75]
+name     : 夏日派对·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 14, "prop3/metal", 14, "prop3/dex", 140, "prop3/wiz", 140, "prop3/str", 140, "prop3/all_attrib", 140,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励76]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森76" })
+
+[雅森76]
+name     : 夏日派对·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 15, "prop3/metal", 15, "prop3/dex", 150, "prop3/wiz", 150, "prop3/str", 150, "prop3/all_attrib", 150,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励77]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森77" })
+
+[雅森77]
+name     : 夏日派对·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 1, "prop3/wood", 1, "prop3/dex", 10, "prop3/wiz", 10, "prop3/str", 10, "prop3/all_attrib", 10,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励78]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森78" })
+
+[雅森78]
+name     : 夏日派对·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 2, "prop3/wood", 2, "prop3/dex", 20, "prop3/wiz", 20, "prop3/str", 20, "prop3/all_attrib", 20,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励79]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森79" })
+
+[雅森79]
+name     : 夏日派对·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 3, "prop3/wood", 3, "prop3/dex", 30, "prop3/wiz", 30, "prop3/str", 30, "prop3/all_attrib", 30,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励80]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森80" })
+
+[雅森80]
+name     : 夏日派对·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 4, "prop3/wood", 4, "prop3/dex", 40, "prop3/wiz", 40, "prop3/str", 40, "prop3/all_attrib", 40,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励81]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森81" })
+
+[雅森81]
+name     : 夏日派对·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 5, "prop3/wood", 5, "prop3/dex", 50, "prop3/wiz", 50, "prop3/str", 50, "prop3/all_attrib", 50,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励82]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森82" })
+
+[雅森82]
+name     : 夏日派对·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 6, "prop3/wood", 6, "prop3/dex", 60, "prop3/wiz", 60, "prop3/str", 60, "prop3/all_attrib", 60,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励83]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森83" })
+
+[雅森83]
+name     : 夏日派对·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 7, "prop3/wood", 7, "prop3/dex", 70, "prop3/wiz", 70, "prop3/str", 70, "prop3/all_attrib", 70,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励84]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森84" })
+
+[雅森84]
+name     : 夏日派对·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 8, "prop3/wood", 8, "prop3/dex", 80, "prop3/wiz", 80, "prop3/str", 80, "prop3/all_attrib", 80,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励85]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森85" })
+
+[雅森85]
+name     : 夏日派对·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 9, "prop3/wood", 9, "prop3/dex", 90, "prop3/wiz", 90, "prop3/str", 90, "prop3/all_attrib", 90,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励86]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森86" })
+
+[雅森86]
+name     : 夏日派对·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 10, "prop3/wood", 10, "prop3/dex", 100, "prop3/wiz", 100, "prop3/str", 100, "prop3/all_attrib", 100,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励87]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森87" })
+
+[雅森87]
+name     : 夏日派对·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 11, "prop3/wood", 11, "prop3/dex", 110, "prop3/wiz", 110, "prop3/str", 110, "prop3/all_attrib", 110,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励88]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森88" })
+
+[雅森88]
+name     : 夏日派对·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 12, "prop3/wood", 12, "prop3/dex", 120, "prop3/wiz", 120, "prop3/str", 120, "prop3/all_attrib", 120,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励89]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森89" })
+
+[雅森89]
+name     : 夏日派对·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 13, "prop3/wood", 13, "prop3/dex", 130, "prop3/wiz", 130, "prop3/str", 130, "prop3/all_attrib", 130,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励90]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森90" })
+
+[雅森90]
+name     : 夏日派对·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 14, "prop3/wood", 14, "prop3/dex", 140, "prop3/wiz", 140, "prop3/str", 140, "prop3/all_attrib", 140,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励91]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森91" })
+
+[雅森91]
+name     : 夏日派对·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 15, "prop3/wood", 15, "prop3/dex", 150, "prop3/wiz", 150, "prop3/str", 150, "prop3/all_attrib", 150,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励92]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森92" })
+
+[雅森92]
+name     : 夏日派对·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 1, "prop3/fire", 1, "prop3/dex", 10, "prop3/wiz", 10, "prop3/str", 10, "prop3/all_attrib", 10,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励93]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森93" })
+
+[雅森93]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 2, "prop3/fire", 2, "prop3/dex", 20, "prop3/wiz", 20, "prop3/str", 20, "prop3/all_attrib", 20,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励94]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森94" })
+
+[雅森94]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 3, "prop3/fire", 3, "prop3/dex", 30, "prop3/wiz", 30, "prop3/str", 30, "prop3/all_attrib", 30,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励95]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森95" })
+
+[雅森95]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 4, "prop3/fire", 4, "prop3/dex", 40, "prop3/wiz", 40, "prop3/str", 40, "prop3/all_attrib", 40,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励96]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森96" })
+
+[雅森96]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 5, "prop3/fire", 5, "prop3/dex", 50, "prop3/wiz", 50, "prop3/str", 50, "prop3/all_attrib", 50,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励97]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森97" })
+
+[雅森97]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 6, "prop3/fire", 6, "prop3/dex", 60, "prop3/wiz", 60, "prop3/str", 60, "prop3/all_attrib", 60,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励98]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森98" })
+
+[雅森98]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 7, "prop3/fire", 7, "prop3/dex", 70, "prop3/wiz", 70, "prop3/str", 70, "prop3/all_attrib", 70,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励99]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森99" })
+
+[雅森99]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 8, "prop3/fire", 8, "prop3/dex", 80, "prop3/wiz", 80, "prop3/str", 80, "prop3/all_attrib", 80,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励100]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森100" })
+
+[雅森100]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 9, "prop3/fire", 9, "prop3/dex", 90, "prop3/wiz", 90, "prop3/str", 90, "prop3/all_attrib", 90,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励101]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森101" })
+
+[雅森101]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 10, "prop3/fire", 10, "prop3/dex", 100, "prop3/wiz", 100, "prop3/str", 100, "prop3/all_attrib", 100,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励102]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森102" })
+
+[雅森102]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 11, "prop3/fire", 11, "prop3/dex", 110, "prop3/wiz", 110, "prop3/str", 110, "prop3/all_attrib", 110,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励103]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森103" })
+
+[雅森103]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 12, "prop3/fire", 12, "prop3/dex", 120, "prop3/wiz", 120, "prop3/str", 120, "prop3/all_attrib", 120,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励104]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森104" })
+
+[雅森104]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 13, "prop3/fire", 13, "prop3/dex", 130, "prop3/wiz", 130, "prop3/str", 130, "prop3/all_attrib", 130,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励105]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森105" })
+
+
+[雅森105]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 14, "prop3/fire", 14, "prop3/dex", 140, "prop3/wiz", 140, "prop3/str", 140, "prop3/all_attrib", 140,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励106]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森106" })
+
+[雅森106]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 15, "prop3/fire", 15, "prop3/dex", 150, "prop3/wiz", 150, "prop3/str", 150, "prop3/all_attrib", 150,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励107]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森107" })
+
+[雅森107]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 1, "prop3/earth", 1, "prop3/dex", 10, "prop3/wiz", 10, "prop3/str", 10, "prop3/all_attrib", 10,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励108]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森108" })
+
+[雅森108]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 2, "prop3/earth", 2, "prop3/dex", 20, "prop3/wiz", 20, "prop3/str", 20, "prop3/all_attrib", 20,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励109]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森109" })
+
+[雅森109]
+name     : 雀羽极
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 3, "prop3/earth", 3, "prop3/dex", 30, "prop3/wiz", 30, "prop3/str", 30, "prop3/all_attrib", 30,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励110]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森110" })
+
+[雅森110]
+name     : 雀羽极
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 4, "prop3/earth", 4, "prop3/dex", 40, "prop3/wiz", 40, "prop3/str", 40, "prop3/all_attrib", 40,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励111]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森"111 })
+
+[雅森111]
+name     : 雀羽极
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 5, "prop3/earth", 5, "prop3/dex", 50, "prop3/wiz", 50, "prop3/str", 50, "prop3/all_attrib", 50,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励112]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森112" })
+
+[雅森112]
+name     : 雀羽极
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 6, "prop3/earth", 6, "prop3/dex", 60, "prop3/wiz", 60, "prop3/str", 60, "prop3/all_attrib", 60,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励113]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森113" })
+
+[雅森113]
+name     : 雀羽极
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 7, "prop3/earth", 7, "prop3/dex", 70, "prop3/wiz", 70, "prop3/str", 70, "prop3/all_attrib", 70,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励114]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森114" })
+
+[雅森114]
+name     : 雀羽极
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 8, "prop3/earth", 8, "prop3/dex", 80, "prop3/wiz", 80, "prop3/str", 80, "prop3/all_attrib", 80,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励115]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森115" })
+
+[雅森115]
+name     : 雀羽极
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 9, "prop3/earth", 9, "prop3/dex", 90, "prop3/wiz", 90, "prop3/str", 90, "prop3/all_attrib", 90,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励116]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森116" })
+
+[雅森116]
+name     : 雀羽极
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 10, "prop3/earth", 10, "prop3/dex", 100, "prop3/wiz", 100, "prop3/str", 100, "prop3/all_attrib", 100,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励117]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森117" })
+
+[雅森117]
+name     : 雀羽极
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 11, "prop3/earth", 11, "prop3/dex", 110, "prop3/wiz", 110, "prop3/str", 110, "prop3/all_attrib", 110,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励118]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森118" })
+
+[雅森118]
+name     : 雀羽极
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 12, "prop3/earth", 12, "prop3/dex", 120, "prop3/wiz", 120, "prop3/str", 120, "prop3/all_attrib", 120,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励119]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森119" })
+
+[雅森119]
+name     : 雀羽翎
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 13, "prop3/earth", 13, "prop3/dex", 130, "prop3/wiz", 130, "prop3/str", 130, "prop3/all_attrib", 130,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励120]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森120" })
+
+[雅森120]
+name     : 雀羽翎
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 14, "prop3/earth", 14, "prop3/dex", 140, "prop3/wiz", 140, "prop3/str", 140, "prop3/all_attrib", 140,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励121]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森121" })
+
+[雅森121]
+name     : 雀羽翎
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 15, "prop3/earth", 15, "prop3/dex", 150, "prop3/wiz", 150, "prop3/str", 150, "prop3/all_attrib", 150,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励122]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森122" })
+
+[雅森122]
+name     : 雀羽翎
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 7,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励123]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森123" })
+
+[雅森123]
+name     : 雀羽翎
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 12,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励124]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森124" })
+
+[雅森124]
+name     : 雀羽翎
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 16,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励125]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森125" })
+
+[雅森125]
+name     : 雀羽翎
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 18,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励126]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森126" })
+
+[雅森126]
+name     : 雀羽翎
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 70,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励127]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森127" })
+
+[雅森127]
+name     : 雀羽翎
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 19,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励128]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森128" })
+
+[雅森128]
+name     : 雀羽翎
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 30,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励129]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森129" })
+
+[雅森129]
+name     : 雀羽翎
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 20,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励130]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森130" })
+
+[雅森130]
+name     : 雀羽翎
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 90,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励131]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森131" })
+
+[雅森131]
+name     : 雀羽翎
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 67,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励132]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森132" })
+
+[雅森132]
+name     : 雀羽翎
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 43,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励133]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森133" })
+
+[雅森133]
+name     : 山藏嗨
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 16,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励134]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森134" })
+
+[雅森134]
+name     : 山藏嗨
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 13,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励135]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森135" })
+
+[雅森135]
+name     : 山藏嗨
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 100,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励136]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森136" })
+
+[雅森136]
+name     : 山藏嗨
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 110,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励137]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森137" })
+
+[雅森137]
+name     : 山藏嗨
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 7,"dex", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励138]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森138" })
+
+[雅森138]
+name     : 山藏嗨
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 12,"dex", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励139]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森139" })
+
+[雅森139]
+name     : 山藏嗨
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 16,"dex", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励140]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森140" })
+
+[雅森140]
+name     : 山藏嗨
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 18,"dex", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励141]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森141" })
+
+[雅森141]
+name     : 山藏嗨
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 70,"dex", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励142]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森142" })
+
+[雅森142]
+name     : 山藏嗨
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 19,"dex", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励143]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森143" })
+
+[雅森143]
+name     : 山藏嗨
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 30,"dex", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励144]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森144" })
+
+[雅森144]
+name     : 水牧云
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 20,"dex", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励145]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森145" })
+
+[雅森145]
+name     : 水牧云
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 90,"dex", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励146]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森146" })
+
+[雅森146]
+name     : 水牧云
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 67,"dex", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励147]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森147" })
+
+[雅森147]
+name     : 水牧云
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 43,"dex", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励148]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森148" })
+
+[雅森148]
+name     : 水牧云
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 16,"dex", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励149]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森149" })
+
+[雅森149]
+name     : 水牧云
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 13,"dex", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励150]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森150" })
+
+[雅森150]
+name     : 望月白
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 100,"dex", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励151]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森151" })
+
+[雅森151]
+name     : 望月白
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 110,"dex", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励152]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森152" })
+
+[雅森152]
+name     : 望月白
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 7,"str", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励153]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森153" })
+
+[雅森153]
+name     : 望月白
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 12,"str", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励154]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森154" })
+
+[雅森154]
+name     : 风清扬
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 16,"str", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励155]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森155" })
+
+[雅森155]
+name     : 风清扬
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 18,"str", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励156]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森156" })
+
+[雅森156]
+name     : 风清扬
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 70,"str", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励157]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森157" })
+
+[雅森157]
+name     : 风清扬
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 19,"str", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励158]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森158" })
+
+[雅森158]
+name     : 风清扬
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 30,"str", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励159]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森159" })
+
+[雅森159]
+name     : 风清扬
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 20,"str", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励160]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森160" })
+
+[雅森160]
+name     : 风清扬
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 90,"str", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励161]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森161" })
+
+[雅森161]
+name     : 乘风破浪·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 67,"str", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+
+[仙器时装奖励162]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森162" })
+
+[雅森162]
+name     : 碧珠玉
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 43,"str", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+
+[仙器时装奖励163]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森163" })
+
+[雅森163]
+name     : 碧珠玉
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 16,"str", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+
+[仙器时装奖励164]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森164" })
+
+[雅森164]
+name     : 碧珠玉
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 13,"str", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励165]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森165" })
+
+[雅森165]
+name     : 碧珠玉
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 100,"str", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+
+[仙器时装奖励166]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森166" })
+
+[雅森166]
+name     : 碧珠玉
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 110,"str", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+
+[仙器时装奖励167]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森167" })
+
+[雅森167]
+name     : 雀羽翎
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 7,"con", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+
+[仙器时装奖励168]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森168" })
+
+[雅森168]
+name     : 雀羽翎
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 12,"con", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励169]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森169" })
+
+[雅森169]
+name     : 雀羽翎
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 16,"con", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励170]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森170" })
+
+[雅森170]
+name     : 雀羽翎
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 18,"con", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励171]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森171" })
+
+[雅森171]
+name     : 雀羽翎
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 70,"con", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励172]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森172" })
+
+[雅森172]
+name     : 雀羽翎
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 19,"con", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励173]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森173" })
+
+[雅森173]
+name     : 雀羽极
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 30,"con", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励174]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森174" })
+
+[雅森174]
+name     : 雀羽极
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 20,"con", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励175]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森175" })
+
+[雅森175]
+name     : 雀羽极
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 90,"con", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励176]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森176" })
+
+[雅森176]
+name     : 水牧云
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 67,"con", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励177]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森177" })
+
+[雅森177]
+name     : 水牧云
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 43,"con", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励178]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森178" })
+
+[雅森178]
+name     : 水牧云
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 16,"con", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励179]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森179" })
+
+[雅森179]
+name     : 霜夜雪
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 13,"con", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励180]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森180" })
+
+[雅森180]
+name     : 霜夜雪
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 100,"con", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励181]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森181" })
+
+[雅森181]
+name     : 霜夜雪
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/wiz", 110,"con", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励182]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森182" })
+
+[雅森182]
+name     : 霜夜雪
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/ignore_all_resist_except", 10,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励183]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森183" })
+
+[雅森183]
+name     : 风清扬
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/ignore_all_resist_except", 15,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励184]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森184" })
+
+[雅森184]
+name     : 风清扬
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/ignore_all_resist_except", 18,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励185]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森185" })
+
+[雅森185]
+name     : 风清扬
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/ignore_all_resist_except", 19,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励186]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森186" })
+
+[雅森186]
+name     : 风清扬
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/ignore_all_resist_except", 24,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励187]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森187" })
+
+[雅森187]
+name     : 风清扬
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/ignore_all_resist_except", 30,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励188]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森188" })
+
+[雅森188]
+name     : 风清扬
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/ignore_all_resist_except", 36,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励189]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森189" })
+
+[雅森189]
+name     : 风清扬
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/ignore_all_resist_except", 17,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励190]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森190" })
+
+[雅森190]
+name     : 乘风破浪·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/ignore_all_resist_except", 40,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励191]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森191" })
+
+[雅森191]
+name     : 乘风破浪·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/ignore_all_resist_except", 15,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励192]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森192" })
+
+[雅森192]
+name     : 乘风破浪·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/ignore_all_resist_except", 34,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励193]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森193" })
+
+[雅森193]
+name     : 乘风破浪·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/ignore_all_resist_except", 38,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励194]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森194" })
+
+[雅森194]
+name     : 乘风破浪·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/ignore_all_resist_except", 39,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励195]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森195" })
+
+[雅森195]
+name     : 山藏嗨
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/ignore_all_resist_except", 33,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励196]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森196" })
+
+[雅森196]
+name     : 山藏嗨
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/phy_power", 1000,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励197]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森197" })
+
+[雅森197]
+name     : 山藏嗨
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/phy_power", 1658,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励198]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森198" })
+
+[雅森198]
+name     : 山藏嗨
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/phy_power", 1249,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励199]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森199" })
+
+[雅森199]
+name     : 山藏嗨
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/phy_power", 1900,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励200]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森200" })
+
+[雅森200]
+name     : 山藏嗨
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/phy_power", 4000,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励201]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森201" })
+
+[雅森201]
+name     : 山藏嗨
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/phy_power", 3298,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励202]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森202" })
+
+[雅森202]
+name     : 山藏嗨
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/phy_power", 4935,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励203]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森203" })
+
+[雅森203]
+name     : 雀羽翎
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/phy_power", 9510,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励204]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森204" })
+
+[雅森204]
+name     : 雀羽翎
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/phy_power", 4692,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励205]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森205" })
+
+[雅森205]
+name     : 雀羽翎
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/phy_power", 4613,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励206]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森206" })
+
+[雅森206]
+name     : 雀羽极
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/phy_power", 1372,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励207]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森207" })
+
+[雅森207]
+name     : 雀羽极
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/phy_power", 10000,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励208]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森208" })
+
+[雅森208]
+name     : 雀羽极
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/phy_power", 12492,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励209]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森209" })
+
+[雅森209]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/phy_power", 8643,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励210]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森210" })
+
+[雅森210]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/phy_power", 7643,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励211]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森211" })
+
+[雅森211]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/phy_power", 6498,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励212]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森212" })
+
+[雅森212]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/phy_power", 8213,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励213]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森213" })
+
+[雅森213]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/phy_power", 15000,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励214]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森214" })
+
+[雅森214]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/phy_power", 1591,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励215]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森215" })
+
+[雅森215]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/phy_power", 5934,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励216]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森216" })
+
+[雅森216]
+name     : 夏日炎炎·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 1, "prop3/fire", 1, "prop3/ignore_all_resist_except", 10,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励217]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森217" })
+
+[雅森217]
+name     : 水牧云
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 2, "prop3/fire", 2, "prop3/ignore_all_resist_except", 11,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励218]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森218" })
+
+[雅森218]
+name     : 水牧云
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 3, "prop3/fire", 3, "prop3/ignore_all_resist_except", 12,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励219]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森219" })
+
+[雅森219]
+name     : 水牧云
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 4, "prop3/fire", 4, "prop3/ignore_all_resist_except", 13,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励220]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森220" })
+
+[雅森220]
+name     : 水牧云
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 8, "prop3/fire", 1, "prop3/ignore_all_resist_except", 15,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励221]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森221" })
+
+[雅森221]
+name     : 水牧云
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 10, "prop3/fire", 3, "prop3/ignore_all_resist_except", 20,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励222]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森222" })
+
+[雅森222]
+name     : 夏日派对·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 9, "prop3/fire", 5, "prop3/ignore_all_resist_except", 33,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励223]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森223" })
+
+[雅森223]
+name     : 夏日派对·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 7, "prop3/fire", 1, "prop3/ignore_all_resist_except", 15,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励224]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森224" })
+
+[雅森224]
+name     : 夏日派对·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 3, "prop3/fire", 4, "prop3/ignore_all_resist_except", 24,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励225]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森225" })
+
+[雅森225]
+name     : 夏日派对·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 11, "prop3/fire", 7, "prop3/ignore_all_resist_except", 19,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励226]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森226" })
+
+[雅森226]
+name     : 夏日派对·男
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 15, "prop3/fire", 4, "prop3/ignore_all_resist_except", 30,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励227]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森227" })
+
+[雅森227]
+name     : 夏日派对·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 4, "prop3/fire", 8, "prop3/ignore_all_resist_except", 17,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励228]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森228" })
+
+[雅森228]
+name     : 夏日派对·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 3, "prop3/fire", 8, "prop3/ignore_all_resist_except", 40,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})
+
+[仙器时装奖励229]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "雅森229" })
+
+[雅森229]
+name     : 夏日派对·女
+min_level : 1
+max_level : 1
+attribs    : ({"prop3/all_polar", 2, "prop3/fire", 4, "prop3/ignore_all_resist_except", 21,"color", 绿色, "durability", 1500, "extra_desc", #Y时装使者：#n在天墉城（249 189）处进行#R时装#L合成})

@@ -1,0 +1,130 @@
+{
+ "input_dir": "layout/etc_mini",
+ "collect_order": [
+  "100heis.list",
+  "Font1.ttf",
+  "Font2.ttf",
+  "ac_combat_answer.c",
+  "account_question.list",
+  "aiwo_zhonghua.list",
+  "aiwo_zhonghua_test.list",
+  "amend.list",
+  "basic_book.list",
+  "boss_template.list",
+  "café.list",
+  "libao007.list",
+  "luck_magic_special.list",
+  "task_score.list",
+  "zuanshi -test.list",
+  "zzz10001.list"
+ ],
+ "manifest_order": [
+  "100heis.list",
+  "Font1.ttf",
+  "Font2.ttf",
+  "ac_combat_answer.c",
+  "account_question.list",
+  "aiwo_zhonghua.list",
+  "aiwo_zhonghua_test.list",
+  "amend.list",
+  "basic_book.list",
+  "boss_template.list",
+  "libao007.list",
+  "luck_magic_special.list",
+  "task_score.list",
+  "zuanshi -test.list",
+  "zzz10001.list"
+ ],
+ "input_files": [
+  {
+   "name": "100heis.list",
+   "len": 7291,
+   "sha256": "b2f1bb8f9588818c5dfb371728b1a5b9d09b8e50857a9f23715e0d9ef1490c83"
+  },
+  {
+   "name": "Font1.ttf",
+   "len": 22680,
+   "sha256": "e96730de22cd9fedbffc0de3890486f2ec027aaec01117d7abd166d81eefd2a4"
+  },
+  {
+   "name": "Font2.ttf",
+   "len": 24932,
+   "sha256": "cef7914d81446aa307b2212695f270cf06b7c1e4741ce882914f107db48e565e"
+  },
+  {
+   "name": "ac_combat_answer.c",
+   "len": 610,
+   "sha256": "3688a19e7e29f36ce2c7a934891e5da41a847ba0f78c4a6878301bb558fa07ab"
+  },
+  {
+   "name": "account_question.list",
+   "len": 6948,
+   "sha256": "dac391440dba6213fadf83a48e1fa84458de15811af4ee789f030b9bd1263148"
+  },
+  {
+   "name": "aiwo_zhonghua.list",
+   "len": 823,
+   "sha256": "80149735fae69efa4508dcd29076d36d5df56f1adaa9db2ffd36b4356624dd1f"
+  },
+  {
+   "name": "aiwo_zhonghua_test.list",
+   "len": 823,
+   "sha256": "9625037ab3125c832b43573fda86139b75633d1ddd55f0dea1e8e4d75e068854"
+  },
+  {
+   "name": "amend.list",
+   "len": 7784,
+   "sha256": "e62059e4e271244dc89573da137abc3c1a9ec2e335cc1df63a7ab9169ed0ae00"
+  },
+  {
+   "name": "basic_book.list",
+   "len": 16,
+   "sha256": "1e74abb428c87c9da7919902d123f360bdf4bcd4d46484a8a6b3bca5d7d06a15"
+  },
+  {
+   "name": "boss_template.list",
+   "len": 261917,
+   "sha256": "8aeac6c8bfa4f9e3348f8ede915fa0d267632e864dfd5b2ba64c3f7322062012"
+  },
+  {
+   "name": "café.list",
+   "len": 1900,
+   "sha256": "0970a7ce11714d51b10ce902fb1471812f1fd0429ff6a578e4524a8027fea205"
+  },
+  {
+   "name": "libao007.list",
+   "len": 233462,
+   "sha256": "b9a3b14bf7538505992677c5cfed950a6f4546e8d936edaaf7f1f1e57cc6490d"
+  },
+  {
+   "name": "luck_magic_special.list",
+   "len": 8,
+   "sha256": "e44a30e30837997b1344a47b46936e7c4c5d062aaeea581020449a6fa23c0ece"
+  },
+  {
+   "name": "task_score.list",
+   "len": 0,
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "name": "zuanshi -test.list",
+   "len": 5284,
+   "sha256": "833050a44bc5600fee6f8203fffe2575e525d40bd3ff3b8943cda19e6ad21568"
+  },
+  {
+   "name": "zzz10001.list",
+   "len": 60535,
+   "sha256": "2d9e9314b5f454b28347853db5330d6b56589d19ebfe0e0f30772da60e027064"
+  }
+ ],
+ "nocompress": {
+  "pak": "layout/etc_mini_nocompress.pak",
+  "sha256": "0e1affb9f0c52f6665e727d76c93b8efcf51d5ba25d4f3c1210df2349b39102b",
+  "size": 636053
+ },
+ "compress": {
+  "pak": "layout/etc_mini_compress.pak",
+  "sha256": "ad01c944d0a8236118373aee19d8d35acfd77fca691d34dbf0fa1ecfe953afc2",
+  "size": 133661
+ }
+}

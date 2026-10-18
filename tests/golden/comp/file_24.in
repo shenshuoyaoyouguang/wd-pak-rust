@@ -1,0 +1,57 @@
+#FORM2
+#zhuangb.list
+#create by caijz 09/18/2006
+#奖励物品        概率
+
+[奖励等级]
+name$: 特等奖
+
+
+[特等奖]
+法宝奖励6 : 5000
+
+
+[法宝奖励6]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "金蛟剪1", "金蛟剪2", "金蛟剪3", "金蛟剪4", "金蛟剪5" })
+#bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "金蛟剪2" })
+#bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "金蛟剪3" })
+#bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "金蛟剪4" })
+#bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "金蛟剪5" })
+
+[金蛟剪1]
+name      : 金蛟剪
+min_level : 1
+max_level : 1
+upgrade_type : 9
+attribs      : ({ "item_polar", 1 }) 
+
+[金蛟剪2]
+name      : 金蛟剪
+min_level : 1
+max_level : 1
+upgrade_type : 9
+attribs      : ({ "item_polar", 2 }) 
+
+[金蛟剪3]
+name      : 金蛟剪
+min_level : 1
+max_level : 1
+upgrade_type : 9
+attribs      : ({ "item_polar", 3 }) 
+
+[金蛟剪4]
+name      : 金蛟剪
+min_level : 1
+max_level : 1
+upgrade_type : 9
+attribs      : ({ "item_polar", 4 }) 
+
+[金蛟剪5]
+name      : 金蛟剪
+min_level : 1
+max_level : 1
+upgrade_type : 9
+attribs      : ({ "item_polar", 5 }) 
+
+
+

@@ -1,0 +1,39 @@
+#FORM2
+#shoushi.list
+#create by caijz 09/18/2006
+#奖励物品        概率
+
+[奖励等级]
+name$: 特等奖
+
+
+[特等奖]
+首饰120 : 1000
+
+[首饰120]
+bonus$:  ({ 0, 0, 100, "属性道具", 2, 2, "九天霜华_封" })
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "五蕴悯光_封" })
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "八宝如意_封" })
+
+[九天霜华_封]
+name      : 九天霜华
+min_level : 120
+max_level : 120
+upgrade_type : 6
+attribs      : ({ "prop2/all_polar", 5, "prop2/dex", 32, "prop/ignore_all_resist_except", 20,"prop2/ignore_all_resist_except", 20, "prop2/all_skill", 10 })
+
+[五蕴悯光_封]
+name      : 五蕴悯光
+min_level : 120
+max_level : 120
+upgrade_type : 6
+attribs      : ({ "prop2/all_polar", 5, "prop2/dex", 32, "prop/ignore_all_resist_except", 20,"prop2/ignore_all_resist_except", 20, "prop2/all_skill", 10 })
+
+[八宝如意_封]
+name      : 八宝如意
+min_level : 120
+max_level : 120
+upgrade_type : 6
+attribs      : ({ "prop2/all_polar", 5, "prop2/dex", 32, "prop/ignore_all_resist_except", 20,"prop2/ignore_all_resist_except", 20, "prop2/all_skill", 10 })
+
+

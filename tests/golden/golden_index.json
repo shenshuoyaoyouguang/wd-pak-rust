@@ -1,0 +1,68 @@
+{
+ "version": 1,
+ "generated_at": "2026-10-18T18:50:12+0800",
+ "python_tool_version": "1.0",
+ "vectors": {
+  "extract": {
+   "manifest": "extract_files.sha256",
+   "lines": 10744,
+   "paks": {
+    "etc.pak": {
+     "files": 2980,
+     "org_bytes": 79942992
+    },
+    "lib_gs32.pak": {
+     "files": 7762,
+     "org_bytes": 118305065
+    }
+   }
+  },
+  "decompress": {
+   "index": "lzss_decompress_cases.json",
+   "data_dir": "decomp",
+   "small": 30,
+   "large": 15
+  },
+  "compress_cases": {
+   "index": "lzss_compress_cases.json",
+   "data_dir": "comp",
+   "count": 20
+  },
+  "compress_files": {
+   "index": "lzss_compress_files.json",
+   "data_dir": "comp",
+   "count": 40,
+   "stored_inline": 37
+  },
+  "layout": {
+   "index": "layout/layout.json",
+   "input_files": 16,
+   "paks": [
+    "etc_mini_nocompress.pak",
+    "etc_mini_compress.pak"
+   ]
+  },
+  "replace": {
+   "index": "replace/replace.json",
+   "cases": 3
+  }
+ },
+ "total_files": 166,
+ "total_bytes": 4689280,
+ "notes": [
+  "lzss_compress(b\"\") == b\"\"（无 flag 字节）；lzss_decompress(b\"\", 0) == b\"\"",
+  "解压初始环形缓冲 = 4078 个 0x20(空格) + 18 个 0x00，起始写指针 r0=4078；匹配的 i 直接作环形下标用，复制时 i 逐字节 +1 跨 4096 环绕",
+  "解压 flag 机制：flags = data[pos] | 0xFF00，(flags & 0x100)==0 时取新 flag 字节；bit=1 字面量、bit=0 匹配；输出达到 out_size 立即停止并忽略流中剩余字节",
+  "匹配解码：i |= (j & 0xF0) << 4；长度 = (j & 0x0F) + 2 + 1，即 3..18",
+  "压缩器匹配接受条件：1 <= d <= 4078 且 d <= i（d = (r - cand) & 4095），因此 Python 压缩流永不引用初始窗口；哈希链最多探测 128 个候选；MIN_MATCH=3",
+  "压缩器哈希链插入条件：字面量处 i+2 < n、匹配内逐字节 i+k+2 < n，即末尾 2 字节不插链",
+  "压缩 flag 字节先写占位 0，凑满 8 项或输入结束时回填；每 bit 对应一组（字面量 bit=1）",
+  "两个真实 pak 全部条目 attrib=0（LZSS），无 RAW_BIT 条目；etc.pak 无目录，lib_gs32.pak 含 519 个目录；抽样 800 个小文件未发现初始窗口引用与流尾部剩余",
+  "read_file 对 RAW_BIT 条目返回 stored[:org]（可能截断）；目录条目 size=org=64*子条目数，数据为子目录表原样字节",
+  "pack 排序：无 manifest 时按名字的 UTF-8(surrogateescape) 字节序；有 manifest 时 order 索引优先，不在 order 的条目（键 1<<30）排同层最后；文件 mtime 默认 0，manifest 可覆盖（校验为 0..0xFFFFFFFF 的 int）；目录条目 mtime 恒为 0；_pak_manifest.json 自动跳过",
+  "pak 内文件名为 latin1 单字节编码（磁盘 UTF-8 名需转 latin1 字节），最长 43 字节，禁止 / \\\\ 与 NUL；pack preflight 会拒绝同层大小写冲突",
+  "replace 为整包重写：未修改条目按原 offset/size 从源 pak 流式拷贝（字节原样），全部条目 mtime 保留原值；被替换条目 mtime 也保留替换前的旧值",
+  "Header 16B：magic=0x11223344, rootDirSize, unused1=0, unused2=0（pack 恒写 0）",
+  "布局：header(offset 0) -> 根目录表(offset 16) -> 各条目数据按目录表顺序深度优先排列；每个目录节点的数据区开头是它的子目录表"
+ ]
+}

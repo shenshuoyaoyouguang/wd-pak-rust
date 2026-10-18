@@ -1,0 +1,29 @@
+{
+ "newfile_len": 4500,
+ "cases": [
+  {
+   "pak": "etc.pak",
+   "inner": "100heis.list",
+   "newfile": "replace/newfile.bin",
+   "mode": "compress",
+   "pak_sha256_before": "4625db0f3db6951470c60bfd2b1a94c24bec626f60cb31f07e1fbd0f0fcedb63",
+   "pak_sha256_after": "edd88c7fd0350f0ccb0341ff7b97498f7b809554e259b41b1f223fee0e4a08d8"
+  },
+  {
+   "pak": "etc.pak",
+   "inner": "100heis.list",
+   "newfile": "replace/newfile.bin",
+   "mode": "no-compress",
+   "pak_sha256_before": "4625db0f3db6951470c60bfd2b1a94c24bec626f60cb31f07e1fbd0f0fcedb63",
+   "pak_sha256_after": "f19d5309ebfcae89a5350b976523644bcdb01bd87b3274a74bb98022e10752cc"
+  },
+  {
+   "pak": "lib_gs32.pak",
+   "inner": "clone/misc/mixed_agent.o",
+   "newfile": "replace/newfile.bin",
+   "mode": "compress",
+   "pak_sha256_before": "4f9b96f98ac9bed840e1ebe6e63a3ce39d0fdc674e79757358b45a0f34060fd2",
+   "pak_sha256_after": "66a94cd545dafe6b039ceb8da089b9f02860135a190b2a5257fba4a005977d56"
+  }
+ ]
+}

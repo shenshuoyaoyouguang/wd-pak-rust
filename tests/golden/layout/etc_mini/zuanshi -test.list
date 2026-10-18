@@ -1,0 +1,283 @@
+#FORM2
+#shoushi.list
+#create by steven QQ:215275534 09/18/2006
+#奖励物品        概率
+
+[奖励等级]
+name$: 特等奖
+
+
+[特等奖]
+元灵奖励1 : 200 
+元灵奖励2 : 200 
+元灵奖励3 : 200 
+元灵奖励4 : 200 
+元灵奖励5 : 1900
+元灵奖励6 : 1900
+
+[元灵奖励1]
+bonus$:  ({ 0, 0, 100, "宠物", 1, 1, "拉车鲁道夫" })
+limit$: ({  "time_limit", "now", 432000000 })
+bonus$:  ({ 0, 0, 100, "宠物", 1, 1, "嗜血豹" })
+limit$: ({  "time_limit", "now", 432000000 })
+bonus$:  ({ 0, 0, 100, "宠物", 1, 1, "墨玉豹" })
+limit$: ({  "time_limit", "now", 432000000 })
+bonus$:  ({ 0, 0, 100, "宠物", 1, 1, "嗜血剑" })
+limit$: ({  "time_limit", "now", 432000000 })
+bonus$:  ({ 0, 0, 100, "宠物", 1, 1, "黑吉祥蛙" })
+limit$: ({  "time_limit", "now", 432000000 })
+
+[元灵奖励2]
+bonus$:  ({ 0, 0, 100, "宠物", 1, 1, "至尊巨骨刺" })
+limit$: ({  "time_limit", "now", 432000000 })
+bonus$:  ({ 0, 0, 100, "宠物", 1, 1, "黑巨骨刺" })
+limit$: ({  "time_limit", "now", 432000000 })
+bonus$:  ({ 0, 0, 100, "宠物", 1, 1, "金巨骨刺" })
+limit$: ({  "time_limit", "now", 432000000 })
+bonus$:  ({ 0, 0, 100, "宠物", 1, 1, "白巨骨刺" })
+limit$: ({  "time_limit", "now", 432000000 })
+bonus$:  ({ 0, 0, 100, "宠物", 1, 1, "黑猿" })
+limit$: ({  "time_limit", "now", 432000000 })
+bonus$:  ({ 0, 0, 100, "宠物", 1, 1, "金猿" })
+limit$: ({  "time_limit", "now", 432000000 })
+
+[元灵奖励3]
+bonus$:  ({ 0, 0, 100, "宠物", 1, 1, "疾风蚀日一" })
+limit$: ({  "time_limit", "now", 432000000 })
+bonus$:  ({ 0, 0, 100, "宠物", 1, 1, "疾风蚀日二" })
+limit$: ({  "time_limit", "now", 432000000 })
+bonus$:  ({ 0, 0, 100, "宠物", 1, 1, "疾风蚀日三" })
+limit$: ({  "time_limit", "now", 432000000 })
+bonus$:  ({ 0, 0, 100, "宠物", 1, 1, "疾风蚀日四" })
+limit$: ({  "time_limit", "now", 432000000 })
+bonus$:  ({ 0, 0, 100, "宠物", 1, 1, "疾风蚀日六" })
+limit$: ({  "time_limit", "now", 432000000 })
+bonus$:  ({ 0, 0, 100, "宠物", 1, 1, "疾风蚀日五" })
+limit$: ({  "time_limit", "now", 432000000 })
+
+[元灵奖励4]
+bonus$:  ({ 0, 0, 100, "宠物", 1, 1, "烟雨剑" })
+limit$: ({  "time_limit", "now", 432000000 })
+bonus$:  ({ 0, 0, 100, "宠物", 1, 1, "无极黑熊" })
+limit$: ({  "time_limit", "now", 432000000 })
+bonus$:  ({ 0, 0, 100, "宠物", 1, 1, "白莲" })
+limit$: ({  "time_limit", "now", 432000000 })
+bonus$:  ({ 0, 0, 100, "宠物", 1, 1, "原谅莲花" })
+limit$: ({  "time_limit", "now", 432000000 })
+bonus$:  ({ 0, 0, 100, "宠物", 1, 1, "紫韵莲花" })
+limit$: ({  "time_limit", "now", 432000000 })
+bonus$:  ({ 0, 0, 100, "宠物", 1, 1, "嗜血莲花" })
+limit$: ({  "time_limit", "now", 432000000 })
+
+
+[元灵奖励5]
+bonus$:  ({ 0, 0, 100, "宠物", 1, 1, "江晓莹" })
+limit$: ({  "time_limit", "now", 432000000 })
+
+[元灵奖励6]
+bonus$:  ({ 0, 0, 100, "宠物", 1, 1, "北极熊" })
+limit$: ({  "time_limit", "now", 432000000 })
+
+
+[北极熊]
+name$: ({ 北极熊, 北极熊 })
+rank$: 宝宝
+mount$: 御灵
+fenglingwan : 300
+enchant_flag : 1
+
+
+[江晓莹]
+name$: ({ 江晓莹, 江晓莹 })
+rank$: 宝宝
+mount$: 御灵
+fenglingwan : 300
+enchant_flag : 1
+
+[烟雨剑]
+name$: ({ 烟雨剑, 烟雨剑 })
+rank$: 宝宝
+mount$: 御灵
+fenglingwan : 300
+enchant_flag : 1
+
+
+[无极黑熊]
+name$: ({无极黑熊, 无极黑熊})
+mount$: 御灵
+level: "1"
+fenglingwan : 300
+enchant_flag : 1
+
+
+[白莲]
+name$: ({白莲, 白莲})
+mount$: 御灵
+level: "1"
+fenglingwan : 300
+enchant_flag : 1
+
+[原谅莲花]
+name$: ({原谅莲花, 原谅莲花})
+mount$: 御灵
+level: "1"
+fenglingwan : 300
+enchant_flag : 1
+
+[紫韵莲花]
+name$: ({紫韵莲花, 紫韵莲花})
+mount$: 御灵
+level: "1"
+fenglingwan : 300
+enchant_flag : 1
+
+[嗜血莲花]
+name$: ({嗜血莲花, 嗜血莲花})
+mount$: 御灵
+level: "1"
+fenglingwan : 300
+enchant_flag : 1
+
+
+[疾风蚀日六]
+name$: ({疾风蚀日六, 疾风蚀日六})
+mount$: 御灵
+level: "1"
+fenglingwan : 300
+enchant_flag : 1
+
+
+[疾风蚀日五]
+name$: ({疾风蚀日五, 疾风蚀日五})
+mount$: 御灵
+level: "1"
+fenglingwan : 300
+enchant_flag : 1
+
+
+[疾风蚀日四]
+name$: ({疾风蚀日四, 疾风蚀日四})
+mount$: 御灵
+level: "1"
+fenglingwan : 300
+enchant_flag : 1
+
+
+
+[疾风蚀日三]
+name$: ({疾风蚀日三, 疾风蚀日三})
+mount$: 御灵
+level: "1"
+fenglingwan : 300
+enchant_flag : 1
+
+
+[疾风蚀日二]
+name$: ({疾风蚀日二, 疾风蚀日二})
+mount$: 御灵
+level: "1"
+fenglingwan : 300
+enchant_flag : 1
+
+
+
+[金猿]
+name$: ({金猿, 金猿})
+mount$: 御灵
+level: "1"
+fenglingwan : 300
+enchant_flag : 1
+
+
+
+[疾风蚀日一]
+name$: ({疾风蚀日一, 疾风蚀日一})
+rank$: 宝宝
+mount$: 御灵
+level: "1"
+fenglingwan : 300
+enchant_flag : 1
+
+[白巨骨刺]
+name$: ({ 白巨骨刺, 白巨骨刺 })
+rank$: 宝宝
+mount$: 御灵
+fenglingwan : 300
+enchant_flag : 1
+
+
+
+[黑猿]
+name$: ({黑猿, 黑猿})
+mount$: 御灵
+level: "1"
+fenglingwan : 300
+enchant_flag : 1
+
+
+[金巨骨刺]
+name$: ({金巨骨刺, 金巨骨刺})
+mount$: 御灵
+level: "1"
+fenglingwan : 300
+enchant_flag : 1
+
+
+[黑巨骨刺]
+name$: ({黑巨骨刺, 黑巨骨刺})
+mount$: 御灵
+level: "1"
+fenglingwan : 300
+enchant_flag : 1
+
+
+[至尊巨骨刺]
+name$: ({至尊巨骨刺, 至尊巨骨刺})
+mount$: 御灵
+level: "1"
+fenglingwan : 300
+enchant_flag : 1
+
+
+[黑吉祥蛙]
+name$: ({黑吉祥蛙, 黑吉祥蛙})
+mount$: 御灵
+level: "1"
+fenglingwan : 300
+enchant_flag : 1
+
+
+
+[嗜血剑]
+name$: ({嗜血剑, 嗜血剑})
+mount$: 御灵
+level: "1"
+fenglingwan : 300
+enchant_flag : 1
+
+
+[墨玉豹]
+name$: ({墨玉豹, 墨玉豹})
+mount$: 御灵
+level: "1"
+fenglingwan : 300
+enchant_flag : 1
+
+
+
+[拉车鲁道夫]
+name$: ({拉车鲁道夫, 拉车鲁道夫})
+mount$: 御灵
+level: "1"
+fenglingwan : 300
+enchant_flag : 1
+
+
+
+[嗜血豹]
+name$: ({嗜血豹, 嗜血豹})
+rank$: 宝宝
+mount$: 御灵
+level: "1"
+fenglingwan : 300
+enchant_flag : 1

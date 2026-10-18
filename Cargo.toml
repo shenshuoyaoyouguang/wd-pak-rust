@@ -1,0 +1,22 @@
+[package]
+name = "wd-pak"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+# preserve_order: Map 用 IndexMap 保插入序 —— manifest 键序=遍历序、
+# pack 的 files 键序一致性的共同前提（Python dict 3.7+ 语义）
+serde_json = { version = "1", features = ["preserve_order"] }
+rayon = "1.10"
+thiserror = "1"
+sha2 = "0.10"
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
+
+[profile.release.package."*"]
+opt-level = 3

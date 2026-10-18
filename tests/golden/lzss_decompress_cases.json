@@ -1,0 +1,444 @@
+{
+ "small": [
+  {
+   "id": 1,
+   "pak": "etc_mini_nocompress.pak",
+   "inner": "task_score.list",
+   "org": 0,
+   "stored_file": "decomp/001.bin",
+   "out_file": "decomp/001.out",
+   "stored_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "out_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "id": 2,
+   "pak": "etc_mini_nocompress.pak",
+   "inner": "100heis.list",
+   "org": 7291,
+   "stored_file": "decomp/002.bin",
+   "out_file": "decomp/002.out",
+   "stored_sha256": "b2f1bb8f9588818c5dfb371728b1a5b9d09b8e50857a9f23715e0d9ef1490c83",
+   "out_sha256": "b2f1bb8f9588818c5dfb371728b1a5b9d09b8e50857a9f23715e0d9ef1490c83"
+  },
+  {
+   "id": 3,
+   "pak": "etc_mini_nocompress.pak",
+   "inner": "zuanshi -test.list",
+   "org": 5284,
+   "stored_file": "decomp/003.bin",
+   "out_file": "decomp/003.out",
+   "stored_sha256": "833050a44bc5600fee6f8203fffe2575e525d40bd3ff3b8943cda19e6ad21568",
+   "out_sha256": "833050a44bc5600fee6f8203fffe2575e525d40bd3ff3b8943cda19e6ad21568"
+  },
+  {
+   "id": 4,
+   "pak": "etc_mini_nocompress.pak",
+   "inner": "café.list",
+   "org": 1900,
+   "stored_file": "decomp/004.bin",
+   "out_file": "decomp/004.out",
+   "stored_sha256": "0970a7ce11714d51b10ce902fb1471812f1fd0429ff6a578e4524a8027fea205",
+   "out_sha256": "0970a7ce11714d51b10ce902fb1471812f1fd0429ff6a578e4524a8027fea205"
+  },
+  {
+   "id": 5,
+   "pak": "lib_gs32.pak",
+   "inner": "clone/misc/mixed_agent.o",
+   "org": 192,
+   "stored_file": "decomp/005.bin",
+   "out_file": "decomp/005.out",
+   "stored_sha256": "f2942c203c4073d06e7badf1d686d1660bc6675cd2f666d6179bf4504e2edf7f",
+   "out_sha256": "a20c5df92382bdb02ebc0e16557b0d2ec21fabb0424522a8a495cf5f685e8c15"
+  },
+  {
+   "id": 6,
+   "pak": "lib_gs32.pak",
+   "inner": "cmds/cta/get_server_version.o",
+   "org": 1287,
+   "stored_file": "decomp/006.bin",
+   "out_file": "decomp/006.out",
+   "stored_sha256": "52320c4e69cddbc937cf342fb1bfba4a2e78ea1bb51ee02ecc3ac9b30b4109b4",
+   "out_sha256": "3afed698063e6363885e42b6ec406b05292de83e7e61bbcbee57bf3f123a3654"
+  },
+  {
+   "id": 7,
+   "pak": "lib_gs32.pak",
+   "inner": "daemons/autorecoverd.o",
+   "org": 16145,
+   "stored_file": "decomp/007.bin",
+   "out_file": "decomp/007.out",
+   "stored_sha256": "82644735563bb3b17acc49825963f743b34c4acd08fdb7c557b72de7f3aa84ac",
+   "out_sha256": "22c3ef2b564c164a9b628582e50aa31e67f6050f6c53467f4f9654300a4baebd"
+  },
+  {
+   "id": 8,
+   "pak": "lib_gs32.pak",
+   "inner": "daemons/data_save/achieve.o",
+   "org": 3748,
+   "stored_file": "decomp/008.bin",
+   "out_file": "decomp/008.out",
+   "stored_sha256": "8ae5fa43b37f2062d1e33e2332e473eaa5903163533bb22fe680d0c34e63474c",
+   "out_sha256": "0b11ada637c71e840db1dad7d96ba02e652b00e0eca61054b3ce9bf488e7bbb1"
+  },
+  {
+   "id": 9,
+   "pak": "etc.pak",
+   "inner": "task_score.list",
+   "org": 0,
+   "stored_file": "decomp/009.bin",
+   "out_file": "decomp/009.out",
+   "stored_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "out_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "id": 10,
+   "pak": "etc.pak",
+   "inner": "luck_magic_special.list",
+   "org": 8,
+   "stored_file": "decomp/010.bin",
+   "out_file": "decomp/010.out",
+   "stored_sha256": "94ecc56523236e5fa2120ba450c8ce3292d11cc2c3293314357aae99fa1bc874",
+   "out_sha256": "e44a30e30837997b1344a47b46936e7c4c5d062aaeea581020449a6fa23c0ece"
+  },
+  {
+   "id": 11,
+   "pak": "etc.pak",
+   "inner": "new_version_guide_tmp.list",
+   "org": 8,
+   "stored_file": "decomp/011.bin",
+   "out_file": "decomp/011.out",
+   "stored_sha256": "94ecc56523236e5fa2120ba450c8ce3292d11cc2c3293314357aae99fa1bc874",
+   "out_sha256": "e44a30e30837997b1344a47b46936e7c4c5d062aaeea581020449a6fa23c0ece"
+  },
+  {
+   "id": 12,
+   "pak": "etc.pak",
+   "inner": "leach.list",
+   "org": 15,
+   "stored_file": "decomp/012.bin",
+   "out_file": "decomp/012.out",
+   "stored_sha256": "7aee0f123a6b4fbc929fc524f011905416a0bd1842ba95007fcc6e7a0407dd00",
+   "out_sha256": "352a8e356813727b3816a6649b53ecf8461e4a672b0fb640d65ca52c6e785dba"
+  },
+  {
+   "id": 13,
+   "pak": "etc.pak",
+   "inner": "basic_book.list",
+   "org": 16,
+   "stored_file": "decomp/013.bin",
+   "out_file": "decomp/013.out",
+   "stored_sha256": "fc61b5b4a7350f1ce2ab4b7a12dc07910fb3a8f137d0f7bd1fd7b7ce2bfbd5e7",
+   "out_sha256": "1e74abb428c87c9da7919902d123f360bdf4bcd4d46484a8a6b3bca5d7d06a15"
+  },
+  {
+   "id": 14,
+   "pak": "etc.pak",
+   "inner": "baozai-junliang.list",
+   "org": 19,
+   "stored_file": "decomp/014.bin",
+   "out_file": "decomp/014.out",
+   "stored_sha256": "f339cbc2635cf1f62c831ece9a3baff17ebcf68899db7861ddc408a2d9aedbbb",
+   "out_sha256": "a2982718e4e4c77c9d3f7c05232ebdf4d323e021c922fbeadbc0801fccd85418"
+  },
+  {
+   "id": 15,
+   "pak": "etc.pak",
+   "inner": "easy_party.list",
+   "org": 23,
+   "stored_file": "decomp/015.bin",
+   "out_file": "decomp/015.out",
+   "stored_sha256": "c069f52f04e87c2b92bb948d5196d68df4489bd1d2e0c2593cd2fea8f00179e5",
+   "out_sha256": "d6f41cf491ac2ed3fa80fb7af992aa76d62bafa74fa11becd4ef91890c1dcf1a"
+  },
+  {
+   "id": 16,
+   "pak": "etc.pak",
+   "inner": "party_stage_monster_assistant.list",
+   "org": 23,
+   "stored_file": "decomp/016.bin",
+   "out_file": "decomp/016.out",
+   "stored_sha256": "85542ce459071b187dbf8fd941707c99a9cad4022a05fc9792b527001141723c",
+   "out_sha256": "9f7d30c76631c89baeefd3847463776b78c41f7b0abe2a306fdd87a3f2c64e9c"
+  },
+  {
+   "id": 17,
+   "pak": "etc.pak",
+   "inner": "party_stage_monster_main.list",
+   "org": 23,
+   "stored_file": "decomp/017.bin",
+   "out_file": "decomp/017.out",
+   "stored_sha256": "85542ce459071b187dbf8fd941707c99a9cad4022a05fc9792b527001141723c",
+   "out_sha256": "9f7d30c76631c89baeefd3847463776b78c41f7b0abe2a306fdd87a3f2c64e9c"
+  },
+  {
+   "id": 18,
+   "pak": "etc.pak",
+   "inner": "party_stage_npc.list",
+   "org": 23,
+   "stored_file": "decomp/018.bin",
+   "out_file": "decomp/018.out",
+   "stored_sha256": "85542ce459071b187dbf8fd941707c99a9cad4022a05fc9792b527001141723c",
+   "out_sha256": "9f7d30c76631c89baeefd3847463776b78c41f7b0abe2a306fdd87a3f2c64e9c"
+  },
+  {
+   "id": 19,
+   "pak": "etc.pak",
+   "inner": "party_stage_statuary_pos.list",
+   "org": 23,
+   "stored_file": "decomp/019.bin",
+   "out_file": "decomp/019.out",
+   "stored_sha256": "85542ce459071b187dbf8fd941707c99a9cad4022a05fc9792b527001141723c",
+   "out_sha256": "9f7d30c76631c89baeefd3847463776b78c41f7b0abe2a306fdd87a3f2c64e9c"
+  },
+  {
+   "id": 20,
+   "pak": "etc.pak",
+   "inner": "kuanghuan_chushi.list",
+   "org": 28,
+   "stored_file": "decomp/020.bin",
+   "out_file": "decomp/020.out",
+   "stored_sha256": "7423b9aa242ffabbb60924effc88d27cf9decce614c500678e86c5bf67f8bb36",
+   "out_sha256": "e9e6f623851f78a5f4f22739de74a9ece73f2cedf8b9c9cc5a95efbc08b1f10a"
+  },
+  {
+   "id": 21,
+   "pak": "etc.pak",
+   "inner": "unique_data_pet.list",
+   "org": 33,
+   "stored_file": "decomp/021.bin",
+   "out_file": "decomp/021.out",
+   "stored_sha256": "04539ec3b5a0c0fadd7e43b7f39ffc12ffd99119930c8aec60d00422843516b2",
+   "out_sha256": "5fda9d8d1967289cbde19dd9562f283bd63b5ebc5943b5086dd63cec78d6fc4f"
+  },
+  {
+   "id": 22,
+   "pak": "etc.pak",
+   "inner": "pattern_item.list",
+   "org": 39,
+   "stored_file": "decomp/022.bin",
+   "out_file": "decomp/022.out",
+   "stored_sha256": "577785ec916ac551ad2fe50b24571175e117db8c9afccc9279b03c78822cb699",
+   "out_sha256": "c54f98487e54f81fe769e7ceeb64cce60c8b16443fda6da6aa19cd20acdff67b"
+  },
+  {
+   "id": 23,
+   "pak": "etc.pak",
+   "inner": "ip_card_task_list.list",
+   "org": 42,
+   "stored_file": "decomp/023.bin",
+   "out_file": "decomp/023.out",
+   "stored_sha256": "931c9b449feb615e86d58bf92cab18e0de507ffc7878782b11ae0c5d9574a963",
+   "out_sha256": "fa2a1c2edce172bdf57afe4048e68fd632867edcd24e4fc1f34b8a4ce4197090"
+  },
+  {
+   "id": 24,
+   "pak": "etc.pak",
+   "inner": "basic_mount_changing_item.list",
+   "org": 51,
+   "stored_file": "decomp/024.bin",
+   "out_file": "decomp/024.out",
+   "stored_sha256": "f7a20d5a5acdb924039fc60434cf8bf8b7ac9a1f704592e90f72570a30e2030d",
+   "out_sha256": "29154938fcfbdc95dbcac0f3b305c1988b69df35835c00f951d91688d2b4a437"
+  },
+  {
+   "id": 25,
+   "pak": "etc.pak",
+   "inner": "hanzi_table1.list",
+   "org": 53,
+   "stored_file": "decomp/025.bin",
+   "out_file": "decomp/025.out",
+   "stored_sha256": "e9fd0f13bb51b98fdf9fa4e8108333ccb852dfea0f1e66050db99438ed619eeb",
+   "out_sha256": "be25507e11b051926cfcdd32f9ad42306685d508ef9ccee14c3a8f38a9e4cf35"
+  },
+  {
+   "id": 26,
+   "pak": "etc.pak",
+   "inner": "basic_pattern_item.list",
+   "org": 65,
+   "stored_file": "decomp/026.bin",
+   "out_file": "decomp/026.out",
+   "stored_sha256": "c3792108755e0250c9301e60e3d235f6dcf171d1693b29e6961f7c202a87140b",
+   "out_sha256": "abc4885bba2ff307e3d6e0f2b4b36be51154d852e781f651dbfa45d125e09a74"
+  },
+  {
+   "id": 27,
+   "pak": "etc.pak",
+   "inner": "samsung_match.list",
+   "org": 77,
+   "stored_file": "decomp/027.bin",
+   "out_file": "decomp/027.out",
+   "stored_sha256": "c8e02b13eb2e192edd0213c294293b0c9a26dde7e42a2d6bc653a2dd97f0fb15",
+   "out_sha256": "552e1fe6183cbb2e0c4fee61e60bbf1168eae8d13c5c638e910e2c9b3339a9d4"
+  },
+  {
+   "id": 28,
+   "pak": "(synthetic)",
+   "inner": "init-window-space-ref",
+   "org": 18,
+   "synthetic": true,
+   "stored_file": "decomp/028.bin",
+   "out_file": "decomp/028.out",
+   "stored_sha256": "99a4c7ec41e7235549133d6f5cf868676348f27eae4e022a645f8e5b263e8bda",
+   "out_sha256": "c1351524deb822571814168e7950a8f3e94bbbc966cf7094b93f578c8196a6ac"
+  },
+  {
+   "id": 29,
+   "pak": "(synthetic)",
+   "inner": "init-window-zero-ref",
+   "org": 18,
+   "synthetic": true,
+   "stored_file": "decomp/029.bin",
+   "out_file": "decomp/029.out",
+   "stored_sha256": "6eee8d86db08ce9e4427248ed6b0a8fac1ad1ed0a2a86ba30da736eddeceb972",
+   "out_sha256": "60daa3a5f7dbfa200f8c82840ecf5b42640b70f3b7218a4c6bbd67db542e75a4"
+  },
+  {
+   "id": 30,
+   "pak": "(synthetic)",
+   "inner": "literal+init-ref+trailing-bytes",
+   "org": 19,
+   "synthetic": true,
+   "stored_file": "decomp/030.bin",
+   "out_file": "decomp/030.out",
+   "stored_sha256": "764586e5fc9f2caf0709484dafee1392ffdae3dd482c031d02d15109e4b923e0",
+   "out_sha256": "e81c40ee2a7117dd99d2ae2e8fd3586edf5dcafc970e02982d7feaa052788fe7"
+  }
+ ],
+ "large": [
+  {
+   "id": 1,
+   "pak": "etc.pak",
+   "inner": "gbsn00lp.ttf",
+   "org": 12128500,
+   "offset": 12241089,
+   "size": 9847005,
+   "expect_sha256": "0d0e8ba436f803236fa10c27903327284c39186a6e7d859e0fae423d11c44583"
+  },
+  {
+   "id": 2,
+   "pak": "etc.pak",
+   "inner": "gkai00mp.ttf",
+   "org": 9761920,
+   "offset": 22093307,
+   "size": 7937539,
+   "expect_sha256": "30848f35c1b8a8a9c87d3299d3e06327347d7f4fb6e4dd5f15cc4a9711f55e24"
+  },
+  {
+   "id": 3,
+   "pak": "etc.pak",
+   "inner": "FZXBSJW.TTF",
+   "org": 7964524,
+   "offset": 4107179,
+   "size": 5775424,
+   "expect_sha256": "5d0121321e465caea5b238723797bdd1097f6ff402e44c93c452136a84a791f9"
+  },
+  {
+   "id": 4,
+   "pak": "etc.pak",
+   "inner": "server_res_text.txt",
+   "org": 7829403,
+   "offset": 32560823,
+   "size": 3847869,
+   "expect_sha256": "b056c6e9459a732640d15779f51f66d01106e5b3494f581b82315f23e4520f93"
+  },
+  {
+   "id": 5,
+   "pak": "etc.pak",
+   "inner": "server_res_text_test.txt",
+   "org": 7829331,
+   "offset": 36408692,
+   "size": 3847786,
+   "expect_sha256": "54d6ae70290a11b174dbb8bf34bc482b0719aebf05ef07f0c09a9da4cde6a0a2"
+  },
+  {
+   "id": 6,
+   "pak": "etc.pak",
+   "inner": "FZKTJW.ttf",
+   "org": 4479776,
+   "offset": 205355,
+   "size": 3901824,
+   "expect_sha256": "ea448f4e21c9de8ad7e1b7b947abf9b3d74c94110b3de46296baf4d6e87fbf71"
+  },
+  {
+   "id": 7,
+   "pak": "etc.pak",
+   "inner": "coupon.list",
+   "org": 1849536,
+   "offset": 10815479,
+   "size": 270644,
+   "expect_sha256": "5cbea941de70d9b7d2ba4102315904a75c8eb1a62eb3256f4ae843b10f8717d3"
+  },
+  {
+   "id": 8,
+   "pak": "etc.pak",
+   "inner": "yixiu001.list",
+   "org": 952072,
+   "offset": 41608159,
+   "size": 148359,
+   "expect_sha256": "a3743132d106daa4cbaedebb50efc1c9d5cd8e946e6bbe5c441acc46bf5d5834"
+  },
+  {
+   "id": 9,
+   "pak": "lib_gs32.pak",
+   "inner": "gs/start_gs.o",
+   "org": 1828668,
+   "offset": 48302154,
+   "size": 643852,
+   "expect_sha256": "2f3ce58bb54584d2ce7bb3d90852893b97fcd5fb55d455b8eccff856fc696174"
+  },
+  {
+   "id": 10,
+   "pak": "lib_gs32.pak",
+   "inner": "gs/daemons/treasure_tradingd.o",
+   "org": 468261,
+   "offset": 44784640,
+   "size": 180326,
+   "expect_sha256": "7470d396e302395318f58cd411353242a8911d6704f032b517978ea9092f0ef7"
+  },
+  {
+   "id": 11,
+   "pak": "lib_gs32.pak",
+   "inner": "gs/daemons/partyd.o",
+   "org": 366878,
+   "offset": 17195439,
+   "size": 145080,
+   "expect_sha256": "b75d311227c1fefc82bf43423e151cd8d312c0d3cef45e43e6dafb5482201890"
+  },
+  {
+   "id": 12,
+   "pak": "lib_gs32.pak",
+   "inner": "gs/daemons/cross_server/everyone_pk_match.o",
+   "org": 320029,
+   "offset": 13253749,
+   "size": 128611,
+   "expect_sha256": "a2c4da666105b21cbd161f16df7baacdfecede017f137df67f8fe9091d12b34b"
+  },
+  {
+   "id": 13,
+   "pak": "lib_gs32.pak",
+   "inner": "gs/daemons/party/party_war.o",
+   "org": 305745,
+   "offset": 16879753,
+   "size": 121224,
+   "expect_sha256": "99945ca429a539b329fc4a5d4f9ef91f9c2516bcbe2268eae5afdd6062569d55"
+  },
+  {
+   "id": 14,
+   "pak": "lib_gs32.pak",
+   "inner": "gs/daemons/buildmsgd.o",
+   "org": 300487,
+   "offset": 12060474,
+   "size": 110486,
+   "expect_sha256": "e61f5770f091e878b167477c3d221432abb2cf95889f16d7027983058b767eb8"
+  },
+  {
+   "id": 15,
+   "pak": "lib_gs32.pak",
+   "inner": "gs/daemons/shopd.o",
+   "org": 272013,
+   "offset": 18401152,
+   "size": 109052,
+   "expect_sha256": "a5573ba9e04d1a51855cb39b6e9f27612d8066c8c221fe386660cfe1087a76a8"
+  }
+ ]
+}

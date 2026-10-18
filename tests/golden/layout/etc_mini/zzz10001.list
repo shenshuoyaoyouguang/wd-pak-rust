@@ -1,0 +1,969 @@
+#FORM2
+#jinnang.list
+#create by caijz 09/18/2006
+#奖励物品        概率
+
+[奖励等级]
+
+name$: 特等奖
+
+[特等奖]
+附灵所有相五 : 5
+附灵所有相四 : 10
+附灵所有相三 : 30
+附灵所有相二 : 50
+附灵所有相一 : 80
+金相法宝 : 1000
+木相法宝 : 1000
+水相法宝 : 1000
+火相法宝 : 1000
+土相法宝 : 1000
+
+
+
+[附灵所有相五]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "法宝金相所有5", "法宝木相所有5", "法宝水相所有5", "法宝火相所有5", "法宝土相所有5" })
+
+[附灵所有相四]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "法宝金相所有4", "法宝木相所有4", "法宝水相所有4", "法宝火相所有4", "法宝土相所有4" })
+
+[附灵所有相三]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "法宝金相所有3", "法宝木相所有3", "法宝水相所有3", "法宝火相所有3", "法宝土相所有3" })
+
+[附灵所有相二]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "法宝金相所有2", "法宝木相所有2", "法宝水相所有2", "法宝火相所有2", "法宝土相所有2" })
+
+[附灵所有相一]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "法宝金相所有1", "法宝木相所有1", "法宝水相所有1", "法宝火相所有1", "法宝土相所有1" })
+
+
+
+[金相法宝]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "金相法宝金1", "金相法宝金2", "金相法宝金3", "金相法宝金4", "金相法宝金5", "金相法宝木1", "金相法宝木2", "金相法宝木3", "金相法宝木4", "金相法宝木5", "金相法宝水1", "金相法宝水2", "金相法宝水3", "金相法宝水4", "金相法宝水5", "金相法宝火1", "金相法宝火2", "金相法宝火3", "金相法宝火4", "金相法宝火5", "金相法宝土1", "金相法宝土2", "金相法宝土3", "金相法宝土4", "金相法宝土5" })
+
+
+[金相法宝金1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/metal",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 金相性 1 增加, "nimbus", 400000 })
+
+[金相法宝金2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/metal",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 金相性 2 增加, "nimbus", 400000 })
+
+[金相法宝金3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/metal",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 金相性 3 增加, "nimbus", 400000 })
+
+[金相法宝金4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/metal",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 金相性 4 增加, "nimbus", 400000 })
+
+[金相法宝金5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/metal",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 金相性 5 增加, "nimbus", 400000 })
+
+[金相法宝木1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/wood",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 木相性 1 增加, "nimbus", 400000 })
+
+[金相法宝木2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/wood",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 木相性 2 增加, "nimbus", 400000 })
+
+[金相法宝木3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/wood",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 木相性 3 增加, "nimbus", 400000 })
+
+[金相法宝木4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/wood",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 木相性 4 增加, "nimbus", 400000 })
+
+[金相法宝木5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/wood",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 木相性 5 增加, "nimbus", 400000 })
+
+[金相法宝水1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/water",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 水相性 1 增加, "nimbus", 400000 })
+
+[金相法宝水2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/water",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 水相性 2 增加, "nimbus", 400000 })
+
+[金相法宝水3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/water",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 水相性 3 增加, "nimbus", 400000 })
+
+[金相法宝水4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/water",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 水相性 4 增加, "nimbus", 400000 })
+
+[金相法宝水5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/water",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 水相性 5 增加, "nimbus", 400000 })
+
+[金相法宝火1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/fire",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 火相性 1 增加, "nimbus", 400000 })
+
+[金相法宝火2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/fire",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 火相性 2 增加, "nimbus", 400000 })
+
+[金相法宝火3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/fire",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 火相性 3 增加, "nimbus", 400000 })
+
+[金相法宝火4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/fire",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 火相性 4 增加, "nimbus", 400000 })
+
+[金相法宝火5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/fire",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 火相性 5 增加, "nimbus", 400000 })
+
+[金相法宝土1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/earth",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 土相性 1 增加, "nimbus", 400000 })
+
+[金相法宝土2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/earth",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 土相性 2 增加, "nimbus", 400000 })
+
+[金相法宝土3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/earth",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 土相性 3 增加, "nimbus", 400000 })
+
+[金相法宝土4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/earth",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 土相性 4 增加, "nimbus", 400000 })
+
+[金相法宝土5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/earth",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 土相性 5 增加, "nimbus", 400000 })
+
+[法宝金相所有1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/all_polar",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 所有相性 1 增加, "nimbus", 400000 })
+
+[法宝金相所有2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/all_polar",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 所有相性 2 增加, "nimbus", 400000 })
+
+[法宝金相所有3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/all_polar",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 所有相性 3 增加, "nimbus", 400000 })
+
+[法宝金相所有4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/all_polar",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 所有相性 4 增加, "nimbus", 400000 })
+
+[法宝金相所有5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 1, "extra_skill_level", 1, "prop/all_polar",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 所有相性 5 增加, "nimbus", 400000 })
+
+
+
+[木相法宝]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "木相法宝金1", "木相法宝金2", "木相法宝金3", "木相法宝金4", "木相法宝金5", "木相法宝木1", "木相法宝木2", "木相法宝木3", "木相法宝木4", "木相法宝木5", "木相法宝水1", "木相法宝水2", "木相法宝水3", "木相法宝水4", "木相法宝水5", "木相法宝火1", "木相法宝火2", "木相法宝火3", "木相法宝火4", "木相法宝火5", "木相法宝土1", "木相法宝土2", "木相法宝土3", "木相法宝土4", "木相法宝土5" })
+
+
+[木相法宝金1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/metal",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 金相性 1 增加, "nimbus", 400000 })
+
+[木相法宝金2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/metal",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 金相性 2 增加, "nimbus", 400000 })
+
+[木相法宝金3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/metal",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 金相性 3 增加, "nimbus", 400000 })
+
+[木相法宝金4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/metal",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 金相性 4 增加, "nimbus", 400000 })
+
+[木相法宝金5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/metal",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 金相性 5 增加, "nimbus", 400000 })
+
+[木相法宝木1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/wood",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 木相性 1 增加, "nimbus", 400000 })
+
+[木相法宝木2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/wood",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 木相性 2 增加, "nimbus", 400000 })
+
+[木相法宝木3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/wood",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 木相性 3 增加, "nimbus", 400000 })
+
+[木相法宝木4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/wood",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 木相性 4 增加, "nimbus", 400000 })
+
+[木相法宝木5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/wood",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 木相性 5 增加, "nimbus", 400000 })
+
+[木相法宝水1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/water",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 水相性 1 增加, "nimbus", 400000 })
+
+[木相法宝水2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/water",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 水相性 2 增加, "nimbus", 400000 })
+
+[木相法宝水3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/water",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 水相性 3 增加, "nimbus", 400000 })
+
+[木相法宝水4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/water",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 水相性 4 增加, "nimbus", 400000 })
+
+[木相法宝水5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/water",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 水相性 5 增加, "nimbus", 400000 })
+
+[木相法宝火1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/fire",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 火相性 1 增加, "nimbus", 400000 })
+
+[木相法宝火2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/fire",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 火相性 2 增加, "nimbus", 400000 })
+
+[木相法宝火3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/fire",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 火相性 3 增加, "nimbus", 400000 })
+
+[木相法宝火4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/fire",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 火相性 4 增加, "nimbus", 400000 })
+
+[木相法宝火5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/fire",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 火相性 5 增加, "nimbus", 400000 })
+
+[木相法宝土1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/earth",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 土相性 1 增加, "nimbus", 400000 })
+
+[木相法宝土2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/earth",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 土相性 2 增加, "nimbus", 400000 })
+
+[木相法宝土3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/earth",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 土相性 3 增加, "nimbus", 400000 })
+
+[木相法宝土4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/earth",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 土相性 4 增加, "nimbus", 400000 })
+
+[木相法宝土5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/earth",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 土相性 5 增加, "nimbus", 400000 })
+
+[法宝木相所有1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/all_polar",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 所有相性 1 增加, "nimbus", 400000 })
+
+[法宝木相所有2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/all_polar",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 所有相性 2 增加, "nimbus", 400000 })
+
+[法宝木相所有3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/all_polar",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 所有相性 3 增加, "nimbus", 400000 })
+
+[法宝木相所有4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/all_polar",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 所有相性 4 增加, "nimbus", 400000 })
+
+[法宝木相所有5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 2, "extra_skill_level", 1, "prop/all_polar",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 所有相性 5 增加, "nimbus", 400000 })
+
+
+
+[水相法宝]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "水相法宝金1", "水相法宝金2", "水相法宝金3", "水相法宝金4", "水相法宝金5", "水相法宝木1", "水相法宝木2", "水相法宝木3", "水相法宝木4", "水相法宝木5", "水相法宝水1", "水相法宝水2", "水相法宝水3", "水相法宝水4", "水相法宝水5", "水相法宝火1", "水相法宝火2", "水相法宝火3", "水相法宝火4", "水相法宝火5", "水相法宝土1", "水相法宝土2", "水相法宝土3", "水相法宝土4", "水相法宝土5" })
+
+
+[水相法宝金1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/metal",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 金相性 1 增加, "nimbus", 400000 })
+
+[水相法宝金2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/metal",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 金相性 2 增加, "nimbus", 400000 })
+
+[水相法宝金3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/metal",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 金相性 3 增加, "nimbus", 400000 })
+
+[水相法宝金4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/metal",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 金相性 4 增加, "nimbus", 400000 })
+
+[水相法宝金5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/metal",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 金相性 5 增加, "nimbus", 400000 })
+
+[水相法宝木1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/wood",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 木相性 1 增加, "nimbus", 400000 })
+
+[水相法宝木2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/wood",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 木相性 2 增加, "nimbus", 400000 })
+
+[水相法宝木3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/wood",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 木相性 3 增加, "nimbus", 400000 })
+
+[水相法宝木4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/wood",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 木相性 4 增加, "nimbus", 400000 })
+
+[水相法宝木5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/wood",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 木相性 5 增加, "nimbus", 400000 })
+
+[水相法宝水1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/water",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 水相性 1 增加, "nimbus", 400000 })
+
+[水相法宝水2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/water",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 水相性 2 增加, "nimbus", 400000 })
+
+[水相法宝水3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/water",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 水相性 3 增加, "nimbus", 400000 })
+
+[水相法宝水4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/water",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 水相性 4 增加, "nimbus", 400000 })
+
+[水相法宝水5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/water",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 水相性 5 增加, "nimbus", 400000 })
+
+[水相法宝火1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/fire",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 火相性 1 增加, "nimbus", 400000 })
+
+[水相法宝火2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/fire",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 火相性 2 增加, "nimbus", 400000 })
+
+[水相法宝火3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/fire",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 火相性 3 增加, "nimbus", 400000 })
+
+[水相法宝火4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/fire",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 火相性 4 增加, "nimbus", 400000 })
+
+[水相法宝火5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/fire",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 火相性 5 增加, "nimbus", 400000 })
+
+[水相法宝土1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/earth",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 土相性 1 增加, "nimbus", 400000 })
+
+[水相法宝土2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/earth",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 土相性 2 增加, "nimbus", 400000 })
+
+[水相法宝土3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/earth",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 土相性 3 增加, "nimbus", 400000 })
+
+[水相法宝土4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/earth",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 土相性 4 增加, "nimbus", 400000 })
+
+[水相法宝土5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/earth",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 土相性 5 增加, "nimbus", 400000 })
+
+[法宝水相所有1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/all_polar",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 所有相性 1 增加, "nimbus", 400000 })
+
+[法宝水相所有2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/all_polar",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 所有相性 2 增加, "nimbus", 400000 })
+
+[法宝水相所有3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/all_polar",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 所有相性 3 增加, "nimbus", 400000 })
+
+[法宝水相所有4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/all_polar",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 所有相性 4 增加, "nimbus", 400000 })
+
+[法宝水相所有5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 3, "extra_skill_level", 1, "prop/all_polar",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 所有相性 5 增加, "nimbus", 400000 })
+
+
+
+[火相法宝]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "火相法宝金1", "火相法宝金2", "火相法宝金3", "火相法宝金4", "火相法宝金5", "火相法宝木1", "火相法宝木2", "火相法宝木3", "火相法宝木4", "火相法宝木5", "火相法宝水1", "火相法宝水2", "火相法宝水3", "火相法宝水4", "火相法宝水5", "火相法宝火1", "火相法宝火2", "火相法宝火3", "火相法宝火4", "火相法宝火5", "火相法宝土1", "火相法宝土2", "火相法宝土3", "火相法宝土4", "火相法宝土5" })
+
+
+[火相法宝金1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/metal",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 金相性 1 增加, "nimbus", 400000 })
+
+[火相法宝金2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/metal",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 金相性 2 增加, "nimbus", 400000 })
+
+[火相法宝金3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/metal",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 金相性 3 增加, "nimbus", 400000 })
+
+[火相法宝金4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/metal",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 金相性 4 增加, "nimbus", 400000 })
+
+[火相法宝金5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/metal",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 金相性 5 增加, "nimbus", 400000 })
+
+[火相法宝木1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/wood",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 木相性 1 增加, "nimbus", 400000 })
+
+[火相法宝木2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/wood",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 木相性 2 增加, "nimbus", 400000 })
+
+[火相法宝木3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/wood",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 木相性 3 增加, "nimbus", 400000 })
+
+[火相法宝木4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/wood",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 木相性 4 增加, "nimbus", 400000 })
+
+[火相法宝木5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/wood",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 木相性 5 增加, "nimbus", 400000 })
+
+[火相法宝水1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/water",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 水相性 1 增加, "nimbus", 400000 })
+
+[火相法宝水2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/water",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 水相性 2 增加, "nimbus", 400000 })
+
+[火相法宝水3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/water",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 水相性 3 增加, "nimbus", 400000 })
+
+[火相法宝水4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/water",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 水相性 4 增加, "nimbus", 400000 })
+
+[火相法宝水5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/water",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 水相性 5 增加, "nimbus", 400000 })
+
+[火相法宝火1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/fire",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 火相性 1 增加, "nimbus", 400000 })
+
+[火相法宝火2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/fire",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 火相性 2 增加, "nimbus", 400000 })
+
+[火相法宝火3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/fire",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 火相性 3 增加, "nimbus", 400000 })
+
+[火相法宝火4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/fire",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 火相性 4 增加, "nimbus", 400000 })
+
+[火相法宝火5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/fire",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 火相性 5 增加, "nimbus", 400000 })
+
+[火相法宝土1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/earth",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 土相性 1 增加, "nimbus", 400000 })
+
+[火相法宝土2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/earth",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 土相性 2 增加, "nimbus", 400000 })
+
+[火相法宝土3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/earth",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 土相性 3 增加, "nimbus", 400000 })
+
+[火相法宝土4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/earth",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 土相性 4 增加, "nimbus", 400000 })
+
+[火相法宝土5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/earth",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 土相性 5 增加, "nimbus", 400000 })
+
+[法宝火相所有1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/all_polar",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 所有相性 1 增加, "nimbus", 400000 })
+
+[法宝火相所有2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/all_polar",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 所有相性 2 增加, "nimbus", 400000 })
+
+[法宝火相所有3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/all_polar",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 所有相性 3 增加, "nimbus", 400000 })
+
+[法宝火相所有4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/all_polar",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 所有相性 4 增加, "nimbus", 400000 })
+
+[法宝火相所有5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 4, "extra_skill_level", 1, "prop/all_polar",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 所有相性 5 增加, "nimbus", 400000 })
+
+
+
+[土相法宝]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "土相法宝金1", "土相法宝金2", "土相法宝金3", "土相法宝金4", "土相法宝金5", "土相法宝木1", "土相法宝木2", "土相法宝木3", "土相法宝木4", "土相法宝木5", "土相法宝水1", "土相法宝水2", "土相法宝水3", "土相法宝水4", "土相法宝水5", "土相法宝火1", "土相法宝火2", "土相法宝火3", "土相法宝火4", "土相法宝火5", "土相法宝土1", "土相法宝土2", "土相法宝土3", "土相法宝土4", "土相法宝土5" })
+
+
+[土相法宝金1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/metal",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 金相性 1 增加, "nimbus", 400000 })
+
+[土相法宝金2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/metal",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 金相性 2 增加, "nimbus", 400000 })
+
+[土相法宝金3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/metal",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 金相性 3 增加, "nimbus", 400000 })
+
+[土相法宝金4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/metal",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 金相性 4 增加, "nimbus", 400000 })
+
+[土相法宝金5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/metal",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 金相性 5 增加, "nimbus", 400000 })
+
+[土相法宝木1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/wood",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 木相性 1 增加, "nimbus", 400000 })
+
+[土相法宝木2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/wood",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 木相性 2 增加, "nimbus", 400000 })
+
+[土相法宝木3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/wood",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 木相性 3 增加, "nimbus", 400000 })
+
+[土相法宝木4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/wood",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 木相性 4 增加, "nimbus", 400000 })
+
+[土相法宝木5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/wood",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 木相性 5 增加, "nimbus", 400000 })
+
+[土相法宝水1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/water",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 水相性 1 增加, "nimbus", 400000 })
+
+[土相法宝水2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/water",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 水相性 2 增加, "nimbus", 400000 })
+
+[土相法宝水3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/water",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 水相性 3 增加, "nimbus", 400000 })
+
+[土相法宝水4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/water",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 水相性 4 增加, "nimbus", 400000 })
+
+[土相法宝水5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/water",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 水相性 5 增加, "nimbus", 400000 })
+
+[土相法宝火1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/fire",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 火相性 1 增加, "nimbus", 400000 })
+
+[土相法宝火2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/fire",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 火相性 2 增加, "nimbus", 400000 })
+
+[土相法宝火3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/fire",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 火相性 3 增加, "nimbus", 400000 })
+
+[土相法宝火4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/fire",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 火相性 4 增加, "nimbus", 400000 })
+
+[土相法宝火5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/fire",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 火相性 5 增加, "nimbus", 400000 })
+
+[土相法宝土1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/earth",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 土相性 1 增加, "nimbus", 400000 })
+
+[土相法宝土2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/earth",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 土相性 2 增加, "nimbus", 400000 })
+
+[土相法宝土3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/earth",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 土相性 3 增加, "nimbus", 400000 })
+
+[土相法宝土4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/earth",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 土相性 4 增加, "nimbus", 400000 })
+
+[土相法宝土5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/earth",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 土相性 5 增加, "nimbus", 400000 })
+
+[法宝土相所有1]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/all_polar",1,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 所有相性 1 增加, "nimbus", 400000 })
+
+[法宝土相所有2]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/all_polar",2,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 所有相性 2 增加, "nimbus", 400000 })
+
+[法宝土相所有3]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/all_polar",3,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 所有相性 3 增加, "nimbus", 400000 })
+
+[法宝土相所有4]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/all_polar",4,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 所有相性 4 增加, "nimbus", 400000 })
+
+[法宝土相所有5]
+name      : 定海珠
+min_level : 1
+max_level : 1
+attribs      : ({"item_polar", 5, "extra_skill_level", 1, "prop/all_polar",5,"prop/enhanced_metal", 30,"prop/enhanced_woodl", 30,"prop/enhanced_water", 30,"prop/enhanced_fire", 30,"prop/enhanced_earth", 30, "prop/enhanced_phy", 30,"extra_desc", #Y已成功注入炼魂书 #r#L炼魂属性增幅: 所有相性 5 增加, "nimbus", 400000 })
+
+

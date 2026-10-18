@@ -1,0 +1,58 @@
+#FORM2
+#jinnang.list
+#create by caijz 09/18/2006
+#奖励物品        机率
+
+[奖励等级]
+name$: 特等奖
+
+
+[特等奖]
+法宝奖励1 : 5000
+
+[法宝奖励1]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "番天印1", "番天印2", "番天印3", "番天印4", "番天印5" })
+#bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "番天印2" })
+#bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "番天印3" })
+#bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "番天印4" })
+#bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "番天印5" })
+
+[番天印1]
+name      : 番天印
+min_level : 1
+max_level : 1
+upgrade_type : 9
+attribs      : ({ "item_polar", 1 }) 
+
+[番天印2]
+name      : 番天印
+min_level : 1
+max_level : 1
+upgrade_type : 9
+attribs      : ({ "item_polar", 2 }) 
+
+[番天印3]
+name      : 番天印
+min_level : 1
+max_level : 1
+upgrade_type : 9
+attribs      : ({ "item_polar", 3 }) 
+
+[番天印4]
+name      : 番天印
+min_level : 1
+max_level : 1
+upgrade_type : 9
+attribs      : ({ "item_polar", 4 }) 
+
+[番天印5]
+name      : 番天印
+min_level : 1
+max_level : 1
+upgrade_type : 9
+attribs      : ({ "item_polar", 5 }) 
+
+
+
+
+

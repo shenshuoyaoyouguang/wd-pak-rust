@@ -1,0 +1,361 @@
+#FORM2
+#jinnang.list
+#create by caijz 09/18/2006
+#奖励物品        概率
+
+[奖励等级]
+name$: 特等奖
+
+
+[特等奖]
+一百级武器黑水 : 50
+一百级头盔黑水 : 50
+一百级衣服黑水 : 50
+一百级鞋子黑水 : 50
+一百级腰带黑水 : 50
+
+
+[一百级武器黑水]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "武器所有相", "武器伤害", "武器所有技能", "武器忽视所有抗性", "武器忽视所有抗异常", "武器体质", "武器敏捷", "武器金相", "武器木相", "武器水相", "武器火相", "武器土相", "武器物理必杀率" })
+
+[一百级头盔黑水]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "头盔所有", "头盔力量", "头盔体质", "头盔敏捷", "头盔灵力", "头盔防御"})
+
+[一百级衣服黑水]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "衣服所有", "衣服抗所有异常", "衣服力量", "衣服体质", "衣服敏捷", "衣服灵力", "衣服防御"})
+
+[一百级鞋子黑水]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "鞋子所有", "鞋子速度", "鞋子力量", "鞋子灵力", "鞋子敏捷", "鞋子体质", "鞋子防御"})
+
+[一百级腰带黑水]
+bonus$:  ({ 0, 0, 100, "属性道具", 1, 1, "腰带所有", "腰带所有异常", "腰带力量", "腰带灵力", "腰带敏捷", "腰带体质", "腰带防御"})
+
+
+[武器所有相]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 1
+attribs      : ({ "prop/all_polar", 5 })
+
+[武器伤害]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 1
+attribs      : ({ "prop/mag_power", 2400, "prop/phy_power", 2400 })
+
+[武器所有技能]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 1
+attribs      : ({ "prop/all_skill", 10 })
+
+[武器忽视所有抗性]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 1
+attribs      : ({ "prop/ignore_all_resist_polar", 20 })
+
+[武器忽视所有抗异常]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 1
+attribs      : ({ "prop/ignore_all_resist_except", 20 })
+
+[武器力量]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 1
+attribs      : ({ "prop/str", 25 })
+
+[武器灵力]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 1
+attribs      : ({ "prop/wiz", 25 })
+
+[武器体质]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 1
+attribs      : ({ "prop/con", 25 })
+
+[武器敏捷]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 1
+attribs      : ({ "prop/dex", 25 })
+
+[武器金相]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 1
+attribs      : ({ "prop/metal", 5 })
+
+[武器木相]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 1
+attribs      : ({ "prop/wood", 5 })
+
+[武器水相]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 1
+attribs      : ({ "prop/water", 5 })
+
+[武器火相]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 1
+attribs      : ({ "prop/fire", 5 })
+
+[武器土相]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 1
+attribs      : ({ "prop/earth", 5 })
+
+[武器物理必杀率]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 1
+attribs      : ({ "prop/stunt_rate", 30 })
+
+[头盔所有]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 2
+attribs      : ({ "prop/all_attrib", 20 })
+
+[头盔力量]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 2
+attribs      : ({ "prop/str", 25 })
+
+[头盔体质]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 2
+attribs      : ({ "prop/con", 25 })
+
+[头盔敏捷]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 2
+attribs      : ({ "prop/dex", 25 })
+
+[头盔灵力]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 2
+attribs      : ({ "prop/wiz", 25 })
+
+[头盔防御]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 2
+attribs      : ({ "prop/def", 440 })
+
+[头盔气血]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 2
+attribs      : ({ "prop/max_life", 1300 })
+
+[衣服所有]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 3
+attribs      : ({ "prop/all_attrib", 20 })
+
+[衣服抗所有异常]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 3
+attribs      : ({ "prop/all_resist_except", 15 })
+
+[衣服所有抗性]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 3
+attribs      : ({ "prop/all_resist_polar", 15 })
+
+[衣服力量]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 3
+attribs      : ({ "prop/str", 25 })
+
+[衣服体质]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 3
+attribs      : ({ "prop/con", 25 })
+
+[衣服敏捷]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 3
+attribs      : ({ "prop/dex", 25 })
+
+[衣服灵力]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 3
+attribs      : ({ "prop/wiz", 25 })
+
+[衣服防御]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 3
+attribs      : ({ "prop/def", 850 })
+
+[衣服气血]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 3
+attribs      : ({ "prop/max_life", 2400 })
+
+[鞋子所有]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 10
+attribs      : ({ "prop/all_attrib", 20 })
+
+[鞋子力量]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 10
+attribs      : ({ "prop/str", 25 })
+
+[鞋子体质]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 10
+attribs      : ({ "prop/con", 25 })
+
+[鞋子敏捷]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 10
+attribs      : ({ "prop/dex", 25 })
+
+[鞋子灵力]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 10
+attribs      : ({ "prop/wiz", 25 })
+
+[鞋子速度]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 10
+attribs      : ({ "prop/speed", 130 })
+
+[鞋子防御]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 10
+attribs      : ({ "prop/def", 440 })
+
+[腰带所有]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 7
+attribs      : ({ "prop/all_attrib", 20 })
+
+[腰带所有抗性]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 7
+attribs      : ({ "prop/all_resist_polar", 15 })
+
+[腰带所有异常]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 7
+attribs      : ({ "prop/all_resist_except", 15 })
+
+[腰带力量]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 7
+attribs      : ({ "prop/str", 25 })
+
+[腰带体质]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 7
+attribs      : ({ "prop/con", 25 })
+
+[腰带敏捷]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 7
+attribs      : ({ "prop/dex", 25 })
+
+[腰带灵力]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 7
+attribs      : ({ "prop/wiz", 25 })
+
+[腰带防御]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 7
+attribs      : ({ "prop/def", 440 })
+
+[腰带气血]
+name      : 超级黑水晶
+min_level : 100
+max_level : 100
+upgrade_type : 7
+attribs      : ({ "prop/max_life", 1300 })
