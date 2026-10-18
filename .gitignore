@@ -1,4 +1,4 @@
 /target/dist
 /dist
 /target*
-.codebuddy*
+.codebuddy/plans/

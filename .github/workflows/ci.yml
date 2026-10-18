@@ -29,8 +29,8 @@ jobs:
       - name: 单元测试
         run: cargo test --locked --lib
 
-      - name: 自包含集成测试（格式 / LZSS 黄金向量）
-        run: cargo test --locked --test format_basic --test lzss_golden
+      - name: 自包含集成测试（格式 / LZSS / 界面逻辑）
+        run: cargo test --locked --test format_basic --test lzss_golden --test browse --test gui_layout --test recent --test session --test workspace
 
   build:
     name: 编译 ${{ matrix.target }}
