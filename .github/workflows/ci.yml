@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # L1 自包含门禁：只跑不依赖仓库外资产的套件。
+  # 未纳入：tests/golden.rs、tests/read_cli.rs、tests/write_cli.rs 需要
+  # ../wd_pak_tool.py（Python 参考实现）与 ../release/*.pak（85MB + 133MB），
+  # 二者均不在本仓库内，只能在有这些资产的机器上本地跑。
+  test:
+    name: L1 测试门禁
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 工具链版本
+        run: rustc -vV && cargo -V
+
+      - name: 单元测试
+        run: cargo test --locked --lib
+
+      - name: 自包含集成测试（格式 / LZSS 黄金向量）
+        run: cargo test --locked --test format_basic --test lzss_golden
+
+  build:
+    name: 编译 ${{ matrix.target }}
+    needs: test
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            artifact: wd-pak-x86_64-gnu
+          - target: x86_64-unknown-linux-musl
+            artifact: wd-pak-x86_64-musl
+          - target: aarch64-unknown-linux-musl
+            artifact: wd-pak-aarch64-musl
+            extra_rustflags: -C linker=rust-lld
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 安装 target
+        run: rustup target add ${{ matrix.target }}
+
+      - name: 编译 release
+        env:
+          EXTRA_RUSTFLAGS: ${{ matrix.extra_rustflags }}
+        run: |
+          # aarch64 交叉链接走 rust-lld（MANUAL.md 2.2），需把它加入 PATH
+          if [ -n "$EXTRA_RUSTFLAGS" ]; then
+            export PATH="$(rustc --print sysroot)/lib/rustlib/$(rustc -vV | sed -n 's/^host: //p')/bin:$PATH"
+            export RUSTFLAGS="$EXTRA_RUSTFLAGS"
+          fi
+          cargo build --release --locked --target ${{ matrix.target }}
+
+      - name: 冒烟（仅同架构目标可执行）
+        if: matrix.target != 'aarch64-unknown-linux-musl'
+        run: |
+          BIN=target/${{ matrix.target }}/release/wd-pak
+          file "$BIN"
+          test "$("$BIN" --version)" = "1.0"
+
+      - name: 按 dist/ 命名归档
+        run: |
+          mkdir -p out
+          cp target/${{ matrix.target }}/release/wd-pak out/${{ matrix.artifact }}
+          ls -l out
+
+      - name: 上传产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: out/${{ matrix.artifact }}
+          if-no-files-found: error
