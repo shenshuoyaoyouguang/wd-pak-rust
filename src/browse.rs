@@ -3,7 +3,7 @@
 //! 只消费 [`SessionEntry`](crate::session::SessionEntry) 快照，不读写包文件。
 
 use std::cmp::Ordering;
-use std::collections::{BTreeSet, HashMap};
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 
 use crate::session::SessionEntry;
 
@@ -98,11 +98,58 @@ pub struct SortSpec {
 
 /// 每个标签独立的视图状态。
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ColumnLayout {
+    pub widths: BTreeMap<Column, i32>,
+    pub hidden: BTreeSet<Column>,
+}
+
+impl Default for ColumnLayout {
+    fn default() -> Self {
+        let mut widths = BTreeMap::new();
+        let mut hidden = BTreeSet::new();
+        for &col in &Column::ALL {
+            widths.insert(col, col.default_width());
+            if !default_visible(col, ViewMode::List) {
+                hidden.insert(col);
+            }
+        }
+        Self { widths, hidden }
+    }
+}
+
+impl ColumnLayout {
+    pub fn width(&self, col: Column) -> i32 {
+        self.widths.get(&col).copied().unwrap_or(col.default_width())
+    }
+
+    pub fn set_width(&mut self, col: Column, w: i32) {
+        self.widths.insert(col, w);
+    }
+
+    pub fn is_hidden(&self, col: Column) -> bool {
+        self.hidden.contains(&col)
+    }
+
+    pub fn toggle_hidden(&mut self, col: Column) {
+        if self.hidden.contains(&col) {
+            self.hidden.remove(&col);
+        } else {
+            self.hidden.insert(col);
+        }
+    }
+
+    pub fn reset(&mut self) {
+        *self = Self::default();
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ViewState {
     pub mode: ViewMode,
     pub sort: SortSpec,
     pub tree: TreeState,
     pub query: Query,
+    pub columns: ColumnLayout,
 }
 
 impl Default for ViewState {
@@ -115,6 +162,7 @@ impl Default for ViewState {
             },
             tree: TreeState::new(),
             query: Query::default(),
+            columns: ColumnLayout::default(),
         }
     }
 }

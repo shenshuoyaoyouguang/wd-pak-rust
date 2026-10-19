@@ -31,6 +31,20 @@ pub use windows::{
 };
 
 /// 去掉行尾 `\r\n` / `\n`（两个平台共用的输入收尾处理）
+/// 路径身份键：normalize + Windows 大小写折叠，用于去重/串行判定。
+/// 业务模块一律走此函数，不直接写 `#[cfg(windows)]`。
+pub fn path_key(path: &std::path::Path) -> String {
+    let normalized = normpath(path);
+    #[cfg(windows)]
+    {
+        normalized.to_string_lossy().to_lowercase()
+    }
+    #[cfg(not(windows))]
+    {
+        normalized.to_string_lossy().into_owned()
+    }
+}
+
 pub(crate) fn trim_line_end(mut s: String) -> String {
     if s.ends_with('\n') {
         s.pop();

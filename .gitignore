@@ -3,3 +3,4 @@
 /target*
 /.codebuddy/*
 !/.codebuddy/rules/
+/.omo/*

@@ -122,6 +122,60 @@ impl PakSession {
         })
     }
 
+    /// 打开并解析包，支持进度回调（每处理一条目调用一次）。
+    pub fn open_with_progress(
+        path: &Path,
+        mut progress: impl FnMut(usize),
+    ) -> Result<Self, PakError> {
+        let reader = crate::commands_read::open_pak(path)?;
+        let (mut files, mut dirs) = (0usize, 0usize);
+        let (mut total_stored, mut total_org) = (0u64, 0u64);
+        let mut attribs: BTreeMap<u32, usize> = BTreeMap::new();
+        let mut entries = Vec::new();
+        let mut count = 0usize;
+        for (rel, node) in reader.walk() {
+            if node.is_dir() {
+                dirs += 1;
+            } else {
+                files += 1;
+                total_stored += node.entry.size as u64;
+                total_org += node.entry.org as u64;
+                *attribs.entry(node.entry.attrib).or_insert(0) += 1;
+            }
+            let e = &node.entry;
+            entries.push(SessionEntry {
+                path: rel,
+                attrib: e.attrib,
+                offset: e.offset,
+                size: e.size,
+                org: e.org,
+                mtime: e.mtime,
+            });
+            count += 1;
+            progress(count);
+        }
+        let root_dir_size = reader.root_size;
+        let file_size = reader.file_size;
+        let ratio = total_stored as f64 / total_org.max(1) as f64;
+        let fingerprint = fingerprint_of(&std::fs::metadata(path)?);
+        Ok(Self {
+            path: path.to_path_buf(),
+            fingerprint,
+            reader,
+            entries,
+            stats: SessionStats {
+                files,
+                dirs,
+                root_dir_size,
+                file_size,
+                total_stored,
+                total_org,
+                ratio,
+                attribs,
+            },
+        })
+    }
+
     pub fn entries(&self) -> &[SessionEntry] {
         &self.entries
     }

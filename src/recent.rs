@@ -48,10 +48,10 @@ impl RecentList {
         if self.limit == 0 {
             return;
         }
-        if let Some(existing) = self.items.iter().find(|e| e.path == entry.path) {
+        if let Some(existing) = self.items.iter().find(|e| crate::platform::path_key(&e.path) == crate::platform::path_key(&entry.path)) {
             entry.pinned = existing.pinned;
         }
-        self.items.retain(|e| e.path != entry.path);
+        self.items.retain(|e| crate::platform::path_key(&e.path) != crate::platform::path_key(&entry.path));
         self.items.push(entry);
         self.sort();
         self.enforce_limit();
@@ -59,7 +59,7 @@ impl RecentList {
 
     /// 固定或取消固定；路径不存在时返回 false。
     pub fn set_pinned(&mut self, path: &Path, pinned: bool) -> bool {
-        let Some(entry) = self.items.iter_mut().find(|e| e.path == path) else {
+        let Some(entry) = self.items.iter_mut().find(|e| crate::platform::path_key(&e.path) == crate::platform::path_key(path)) else {
             return false;
         };
         entry.pinned = pinned;
@@ -70,7 +70,7 @@ impl RecentList {
     /// 移除一条记录；路径不存在时返回 false。
     pub fn remove(&mut self, path: &Path) -> bool {
         let before = self.items.len();
-        self.items.retain(|e| e.path != path);
+        self.items.retain(|e| crate::platform::path_key(&e.path) != crate::platform::path_key(path));
         self.items.len() != before
     }
 
