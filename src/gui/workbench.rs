@@ -2,8 +2,6 @@
 //!
 //! 只定义工作台的卡片与启动模式，不涉及 Win32 控件。
 
-use crate::gui::states::SessionState;
-
 /// 工作台卡片。
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WorkbenchCard {

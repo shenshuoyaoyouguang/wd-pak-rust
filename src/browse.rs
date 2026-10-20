@@ -73,6 +73,21 @@ impl Column {
             Column::Ratio => 70,
         }
     }
+
+    /// 配置持久化键；与界面文案解耦，避免改标题破坏已保存的列宽。
+    pub fn key(self) -> &'static str {
+        match self {
+            Column::Name => "name",
+            Column::Type => "type",
+            Column::Org => "org",
+            Column::Size => "size",
+            Column::Compression => "compression",
+            Column::Attrib => "attrib",
+            Column::Offset => "offset",
+            Column::Mtime => "mtime",
+            Column::Ratio => "ratio",
+        }
+    }
 }
 
 /// 列默认是否显示；与规格 §2.4 的默认列一致。
@@ -170,6 +185,12 @@ impl Default for ViewState {
 /// 返回排序后的条目下标；目录恒在文件前，同值按路径升序稳定。
 pub fn sorted_indices(entries: &[SessionEntry], spec: SortSpec) -> Vec<usize> {
     let mut indices: Vec<usize> = (0..entries.len()).collect();
+    sort_indices(entries, &mut indices, spec);
+    indices
+}
+
+/// 对已有下标子集排序（筛选结果），不改变命中集合。
+pub fn sort_indices(entries: &[SessionEntry], indices: &mut [usize], spec: SortSpec) {
     indices.sort_by(|&a, &b| {
         let (ea, eb) = (&entries[a], &entries[b]);
         let by_kind = eb.is_dir().cmp(&ea.is_dir());
@@ -178,7 +199,6 @@ pub fn sorted_indices(entries: &[SessionEntry], spec: SortSpec) -> Vec<usize> {
         }
         compare_key(ea, eb, spec.key, spec.dir).then_with(|| ea.path.cmp(&eb.path))
     });
-    indices
 }
 
 fn compare_key(a: &SessionEntry, b: &SessionEntry, key: Column, dir: SortDir) -> Ordering {
@@ -474,8 +494,59 @@ impl TreeState {
 
     /// 只返回当前可见行；目录先于文件、同层按路径升序。
     pub fn rows(&self, entries: &[SessionEntry]) -> Vec<TreeRow> {
+        self.project(
+            entries,
+            SortSpec {
+                key: Column::Name,
+                dir: SortDir::Asc,
+            },
+            &Query::default(),
+        )
+    }
+
+    /// 带查询与排序的树投影。
+    ///
+    /// - 命中项及其祖先保留，祖先强制展开；
+    /// - 命中目录时保留整个子树；
+    /// - 空关键字且无条件过滤时不裁剪。
+    pub fn project(
+        &self,
+        entries: &[SessionEntry],
+        spec: SortSpec,
+        query: &Query,
+    ) -> Vec<TreeRow> {
+        let (keep, forced) = if *query != Query::default() {
+            let matches = query.apply(entries);
+            let mut keep = BTreeSet::new();
+            let mut forced = BTreeSet::new();
+            for &index in &matches {
+                let entry = &entries[index];
+                keep.insert(entry.path.clone());
+                if entry.is_dir() {
+                    let prefix = format!("{}/", entry.path);
+                    for child in entries.iter().filter(|e| e.path.starts_with(&prefix)) {
+                        keep.insert(child.path.clone());
+                    }
+                }
+                let mut current = entry.path.as_str();
+                while let Some((parent, _)) = current.rsplit_once('/') {
+                    keep.insert(parent.to_string());
+                    forced.insert(parent.to_string());
+                    current = parent;
+                }
+            }
+            (Some(keep), forced)
+        } else {
+            (None, BTreeSet::new())
+        };
+
         let mut children: HashMap<String, Vec<usize>> = HashMap::new();
         for (index, entry) in entries.iter().enumerate() {
+            if let Some(keep) = &keep {
+                if !keep.contains(&entry.path) {
+                    continue;
+                }
+            }
             let parent = entry
                 .path
                 .rsplit_once('/')
@@ -484,16 +555,11 @@ impl TreeState {
             children.entry(parent).or_default().push(index);
         }
         for list in children.values_mut() {
-            list.sort_by(|&a, &b| {
-                let (ea, eb) = (&entries[a], &entries[b]);
-                eb.is_dir()
-                    .cmp(&ea.is_dir())
-                    .then_with(|| ea.path.cmp(&eb.path))
-            });
+            sort_indices(entries, list, spec);
         }
 
         let mut rows = Vec::new();
-        render_rows("", 0, &children, entries, self, &mut rows);
+        render_rows("", 0, &children, entries, self, &forced, &mut rows);
         rows
     }
 }
@@ -504,6 +570,7 @@ fn render_rows(
     children: &HashMap<String, Vec<usize>>,
     entries: &[SessionEntry],
     tree: &TreeState,
+    forced: &BTreeSet<String>,
     rows: &mut Vec<TreeRow>,
 ) {
     let Some(list) = children.get(parent) else {
@@ -520,8 +587,9 @@ fn render_rows(
             depth,
             has_children,
         });
-        if entry.is_dir() && has_children && tree.is_expanded(&entry.path) {
-            render_rows(&entry.path, depth + 1, children, entries, tree, rows);
+        let expanded = tree.is_expanded(&entry.path) || forced.contains(&entry.path);
+        if entry.is_dir() && has_children && expanded {
+            render_rows(&entry.path, depth + 1, children, entries, tree, forced, rows);
         }
     }
 }
@@ -594,4 +662,117 @@ pub fn dedupe_requests(requests: &[LocateRequest]) -> Vec<LocateRequest> {
 
 fn normalize_inner(target: &str) -> String {
     target.replace('\\', "/").trim_matches('/').to_string()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn entry(path: &str, dir: bool, size: u32, org: u32) -> SessionEntry {
+        SessionEntry {
+            path: path.into(),
+            attrib: if dir { 1 } else { 0 },
+            offset: 0,
+            size,
+            org,
+            mtime: 0,
+        }
+    }
+
+    fn sample() -> Vec<SessionEntry> {
+        vec![
+            entry("a", true, 0, 0),
+            entry("a/b.txt", false, 40, 80),
+            entry("a/c", true, 0, 0),
+            entry("a/c/d.txt", false, 10, 20),
+            entry("z.txt", false, 30, 30),
+        ]
+    }
+
+    #[test]
+    fn sort_indices_orders_subset_with_dirs_first() {
+        let entries = sample();
+        let mut indices = vec![4, 1, 3];
+        sort_indices(
+            &entries,
+            &mut indices,
+            SortSpec {
+                key: Column::Size,
+                dir: SortDir::Desc,
+            },
+        );
+        assert_eq!(indices, vec![1, 4, 3]);
+    }
+
+    #[test]
+    fn tree_project_keeps_matches_and_expands_ancestors() {
+        let entries = sample();
+        let mut tree = TreeState::new();
+        tree.collapse("a");
+        let query = Query {
+            keyword: "d.txt".into(),
+            ..Default::default()
+        };
+        let rows = tree.project(
+            &entries,
+            SortSpec {
+                key: Column::Name,
+                dir: SortDir::Asc,
+            },
+            &query,
+        );
+        let visible: Vec<(String, usize)> = rows
+            .iter()
+            .map(|row| (entries[row.index].path.clone(), row.depth))
+            .collect();
+        assert_eq!(
+            visible,
+            vec![
+                ("a".into(), 0),
+                ("a/c".into(), 1),
+                ("a/c/d.txt".into(), 2),
+            ]
+        );
+    }
+
+    #[test]
+    fn tree_project_matched_directory_keeps_subtree() {
+        let entries = sample();
+        let query = Query {
+            keyword: "a/c".into(),
+            ..Default::default()
+        };
+        let rows = TreeState::new().project(
+            &entries,
+            SortSpec {
+                key: Column::Name,
+                dir: SortDir::Asc,
+            },
+            &query,
+        );
+        let paths: Vec<&str> = rows
+            .iter()
+            .map(|row| entries[row.index].path.as_str())
+            .collect();
+        assert_eq!(paths, vec!["a", "a/c", "a/c/d.txt"]);
+    }
+
+    #[test]
+    fn tree_project_no_match_is_empty() {
+        let entries = sample();
+        let query = Query {
+            keyword: "missing".into(),
+            ..Default::default()
+        };
+        assert!(TreeState::new()
+            .project(
+                &entries,
+                SortSpec {
+                    key: Column::Name,
+                    dir: SortDir::Asc
+                },
+                &query
+            )
+            .is_empty());
+    }
 }

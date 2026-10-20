@@ -6,8 +6,9 @@
 use std::fs;
 use std::path::Path;
 
-/// 界面显示的版本：唯一来源是 `Cargo.toml`，不得复制字面量。
-pub const APP_VERSION: &str = env!("CARGO_PKG_VERSION");
+/// 界面显示的版本：规范要求原样显示 `1.0`（`docs/windows-ui-plan.md` §805），
+/// 与 `Cargo.toml` 的包版本（1.0.0）解耦，此处为唯一来源。
+pub const APP_VERSION: &str = "1.0";
 
 /// 诊断里保留的最近错误条数。
 pub const RECENT_ERROR_LIMIT: usize = 5;
@@ -110,5 +111,16 @@ pub fn long_paths_enabled(probe: &mut dyn FnMut(&Path) -> std::io::Result<()>) -
             false,
             format!("系统长路径支持：未启用（{}）", error),
         ),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // D6：界面版本原样显示 `1.0`；回退为 env!("CARGO_PKG_VERSION") 会得到 1.0.0 而失败。
+    #[test]
+    fn app_version_is_display_spec_value() {
+        assert_eq!(APP_VERSION, "1.0");
     }
 }

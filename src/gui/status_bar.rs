@@ -3,20 +3,16 @@
 //! 只定义状态栏的文本投影与校验徽标状态，不涉及 Win32 控件。
 
 use crate::gui::states::ValidationState;
+use crate::gui::text::short_middle;
 
 /// 校验徽标四态。
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum ValidationBadge {
+    #[default]
     Unchecked,
     Passed,
     Problems(usize),
     Expired,
-}
-
-impl Default for ValidationBadge {
-    fn default() -> Self {
-        ValidationBadge::Unchecked
-    }
 }
 
 impl ValidationBadge {
@@ -58,23 +54,13 @@ pub struct StatusBarState {
 impl StatusBarState {
     /// 中间省略的路径（超过 limit 字符时中间省略）。
     pub fn short_path(&self, limit: usize) -> String {
-        let chars: Vec<char> = self.path.chars().collect();
-        if chars.len() <= limit || limit < 8 {
-            return self.path.clone();
-        }
-        let head = limit / 2 - 1;
-        let tail = limit - head - 1;
-        format!(
-            "{}…{}",
-            chars[..head].iter().collect::<String>(),
-            chars[chars.len() - tail..].iter().collect::<String>()
-        )
+        short_middle(&self.path, limit)
     }
 
     /// 完整状态文本（三段）。
     pub fn full_text(&self) -> String {
         format!(
-            "{} | {} 个文件 / {} 个目录 | 存储 {} / 原始 {}，存储比 {} | {}",
+            "{} | {} 个文件 / {} 个目录 | 存储 {} / 原始 {}（存储比 {}） | {}",
             self.short_path(60),
             self.files,
             self.dirs,

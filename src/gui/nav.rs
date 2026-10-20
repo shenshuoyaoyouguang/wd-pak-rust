@@ -7,11 +7,11 @@
 pub enum NavItem {
     Workbench,
     Recent,
-    Browse,
-    Validation,
     Tasks,
+    Notifications,
     Settings,
     Help,
+    AccountLicense,
 }
 
 impl NavItem {
@@ -19,11 +19,11 @@ impl NavItem {
         match self {
             NavItem::Workbench => "工作台",
             NavItem::Recent => "最近打开",
-            NavItem::Browse => "浏览",
-            NavItem::Validation => "校验",
-            NavItem::Tasks => "任务",
+            NavItem::Tasks => "任务中心",
+            NavItem::Notifications => "通知",
             NavItem::Settings => "设置",
             NavItem::Help => "帮助",
+            NavItem::AccountLicense => "账户与许可",
         }
     }
 
@@ -31,11 +31,11 @@ impl NavItem {
         &[
             NavItem::Workbench,
             NavItem::Recent,
-            NavItem::Browse,
-            NavItem::Validation,
             NavItem::Tasks,
+            NavItem::Notifications,
             NavItem::Settings,
             NavItem::Help,
+            NavItem::AccountLicense,
         ]
     }
 }
@@ -141,6 +141,24 @@ mod tests {
         let mut nav = NavState::new(false);
         nav.select(NavItem::Settings);
         assert_eq!(nav.selected, NavItem::Settings);
+    }
+
+    #[test]
+    fn nav_items_match_spec_order_and_count() {
+        let labels: Vec<&str> = NavItem::all().iter().map(|item| item.label()).collect();
+        assert_eq!(
+            labels,
+            vec![
+                "工作台",
+                "最近打开",
+                "任务中心",
+                "通知",
+                "设置",
+                "帮助",
+                "账户与许可",
+            ]
+        );
+        assert_eq!(NavItem::all().len(), 7);
     }
 
     #[test]

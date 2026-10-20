@@ -30,6 +30,29 @@ pub use windows::{
     Stdout, StdoutRaw,
 };
 
+/// 用户配置目录：Windows 用 `%APPDATA%\wd-pak`，Unix 用 XDG 配置目录。
+pub fn app_config_dir() -> std::path::PathBuf {
+    #[cfg(windows)]
+    {
+        if let Some(base) = std::env::var_os("APPDATA") {
+            return std::path::PathBuf::from(base).join("wd-pak");
+        }
+        if let Some(base) = std::env::var_os("USERPROFILE") {
+            return std::path::PathBuf::from(base).join(".wd-pak");
+        }
+    }
+    #[cfg(not(windows))]
+    {
+        if let Some(base) = std::env::var_os("XDG_CONFIG_HOME") {
+            return std::path::PathBuf::from(base).join("wd-pak");
+        }
+        if let Some(home) = std::env::var_os("HOME") {
+            return std::path::PathBuf::from(home).join(".config").join("wd-pak");
+        }
+    }
+    std::path::PathBuf::from(".wd-pak")
+}
+
 /// 去掉行尾 `\r\n` / `\n`（两个平台共用的输入收尾处理）
 /// 路径身份键：normalize + Windows 大小写折叠，用于去重/串行判定。
 /// 业务模块一律走此函数，不直接写 `#[cfg(windows)]`。

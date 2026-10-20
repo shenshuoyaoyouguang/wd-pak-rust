@@ -104,6 +104,18 @@ pub struct Config {
     pub ui: UiSettings,
     /// 列宽：列名 -> DIP 宽度。
     pub column_widths: BTreeMap<String, i32>,
+    /// 隐藏列键；None 表示使用默认列集。
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub hidden_columns: Option<Vec<String>>,
+    /// 上次导出目录；None 表示尚未导出过。
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_export_dir: Option<String>,
+    /// 上次打包源目录（G4-03）。
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_pack_dir: Option<String>,
+    /// 上次解包输出目录（G4-06）。
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_unpack_dir: Option<String>,
     /// 详情面板宽度（DIP）。
     pub detail_width: i32,
     /// 任务面板高度（DIP）。
@@ -118,6 +130,10 @@ impl Default for Config {
             window: WindowState::default(),
             ui: UiSettings::default(),
             column_widths: BTreeMap::new(),
+            hidden_columns: None,
+            last_export_dir: None,
+            last_pack_dir: None,
+            last_unpack_dir: None,
             detail_width: 320,
             task_panel_height: 120,
             recent: Vec::new(),
