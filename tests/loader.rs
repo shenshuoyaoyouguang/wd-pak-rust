@@ -57,6 +57,15 @@ fn cancel_wins_even_if_parsing_finished() {
 }
 
 #[test]
+fn cancel_joins_worker_before_reporting_cancelled() {
+    let mut loader = Loader::start(golden("layout/etc_mini_nocompress.pak"));
+    loader.cancel();
+
+    assert!(matches!(wait(&mut loader), LoadResult::Cancelled));
+    assert!(loader.is_finished(), "取消后必须完成 join，不能留下后台解析线程");
+}
+
+#[test]
 fn missing_file_reports_failed_with_path() {
     let path = std::env::temp_dir().join("wd_pak_loader_missing.pak");
     let _ = std::fs::remove_file(&path);

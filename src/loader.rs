@@ -7,6 +7,7 @@ use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{self, Receiver, TryRecvError};
 use std::sync::Arc;
+use std::thread::JoinHandle;
 
 use crate::error::PakError;
 use crate::session::PakSession;
@@ -28,6 +29,7 @@ pub struct Loader {
     path: PathBuf,
     cancel: Arc<AtomicBool>,
     rx: Receiver<Message>,
+    worker: Option<JoinHandle<()>>,
     progress: Option<usize>,
     done: bool,
 }
@@ -39,20 +41,25 @@ impl Loader {
         let cancel = Arc::new(AtomicBool::new(false));
         let thread_path = path.clone();
         let thread_cancel = Arc::clone(&cancel);
-        std::thread::spawn(move || {
+        let worker = std::thread::spawn(move || {
             if thread_cancel.load(Ordering::Relaxed) {
                 return;
             }
             let progress_tx = tx.clone();
-            let result = PakSession::open_with_progress(&thread_path, |count| {
-                let _ = progress_tx.send(Message::Progress(count));
-            });
+            let result = PakSession::open_with_progress(
+                &thread_path,
+                |count| {
+                    let _ = progress_tx.send(Message::Progress(count));
+                },
+                Some(thread_cancel.as_ref()),
+            );
             let _ = tx.send(Message::Done(result));
         });
         Self {
             path,
             cancel,
             rx,
+            worker: Some(worker),
             progress: None,
             done: false,
         }
@@ -65,6 +72,11 @@ impl Loader {
     /// 最近一次回报的已读取条目数；尚未回报时为 None。
     pub fn progress(&self) -> Option<usize> {
         self.progress
+    }
+
+    /// 后台线程是否已收尾（`poll` 交付结果时已完成 join）。
+    pub fn is_finished(&self) -> bool {
+        self.worker.is_none()
     }
 
     /// 取消：即使解析已经完成，也以取消为准，结果被丢弃。
@@ -95,7 +107,16 @@ impl Loader {
                 )),
             };
             self.done = true;
+            self.finish_worker();
             return Some(result);
+        }
+    }
+
+    /// 排空剩余消息并 join 后台线程，确保结果交付后不再有解析在后台继续。
+    fn finish_worker(&mut self) {
+        while self.rx.try_recv().is_ok() {}
+        if let Some(worker) = self.worker.take() {
+            let _ = worker.join();
         }
     }
 }
