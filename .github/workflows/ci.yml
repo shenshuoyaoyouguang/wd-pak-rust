@@ -30,7 +30,7 @@ jobs:
         run: cargo test --locked --lib
 
       - name: 自包含集成测试（格式 / LZSS / 界面逻辑）
-        run: cargo test --locked --test format_basic --test lzss_golden --test browse --test gui_layout --test recent --test session --test workspace --test config --test gui_states
+        run: cargo test --locked --test format_basic --test lzss_golden --test browse --test gui_layout --test recent --test session --test workspace --test config --test gui_states --test gui_text
 
   build:
     name: 编译 ${{ matrix.target }}
