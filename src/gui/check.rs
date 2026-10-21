@@ -1,6 +1,12 @@
 //! 校验纯逻辑（G5）。
 
+use std::collections::BTreeMap;
+use std::path::Path;
+use std::sync::atomic::{AtomicBool, Ordering};
+
+use crate::error::PakError;
 use crate::format::{DIR_BIT, RAW_BIT};
+use crate::session::SessionEntry;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum CheckMode {
@@ -20,6 +26,19 @@ pub enum CheckProblemKind {
     BadName,
 }
 
+impl CheckProblemKind {
+    pub fn label(self) -> &'static str {
+        match self {
+            Self::OffsetOutOfBounds | Self::SizeOutOfBounds => "越界",
+            Self::DecompressionFailed => "解压失败",
+            Self::SizeMismatch => "解压大小不符",
+            Self::DuplicateName => "重名",
+            Self::Cycle => "循环引用",
+            Self::BadName => "非法名",
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CheckProblem {
     pub kind: CheckProblemKind,
@@ -33,6 +52,22 @@ impl CheckProblem {
             kind,
             path: path.to_string(),
             detail: detail.to_string(),
+        }
+    }
+
+    /// 与 CLI `check` 的问题行逐字对齐（`  {line}`）。
+    pub fn cli_line(&self) -> String {
+        match self.kind {
+            CheckProblemKind::OffsetOutOfBounds | CheckProblemKind::SizeOutOfBounds => {
+                format!("越界: {} {}", self.path, self.detail)
+            }
+            CheckProblemKind::SizeMismatch => {
+                format!("解压大小不符: {} {}", self.path, self.detail)
+            }
+            CheckProblemKind::DecompressionFailed => {
+                format!("解压失败: {}: {}", self.path, self.detail)
+            }
+            _ => format!("{}: {} {}", self.kind.label(), self.path, self.detail),
         }
     }
 }
@@ -132,12 +167,156 @@ pub struct CheckResult {
     pub total_stored: u64,
     pub total_org: u64,
     pub ratio: f64,
+    pub attribs: BTreeMap<u32, usize>,
     pub problems: Vec<CheckProblem>,
 }
 
 impl CheckResult {
     pub fn passed(&self) -> bool {
         self.problems.is_empty()
+    }
+}
+
+/// 一次校验执行的结果；取消时保留已处理的部分结果。
+#[derive(Debug, Clone, PartialEq)]
+pub struct CheckOutcome {
+    pub result: CheckResult,
+    pub cancelled: bool,
+    pub processed: usize,
+    pub total: usize,
+}
+
+impl CheckOutcome {
+    /// 生成与 CLI `check` 结构一致的报告文本。
+    ///
+    /// CLI 只列出前 50 条问题，界面展示全部；超过 50 条时报告注明差异。
+    pub fn report(&self, pak_path: &Path) -> String {
+        let result = &self.result;
+        let mut out = String::new();
+        out.push_str(&format!("# {}\n", pak_path.display()));
+        out.push_str(&format!(
+            "# files={} dirs={} rootDirSize={} fileSize={}\n",
+            result.files, result.dirs, result.root_dir_size, result.file_size
+        ));
+        out.push_str(&format!(
+            "# stored={} org={} ratio={:.3}\n",
+            result.total_stored, result.total_org, result.ratio
+        ));
+        let dist = result
+            .attribs
+            .iter()
+            .map(|(attrib, count)| format!("0x{attrib:08x}x{count}"))
+            .collect::<Vec<_>>()
+            .join(", ");
+        out.push_str(&format!("# attrib 分布: {dist}\n"));
+        if self.cancelled {
+            out.push_str(&format!(
+                "# 校验已取消（已处理 {}/{} 项）\n",
+                self.processed, self.total
+            ));
+            return out;
+        }
+        if result.problems.is_empty() {
+            out.push_str(&format!(
+                "# 校验通过{}\n",
+                if result.mode == CheckMode::Deep {
+                    " (含全量解压)"
+                } else {
+                    ""
+                }
+            ));
+            return out;
+        }
+        out.push_str(&format!("# 问题 {} 个:\n", result.problems.len()));
+        if result.problems.len() > 50 {
+            out.push_str("# （CLI 仅列前 50 条；界面与复制内容为全部）\n");
+        }
+        for problem in &result.problems {
+            out.push_str(&format!("  {}\n", problem.cli_line()));
+        }
+        out
+    }
+}
+
+/// 遍历会话条目执行校验。`read` 只在深度校验时调用；
+/// `cancel` 置位后在条目之间停止，已处理的部分结果仍会返回。
+pub fn run_check(
+    entries: &[SessionEntry],
+    root_dir_size: u32,
+    file_size: u64,
+    mode: CheckMode,
+    cancel: &AtomicBool,
+    mut progress: impl FnMut(usize, usize),
+    mut read: impl FnMut(&SessionEntry) -> Result<Vec<u8>, PakError>,
+) -> CheckOutcome {
+    let total = entries.len();
+    let mut files = 0usize;
+    let mut dirs = 0usize;
+    let mut total_stored = 0u64;
+    let mut total_org = 0u64;
+    let mut attribs: BTreeMap<u32, usize> = BTreeMap::new();
+    let mut problems = Vec::new();
+    let mut processed = 0usize;
+    let mut cancelled = false;
+
+    for entry in entries {
+        if cancel.load(Ordering::Relaxed) {
+            cancelled = true;
+            break;
+        }
+        if entry.is_dir() {
+            dirs += 1;
+        } else {
+            files += 1;
+            total_stored += entry.size as u64;
+            total_org += entry.org as u64;
+            *attribs.entry(entry.attrib).or_insert(0) += 1;
+            if entry.offset as u64 + entry.size as u64 > file_size {
+                problems.push(CheckProblem::new(
+                    CheckProblemKind::OffsetOutOfBounds,
+                    &entry.path,
+                    &format!("off=0x{:x} size={}", entry.offset, entry.size),
+                ));
+            }
+            if mode == CheckMode::Deep {
+                match read(entry) {
+                    Ok(data) => {
+                        if data.len() as u64 != entry.org as u64 {
+                            problems.push(CheckProblem::new(
+                                CheckProblemKind::SizeMismatch,
+                                &entry.path,
+                                &format!("{} != {}", data.len(), entry.org),
+                            ));
+                        }
+                    }
+                    Err(error) => problems.push(CheckProblem::new(
+                        CheckProblemKind::DecompressionFailed,
+                        &entry.path,
+                        &error.to_string(),
+                    )),
+                }
+            }
+        }
+        processed += 1;
+        progress(processed, total);
+    }
+
+    CheckOutcome {
+        result: CheckResult {
+            mode,
+            files,
+            dirs,
+            root_dir_size,
+            file_size,
+            total_stored,
+            total_org,
+            ratio: total_stored as f64 / total_org.max(1) as f64,
+            attribs,
+            problems,
+        },
+        cancelled,
+        processed,
+        total,
     }
 }
 
@@ -266,5 +445,126 @@ mod tests {
     fn deep_check_raw_trailing_bytes_accepted() {
         let probs = deep_check_entry("a", true, &[1, 2, 3, 4], 3);
         assert!(probs.is_empty());
+    }
+
+    fn entry(path: &str, offset: u32, size: u32, org: u32, attrib: u32) -> SessionEntry {
+        SessionEntry {
+            path: path.to_string(),
+            attrib,
+            offset,
+            size,
+            org,
+            mtime: 0,
+        }
+    }
+
+    #[test]
+    fn run_shallow_reports_out_of_bounds() {
+        let entries = vec![
+            entry("d", 0, 0, 0, DIR_BIT),
+            entry("a", 0, 5, 5, 0),
+            entry("b", 10, 5, 5, 0),
+        ];
+        let cancel = AtomicBool::new(false);
+        let mut last_progress = (0, 0);
+        let outcome = run_check(
+            &entries,
+            1024,
+            12,
+            CheckMode::Shallow,
+            &cancel,
+            |done, total| last_progress = (done, total),
+            |_| panic!("浅校验不应读取条目内容"),
+        );
+        assert_eq!(last_progress, (3, 3));
+        assert_eq!(outcome.processed, 3);
+        assert_eq!(outcome.total, 3);
+        assert!(!outcome.cancelled);
+        assert_eq!(outcome.result.files, 2);
+        assert_eq!(outcome.result.dirs, 1);
+        assert_eq!(outcome.result.total_stored, 10);
+        assert_eq!(outcome.result.total_org, 10);
+        assert_eq!(outcome.result.ratio, 1.0);
+        assert_eq!(outcome.result.problems.len(), 1);
+        assert_eq!(outcome.result.problems[0].kind, CheckProblemKind::OffsetOutOfBounds);
+        assert_eq!(outcome.result.problems[0].cli_line(), "越界: b off=0xa size=5");
+    }
+
+    #[test]
+    fn run_deep_reports_read_failure_and_size_mismatch() {
+        let entries = vec![entry("bad", 0, 2, 10, 0), entry("short", 2, 2, 5, 0)];
+        let cancel = AtomicBool::new(false);
+        let outcome = run_check(
+            &entries,
+            0,
+            100,
+            CheckMode::Deep,
+            &cancel,
+            |_, _| {},
+            |entry| {
+                if entry.path == "bad" {
+                    Err(PakError::DataOob("bad data".into()))
+                } else {
+                    Ok(vec![1, 2, 3])
+                }
+            },
+        );
+        assert_eq!(outcome.result.problems.len(), 2);
+        assert_eq!(
+            outcome.result.problems[0].cli_line(),
+            "解压失败: bad: 读取越界: bad data"
+        );
+        assert_eq!(
+            outcome.result.problems[1].cli_line(),
+            "解压大小不符: short 3 != 5"
+        );
+    }
+
+    #[test]
+    fn run_check_cancel_stops_between_entries() {
+        let entries = vec![
+            entry("a", 0, 1, 1, 0),
+            entry("b", 1, 1, 1, 0),
+            entry("c", 2, 1, 1, 0),
+        ];
+        let cancel = AtomicBool::new(false);
+        let outcome = run_check(
+            &entries,
+            0,
+            100,
+            CheckMode::Shallow,
+            &cancel,
+            |done, _| {
+                if done == 1 {
+                    cancel.store(true, Ordering::Relaxed);
+                }
+            },
+            |_| unreachable!(),
+        );
+        assert!(outcome.cancelled);
+        assert_eq!(outcome.processed, 1);
+        assert_eq!(outcome.total, 3);
+        assert_eq!(outcome.result.files, 1);
+    }
+
+    #[test]
+    fn report_matches_cli_header() {
+        let entries = vec![entry("a", 0, 5, 10, 0)];
+        let cancel = AtomicBool::new(false);
+        let outcome = run_check(
+            &entries,
+            1024,
+            100,
+            CheckMode::Shallow,
+            &cancel,
+            |_, _| {},
+            |_| unreachable!(),
+        );
+        let report = outcome.report(Path::new("x.pak"));
+        assert!(report.starts_with("# x.pak\n"), "{report}");
+        assert!(report.contains("# files=1 dirs=0 rootDirSize=1024 fileSize=100\n"));
+        assert!(report.contains("# stored=5 org=10 ratio=0.500\n"));
+        assert!(report.contains("# attrib 分布: 0x00000000x1\n"));
+        assert!(report.ends_with("# 校验通过\n"), "{report}");
     }
 }

@@ -12,7 +12,7 @@ mod win {
     use std::path::{Path, PathBuf};
     use std::ptr::{null, null_mut};
     use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
-    use std::sync::Arc;
+    use std::sync::{Arc, Mutex};
     use std::thread::JoinHandle;
     use std::time::Instant;
 
@@ -21,6 +21,7 @@ mod win {
     use wd_pak::config::Config;
     use wd_pak::diagnostics::{APP_VERSION, ErrorLog};
     use wd_pak::error::PakError;
+    use wd_pak::gui::check::{run_check, CheckMode, CheckOutcome, CheckProblem};
     use wd_pak::gui::error_text::{error_reason, error_suggestion, error_title};
     use wd_pak::gui::export::{
         default_export_name, looks_binary, preview_for, preview_hex, preview_truncate,
@@ -38,7 +39,7 @@ mod win {
     use wd_pak::gui::layout::{
         layout, scale, LayoutInput, Rect, ShellRects, MIN_HEIGHT, MIN_WIDTH,
     };
-    use wd_pak::gui::locate::HighlightState;
+    use wd_pak::gui::locate::{nearest_entry_index, HighlightState};
     use wd_pak::gui::persist::{self, SessionSnapshot, TabSnapshot};
     use wd_pak::gui::text::{detail_text_multi, entry_text, status_text_multi, tree_entry_text};
     use wd_pak::loader::{LoadResult, Loader};
@@ -72,8 +73,9 @@ mod win {
         InitCommonControlsEx, EM_LIMITTEXT, EM_SETCUEBANNER, ICC_LISTVIEW_CLASSES,
         ICC_PROGRESS_CLASS,
         INITCOMMONCONTROLSEX, LVCF_SUBITEM, LVCF_TEXT, LVCF_WIDTH, LVCOLUMNW, LVIF_TEXT,
-        LVIS_FOCUSED, LVIS_SELECTED, LVITEMW, LVM_DELETECOLUMN, LVM_ENSUREVISIBLE,
-        LVM_GETCOLUMNWIDTH, LVM_GETNEXTITEM, LVM_INSERTCOLUMNW, LVM_SETCOLUMNWIDTH,
+        LVIS_FOCUSED, LVIS_SELECTED, LVITEMW, LVM_DELETECOLUMN, LVM_DELETEALLITEMS,
+        LVM_ENSUREVISIBLE, LVM_GETCOLUMNWIDTH, LVM_GETNEXTITEM, LVM_INSERTCOLUMNW,
+        LVM_INSERTITEMW, LVM_SETCOLUMNWIDTH, LVM_SETITEMTEXTW,
         LVM_SETEXTENDEDLISTVIEWSTYLE, LVM_SETITEMCOUNT, LVM_SETITEMSTATE, LVNI_SELECTED,
         LVN_COLUMNCLICK, LVN_GETDISPINFOW, LVN_ITEMCHANGED, LVN_KEYDOWN, LVS_EX_DOUBLEBUFFER,
         LVS_EX_FULLROWSELECT, LVS_OWNERDATA, LVS_REPORT, NMHDR, NMLISTVIEW, NMLVCUSTOMDRAW,
@@ -164,6 +166,12 @@ mod win {
     const UNPACK_CHECK_ID: usize = 4205;
     const UNPACK_START_ID: usize = 4206;
     const UNPACK_CLOSE_ID: usize = 4207;
+    const CHECK_SHALLOW_ID: usize = 4301;
+    const CHECK_DEEP_ID: usize = 4302;
+    const CHECK_START_ID: usize = 4303;
+    const CHECK_COPY_ID: usize = 4304;
+    const CHECK_CLOSE_ID: usize = 4305;
+    const CHECK_PROBLEMS_ID: usize = 4306;
     const FILTER_TIMER_ID: usize = 1;
     const HIGHLIGHT_TIMER_ID: usize = 3;
     const EXPORT_PROGRESS_TIMER_ID: usize = 4;
@@ -176,6 +184,7 @@ mod win {
     const REPLACE_CLASS: &str = "WdPakReplaceDialog";
     const PACK_CLASS: &str = "WdPakPackDialog";
     const UNPACK_CLASS: &str = "WdPakUnpackDialog";
+    const CHECK_CLASS: &str = "WdPakCheckDialog";
     const WRITE_PROGRESS_CLASS: &str = "WdPakWriteProgress";
     /// 预览读取上限：超过该大小的条目整包解压代价过高，直接提示改为导出。
     const PREVIEW_READ_GUARD: u64 = 64 * 1024 * 1024;
@@ -226,6 +235,7 @@ mod win {
     const MENU_REPLACE: usize = 9011;
     const MENU_PACK: usize = 9012;
     const MENU_UNPACK: usize = 9013;
+    const MENU_CHECK: usize = 9014;
     const MENU_RECENT_BASE: usize = 9100;
     const MENU_RECENT_MAX: usize = 20;
     const MENU_RECENT_CLEAR: usize = 9120;
@@ -653,6 +663,7 @@ mod win {
                         MENU_REPLACE => { replace_selected(hwnd); return 0; }
                         MENU_PACK => { open_pack_dialog(hwnd); return 0; }
                         MENU_UNPACK => { open_unpack_dialog(hwnd); return 0; }
+                        MENU_CHECK => { open_check_dialog(hwnd); return 0; }
                         MENU_CLEAR => { handle_escape(hwnd); return 0; }
                         MENU_COPY_PATH => {
                             let pointer = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *const Ui;
@@ -1465,6 +1476,71 @@ mod win {
         SetFocus(ui.list);
     }
 
+    /// 定位到指定包内路径；目标不存在时回退到最近父目录（G2-06.3）。
+    unsafe fn locate_path(hwnd: HWND, path: &str) {
+        let pointer = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut Ui;
+        if pointer.is_null() {
+            return;
+        }
+        let entry_index = {
+            let ui = &*pointer;
+            let Some(session) = ui.session.as_ref() else {
+                return;
+            };
+            nearest_entry_index(session.entries(), path)
+        };
+        let Some(entry_index) = entry_index else {
+            return;
+        };
+        let target_path = {
+            let ui = &*pointer;
+            ui.session
+                .as_ref()
+                .and_then(|session| session.entries().get(entry_index))
+                .map(|entry| entry.path.clone())
+                .unwrap_or_default()
+        };
+        {
+            let ui = &mut *pointer;
+            if !ui.filter.is_empty() || !read_text(ui.edit).is_empty() {
+                set_text(ui.edit, "");
+                ui.filter.clear();
+            }
+            if let Some(index) = ui.workspace.active_index() {
+                if let Some(tab) = ui.workspace.tab_mut(index) {
+                    let mut ancestor = String::new();
+                    let parts: Vec<&str> = target_path.split('/').collect();
+                    for part in parts.iter().take(parts.len().saturating_sub(1)) {
+                        if !ancestor.is_empty() {
+                            ancestor.push('/');
+                        }
+                        ancestor.push_str(part);
+                        tab.view.tree.expand(&ancestor);
+                    }
+                }
+            }
+        }
+        apply_filter(hwnd);
+        let position = {
+            let ui = &*pointer;
+            ui.visible.iter().position(|&index| index == entry_index)
+        };
+        let Some(position) = position else {
+            return;
+        };
+        let ui = &mut *pointer;
+        clear_list_selection(ui);
+        let mut item: LVITEMW = zeroed();
+        item.stateMask = LVIS_SELECTED | LVIS_FOCUSED;
+        item.state = LVIS_SELECTED | LVIS_FOCUSED;
+        SendMessageW(ui.list, LVM_SETITEMSTATE, position, &item as *const _ as isize);
+        SendMessageW(ui.list, LVM_ENSUREVISIBLE, position, 0);
+        ui.highlight = Some(HighlightState::new(&target_path, 2000));
+        SetTimer(hwnd, HIGHLIGHT_TIMER_ID, 100, None);
+        InvalidateRect(ui.list, null(), 1);
+        SetFocus(ui.list);
+    }
+
     /// 标签条命中矩形（DIP 转物理像素）；宽度随标签数收缩，超出部分裁掉。
     fn tab_layout(ui: &Ui, tabs: Rect, dpi: u32) -> Vec<(Rect, Rect)> {
         let count = ui.workspace.tabs().len();
@@ -1784,7 +1860,7 @@ mod win {
         if ui.config_read_only {
             return;
         }
-        persist_config(ui);
+        let _ = persist::save_config(&ui.config_path, &ui.config);
     }
 
     unsafe fn record_recent(hwnd: HWND, path: &std::path::Path) {
@@ -2460,6 +2536,7 @@ mod win {
             EnableMenuItem(file_menu, MENU_REPLACE as u32, enable(can_preview));
             EnableMenuItem(file_menu, MENU_PACK as u32, enable(true));
             EnableMenuItem(file_menu, MENU_UNPACK as u32, enable(has_session));
+            EnableMenuItem(file_menu, MENU_CHECK as u32, enable(has_session));
         }
         let edit_menu = GetSubMenu(menu, 1);
         if !edit_menu.is_null() {
@@ -6409,6 +6486,427 @@ mod win {
         run_modal(dialog, main, dir_edit);
     }
 
+    // -----------------------------------------------------------------------
+    // G5 校验
+    // -----------------------------------------------------------------------
+
+    struct CheckDialogState {
+        pak_path: PathBuf,
+        shallow: HWND,
+        deep: HWND,
+        start: HWND,
+        copy: HWND,
+        close: HWND,
+        summary: HWND,
+        list: HWND,
+        total: usize,
+        result: Option<CheckOutcome>,
+        error: Option<String>,
+        locate_out: *mut Option<String>,
+    }
+
+    unsafe fn layout_check(hwnd: HWND) {
+        let pointer = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *const CheckDialogState;
+        if pointer.is_null() {
+            return;
+        }
+        let state = &*pointer;
+        let (client, dpi) = client_metrics(hwnd);
+        let margin = scale(16, dpi);
+        let width = client.right - margin * 2;
+        let row_h = scale(22, dpi);
+        place(state.shallow, margin, scale(12, dpi), width, row_h);
+        place(state.deep, margin, scale(38, dpi), width, row_h);
+        place(state.start, margin, scale(70, dpi), scale(120, dpi), scale(30, dpi));
+        place(state.summary, margin, scale(112, dpi), width, scale(56, dpi));
+
+        let button_h = scale(30, dpi);
+        let bottom = client.bottom - margin - button_h;
+        let list_top = scale(176, dpi);
+        place(
+            state.list,
+            margin,
+            list_top,
+            width,
+            (bottom - scale(10, dpi) - list_top).max(scale(80, dpi)),
+        );
+        let close_w = scale(100, dpi);
+        let copy_w = scale(110, dpi);
+        place(state.close, client.right - margin - close_w, bottom, close_w, button_h);
+        place(
+            state.copy,
+            client.right - margin - close_w - scale(8, dpi) - copy_w,
+            bottom,
+            copy_w,
+            button_h,
+        );
+
+        let kind_w = scale(96, dpi);
+        let path_w = scale(240, dpi);
+        let detail_w = (width - kind_w - path_w).max(scale(120, dpi));
+        SendMessageW(state.list, LVM_SETCOLUMNWIDTH, 0, kind_w as isize);
+        SendMessageW(state.list, LVM_SETCOLUMNWIDTH, 1, path_w as isize);
+        SendMessageW(state.list, LVM_SETCOLUMNWIDTH, 2, detail_w as isize);
+    }
+
+    unsafe fn insert_check_problems(list: HWND, problems: &[CheckProblem]) {
+        SendMessageW(list, LVM_DELETEALLITEMS, 0, 0);
+        for (index, problem) in problems.iter().enumerate() {
+            let kind = wide(problem.kind.label());
+            let mut item: LVITEMW = zeroed();
+            item.mask = LVIF_TEXT;
+            item.iItem = index as i32;
+            item.iSubItem = 0;
+            item.pszText = kind.as_ptr() as *mut u16;
+            SendMessageW(list, LVM_INSERTITEMW, 0, &item as *const _ as isize);
+            for (sub_item, text) in [(1usize, &problem.path), (2usize, &problem.detail)] {
+                let text = wide(text);
+                let mut sub: LVITEMW = zeroed();
+                sub.iItem = index as i32;
+                sub.iSubItem = sub_item as i32;
+                sub.pszText = text.as_ptr() as *mut u16;
+                SendMessageW(list, LVM_SETITEMTEXTW, index, &sub as *const _ as isize);
+            }
+        }
+    }
+
+    unsafe fn refresh_check_view(hwnd: HWND) {
+        let pointer = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut CheckDialogState;
+        if pointer.is_null() {
+            return;
+        }
+        let state = &mut *pointer;
+        let (summary, problems) = match (&state.result, &state.error) {
+            (_, Some(error)) => (format!("校验失败：{error}"), Vec::new()),
+            (Some(outcome), None) => {
+                let result = &outcome.result;
+                let conclusion = if outcome.cancelled {
+                    format!(
+                        "校验已取消（已处理 {}/{} 项）",
+                        outcome.processed, outcome.total
+                    )
+                } else if result.problems.is_empty() {
+                    format!(
+                        "校验通过{}",
+                        if result.mode == CheckMode::Deep {
+                            " (含全量解压)"
+                        } else {
+                            ""
+                        }
+                    )
+                } else {
+                    format!("发现问题 {} 个", result.problems.len())
+                };
+                let summary = format!(
+                    "{conclusion}\nfiles={} dirs={} rootDirSize={} fileSize={}\nstored={} org={} ratio={:.3}",
+                    result.files,
+                    result.dirs,
+                    result.root_dir_size,
+                    result.file_size,
+                    result.total_stored,
+                    result.total_org,
+                    result.ratio
+                );
+                (summary, result.problems.clone())
+            }
+            (None, None) => (
+                "尚未校验。浅校验检查 offset+size 越界；深度校验会逐条解压，耗时较长。"
+                    .to_string(),
+                Vec::new(),
+            ),
+        };
+        set_text(state.summary, &summary);
+        insert_check_problems(state.list, &problems);
+        EnableWindow(state.copy, state.result.is_some() as i32);
+    }
+
+    unsafe fn start_check(hwnd: HWND) {
+        let pointer = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut CheckDialogState;
+        if pointer.is_null() {
+            return;
+        }
+        let (mode, pak_path, total) = {
+            let state = &*pointer;
+            (
+                if is_checked(state.shallow) {
+                    CheckMode::Shallow
+                } else {
+                    CheckMode::Deep
+                },
+                state.pak_path.clone(),
+                state.total,
+            )
+        };
+        {
+            let state = &*pointer;
+            EnableWindow(state.start, 0);
+            EnableWindow(state.shallow, 0);
+            EnableWindow(state.deep, 0);
+            set_text(
+                state.summary,
+                if mode == CheckMode::Deep {
+                    "正在深度校验（逐条解压）…"
+                } else {
+                    "正在浅校验…"
+                },
+            );
+        }
+
+        let slot: Arc<Mutex<Option<Result<CheckOutcome, String>>>> = Arc::new(Mutex::new(None));
+        let outcome = run_write_progress(
+            hwnd,
+            "校验",
+            total,
+            Vec::new(),
+            true,
+            {
+                let slot = slot.clone();
+                move |progress, cancel, _stage| match PakSession::open(&pak_path) {
+                    Ok(session) => {
+                        let result = run_check(
+                            session.entries(),
+                            session.stats().root_dir_size,
+                            session.stats().file_size,
+                            mode,
+                            &cancel,
+                            |done, total| {
+                                progress.store(done.min(total), Ordering::Relaxed);
+                            },
+                            |entry| session.read(&entry.path),
+                        );
+                        if let Ok(mut guard) = slot.lock() {
+                            *guard = Some(Ok(result));
+                        }
+                        WriteOutcome::success("校验完成")
+                    }
+                    Err(error) => {
+                        let message = error.to_string();
+                        if let Ok(mut guard) = slot.lock() {
+                            *guard = Some(Err(message.clone()));
+                        }
+                        WriteOutcome::failure(message)
+                    }
+                }
+            },
+        );
+        let stored = slot.lock().ok().and_then(|mut guard| guard.take());
+
+        let pointer = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut CheckDialogState;
+        if pointer.is_null() {
+            return;
+        }
+        let state = &mut *pointer;
+        let mut error_message = None;
+        match stored {
+            Some(Ok(result)) => {
+                state.result = Some(result);
+                state.error = None;
+            }
+            Some(Err(message)) => {
+                state.result = None;
+                state.error = Some(message.clone());
+                error_message = Some(message);
+            }
+            None => {
+                state.result = None;
+                state.error = Some(outcome.message.clone());
+                error_message = Some(outcome.message.clone());
+            }
+        }
+        EnableWindow(state.start, 1);
+        EnableWindow(state.shallow, 1);
+        EnableWindow(state.deep, 1);
+        refresh_check_view(hwnd);
+        if let Some(message) = error_message {
+            show_message(hwnd, &format!("校验失败：{message}"), MB_OK | MB_ICONERROR);
+        }
+    }
+
+    unsafe extern "system" fn check_wndproc(
+        hwnd: HWND,
+        msg: u32,
+        wparam: WPARAM,
+        lparam: LPARAM,
+    ) -> LRESULT {
+        match msg {
+            WM_SIZE => {
+                layout_check(hwnd);
+                0
+            }
+            WM_CTLCOLORSTATIC => dialog_color(wparam),
+            WM_COMMAND => {
+                let id = (wparam & 0xffff) as i32;
+                let code = ((wparam >> 16) & 0xffff) as u32;
+                let pointer =
+                    GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut CheckDialogState;
+                if !pointer.is_null() && code == BN_CLICKED {
+                    match id as usize {
+                        CHECK_START_ID => {
+                            start_check(hwnd);
+                            return 0;
+                        }
+                        CHECK_COPY_ID => {
+                            if let Some(result) = &(*pointer).result {
+                                copy_text(hwnd, &result.report(&(*pointer).pak_path));
+                            }
+                            return 0;
+                        }
+                        CHECK_CLOSE_ID => {
+                            DestroyWindow(hwnd);
+                            return 0;
+                        }
+                        _ => {}
+                    }
+                }
+                if id == IDCANCEL {
+                    DestroyWindow(hwnd);
+                    return 0;
+                }
+                DefWindowProcW(hwnd, msg, wparam, lparam)
+            }
+            WM_NOTIFY => {
+                let pointer =
+                    GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut CheckDialogState;
+                if !pointer.is_null() {
+                    let header = &*(lparam as *const NMHDR);
+                    if header.code == NM_DBLCLK && header.hwndFrom == (*pointer).list {
+                        let index = SendMessageW(
+                            (*pointer).list,
+                            LVM_GETNEXTITEM,
+                            (-1isize) as usize,
+                            LVNI_SELECTED as isize,
+                        );
+                        if index >= 0 {
+                            let path = (*pointer)
+                                .result
+                                .as_ref()
+                                .and_then(|result| result.result.problems.get(index as usize))
+                                .map(|problem| problem.path.clone());
+                            if let Some(path) = path {
+                                *(*pointer).locate_out = Some(path);
+                                DestroyWindow(hwnd);
+                            }
+                        }
+                    }
+                }
+                0
+            }
+            WM_CLOSE => {
+                DestroyWindow(hwnd);
+                0
+            }
+            WM_NCDESTROY => {
+                let pointer =
+                    SetWindowLongPtrW(hwnd, GWLP_USERDATA, 0) as *mut CheckDialogState;
+                if !pointer.is_null() {
+                    drop(Box::from_raw(pointer));
+                }
+                DefWindowProcW(hwnd, msg, wparam, lparam)
+            }
+            _ => DefWindowProcW(hwnd, msg, wparam, lparam),
+        }
+    }
+
+    unsafe fn open_check_dialog(main: HWND) {
+        let pointer = GetWindowLongPtrW(main, GWLP_USERDATA) as *const Ui;
+        if pointer.is_null() {
+            return;
+        }
+        let (pak_path, total) = {
+            let ui = &*pointer;
+            let Some(session) = ui.session.as_ref() else {
+                return;
+            };
+            let Some(path) = ui.path.clone() else {
+                return;
+            };
+            (path, session.entries().len())
+        };
+        let mut locate: Option<String> = None;
+        let (class_name, instance) =
+            register_dialog_class(CHECK_CLASS, Some(check_wndproc), COLOR_BTNFACE);
+        let dpi = dpi_of(main);
+        let dialog = create_centered_dialog(
+            main,
+            &class_name,
+            instance,
+            "校验包",
+            WS_EX_DLGMODALFRAME,
+            scale(680, dpi),
+            scale(560, dpi),
+        );
+        if dialog.is_null() {
+            show_message(main, "无法创建校验窗口。", MB_OK | MB_ICONERROR);
+            return;
+        }
+        let shallow = create_button(
+            dialog,
+            instance,
+            "浅校验（仅检查 offset+size 越界）",
+            BS_AUTORADIOBUTTON as u32 | WS_GROUP,
+            CHECK_SHALLOW_ID,
+        );
+        let deep = create_button(
+            dialog,
+            instance,
+            "深度校验（逐条解压，耗时较长）",
+            BS_AUTORADIOBUTTON as u32,
+            CHECK_DEEP_ID,
+        );
+        let start = create_button(dialog, instance, "开始校验", BS_DEFPUSHBUTTON as u32, CHECK_START_ID);
+        let summary = create_label(dialog, instance, "");
+        let list = create_control(
+            dialog,
+            instance,
+            "SysListView32",
+            null(),
+            WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | LVS_REPORT,
+            WS_EX_CLIENTEDGE,
+            CHECK_PROBLEMS_ID,
+        );
+        let copy = create_button(dialog, instance, "复制报告", 0, CHECK_COPY_ID);
+        let close = create_button(dialog, instance, "关闭", 0, CHECK_CLOSE_ID);
+        if !all_present(&[shallow, deep, start, summary, list, copy, close]) {
+            DestroyWindow(dialog);
+            show_message(main, "无法创建校验控件。", MB_OK | MB_ICONERROR);
+            return;
+        }
+        set_checked(shallow, true);
+        insert_column(list, 0, "类型", scale(96, dpi));
+        insert_column(list, 1, "包内路径", scale(240, dpi));
+        insert_column(list, 2, "详情", scale(240, dpi));
+        SendMessageW(
+            list,
+            LVM_SETEXTENDEDLISTVIEWSTYLE,
+            0,
+            (LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER) as isize,
+        );
+        apply_default_font(&[shallow, deep, start, summary, copy, close]);
+        EnableWindow(copy, 0);
+
+        let state = Box::new(CheckDialogState {
+            pak_path,
+            shallow,
+            deep,
+            start,
+            copy,
+            close,
+            summary,
+            list,
+            total,
+            result: None,
+            error: None,
+            locate_out: &mut locate,
+        });
+        SetWindowLongPtrW(dialog, GWLP_USERDATA, Box::into_raw(state) as isize);
+        layout_check(dialog);
+        refresh_check_view(dialog);
+        run_modal(dialog, main, shallow);
+        if let Some(path) = locate {
+            locate_path(main, &path);
+        }
+    }
+
     unsafe fn place(hwnd: HWND, x: i32, y: i32, width: i32, height: i32) {
         SetWindowPos(
             hwnd,
@@ -6825,6 +7323,7 @@ mod win {
                 append_separator(file_menu);
                 append_menu(file_menu, MF_STRING, MENU_PACK, "从目录打包…\tCtrl+N");
                 append_menu(file_menu, MF_STRING, MENU_UNPACK, "解包到目录…");
+                append_menu(file_menu, MF_STRING, MENU_CHECK, "校验包…\tCtrl+K");
                 append_separator(file_menu);
                 recent_menu = CreatePopupMenu();
                 append_menu(file_menu, MF_POPUP, recent_menu as usize, "最近打开");
@@ -6885,6 +7384,7 @@ mod win {
                 ACCEL { fVirt: FVIRTKEY | FCONTROL, key: 0x45, cmd: MENU_EXPORT as u16 },
                 ACCEL { fVirt: FVIRTKEY | FCONTROL, key: 0x52, cmd: MENU_REPLACE as u16 },
                 ACCEL { fVirt: FVIRTKEY | FCONTROL, key: 0x4E, cmd: MENU_PACK as u16 },
+                ACCEL { fVirt: FVIRTKEY | FCONTROL, key: 0x4B, cmd: MENU_CHECK as u16 },
                 ACCEL {
                     fVirt: FVIRTKEY | FCONTROL | FSHIFT,
                     key: 0x43,
