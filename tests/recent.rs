@@ -108,3 +108,19 @@ fn remove_and_clear_drop_entries() {
     list.clear();
     assert!(list.items().is_empty());
 }
+
+#[test]
+fn alternate_spelling_resolves_to_same_entry() {
+    let mut list = RecentList::new(DEFAULT_LIMIT);
+    list.record(opened("a.pak", 10, 100));
+    list.record(opened("./a.pak", 11, 200));
+
+    assert_eq!(list.items().len(), 1);
+    assert_eq!(list.items()[0].path, p("./a.pak"));
+    assert_eq!(list.items()[0].size, 11);
+
+    assert!(list.set_pinned(&p("a.pak"), true));
+    assert!(list.set_pinned(&p("./a.pak"), false));
+    assert!(list.remove(&p("./a.pak")));
+    assert!(list.items().is_empty());
+}

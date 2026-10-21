@@ -117,3 +117,22 @@ fn set_recent_pinned_works() {
     assert!(c.recent[0].pinned);
     assert!(!set_recent_pinned(&mut c, "nope", true));
 }
+
+#[test]
+fn pinned_recent_survives_limit_when_others_touched() {
+    use wd_pak::config::set_recent_pinned;
+    let mut c = Config::default();
+    c.ui.recent_limit = 2;
+    c.touch_recent("a.pak", 1);
+    assert!(set_recent_pinned(&mut c, "a.pak", true));
+
+    c.touch_recent("b.pak", 2);
+    c.touch_recent("c.pak", 3);
+
+    assert_eq!(c.recent.len(), 2);
+    assert!(
+        c.recent.iter().any(|e| e.path == "a.pak" && e.pinned),
+        "固定项不应被较新的未固定项淘汰: {:?}",
+        c.recent
+    );
+}

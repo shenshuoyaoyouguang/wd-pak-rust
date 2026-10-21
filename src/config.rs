@@ -203,7 +203,8 @@ impl Config {
             self.window.height = 640;
             changed = true;
         }
-        // 去重最近打开：同一路径只保留一条，按 last_opened 降序。
+        // 最近打开：与 `crate::recent::RecentList` 的模型有意不合并（此处持久化简版，
+        // RecentList 为运行时富模型）；排序/淘汰策略已对齐：固定项优先、按 last_opened 降序。
         let mut seen = std::collections::BTreeSet::new();
         let mut deduped = Vec::new();
         for entry in self.recent.drain(..) {
@@ -211,7 +212,11 @@ impl Config {
                 deduped.push(entry);
             }
         }
-        deduped.sort_by(|a, b| b.last_opened.cmp(&a.last_opened));
+        deduped.sort_by(|a, b| {
+            b.pinned
+                .cmp(&a.pinned)
+                .then_with(|| b.last_opened.cmp(&a.last_opened))
+        });
         if deduped.len() > self.ui.recent_limit as usize && self.ui.recent_limit > 0 {
             deduped.truncate(self.ui.recent_limit as usize);
         }
