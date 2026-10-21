@@ -311,7 +311,13 @@ pub fn pack_precheck(entries: &[PackEntry], max_file_size: u64) -> PackPrecheckR
                 });
             }
         }
-        if let Err(issue) = validate_pack_rel_path(&e.rel_path) {
+        if e.rel_path.is_empty() || e.rel_path.split('/').any(str::is_empty) {
+            issues.push(PackIssue {
+                kind: PackIssueKind::NameInvalid,
+                path: e.rel_path.clone(),
+                detail: "空文件名或空路径段".into(),
+            });
+        } else if let Err(issue) = validate_pack_rel_path(&e.rel_path) {
             issues.push(PackIssue {
                 path: if issue.path.is_empty() {
                     e.rel_path.clone()
@@ -321,6 +327,15 @@ pub fn pack_precheck(entries: &[PackEntry], max_file_size: u64) -> PackPrecheckR
                 ..issue
             });
         }
+    }
+    // CLI 在写出阶段拒绝 HDR + 目录树超过 4GB；源文件合计超过上限时必然无法写出，
+    // 预检提前阻断（压缩后可能变小，因此只在上限本身被突破时报告）。
+    if total_size > u64::from(u32::MAX) {
+        issues.push(PackIssue {
+            kind: PackIssueKind::TooLarge,
+            path: String::new(),
+            detail: "整包超过 4GB 限制".into(),
+        });
     }
     PackPrecheckResult {
         issues,
@@ -383,6 +398,32 @@ mod tests {
         let r = pack_precheck(&entries, 1000);
         assert!(!r.can_start());
         assert!(r.issues.iter().any(|i| i.kind == PackIssueKind::NonAscii));
+    }
+
+    #[test]
+    fn precheck_rejects_whole_package_over_4gb() {
+        let entries = vec![
+            PackEntry { rel_path: "a".into(), size: 3 << 30, is_dir: false },
+            PackEntry { rel_path: "b".into(), size: 2 << 30, is_dir: false },
+        ];
+        let r = pack_precheck(&entries, u64::from(u32::MAX));
+        assert!(!r.can_start());
+        assert!(r
+            .issues
+            .iter()
+            .any(|issue| issue.kind == PackIssueKind::TooLarge && issue.path.is_empty()));
+    }
+
+    #[test]
+    fn precheck_rejects_empty_path_segment() {
+        let entries = vec![PackEntry {
+            rel_path: "a//b.txt".into(),
+            size: 1,
+            is_dir: false,
+        }];
+        let r = pack_precheck(&entries, 1000);
+        assert!(!r.can_start());
+        assert!(r.issues.iter().any(|issue| issue.kind == PackIssueKind::NameInvalid));
     }
 
     #[test]

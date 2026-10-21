@@ -18,6 +18,7 @@ use std::ffi::OsStr;
 use std::fs::File;
 use std::io::{self, BufWriter, Read, Seek, SeekFrom, Write};
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use serde_json::{Map, Value};
 
@@ -399,18 +400,24 @@ fn load_one(path: &Path, compress: bool) -> Result<Prepared, io::Error> {
 /// * 其余 → 顺序迭代
 ///
 /// 进度（仅压缩模式）：`# 压缩进度 {done}/{total}`，done%500==0 或 done==total。
-fn preload_files(
+fn preload_files_with_control(
     files: &[PathBuf],
     compress: bool,
     jobs: usize,
     err: &mut (impl Write + Send),
+    cancel: &AtomicBool,
+    progress_cb: &(dyn Fn(usize, usize) + Sync),
 ) -> Result<HashMap<PathBuf, Prepared>, PakError> {
     let total = files.len();
     let mut out: HashMap<PathBuf, Prepared> = HashMap::with_capacity(total);
     if !compress {
-        for path in files {
+        for (i, path) in files.iter().enumerate() {
+            if cancel.load(Ordering::Relaxed) {
+                return Err(PakError::Manifest(PACK_CANCELLED.into()));
+            }
             let p = load_one(path, false)?;
             out.insert(path.clone(), p);
+            progress_cb(i + 1, total);
         }
         return Ok(out);
     }
@@ -446,9 +453,13 @@ fn preload_files(
                 while let Ok((i, r)) = rx.recv() {
                     pending.insert(i, r);
                     while let Some(r) = pending.remove(&next) {
+                        if cancel.load(Ordering::Relaxed) {
+                            return Err(PakError::Manifest(PACK_CANCELLED.into()));
+                        }
                         let done = next + 1;
                         next = done;
                         progress(done, total, err)?;
+                        progress_cb(done, total);
                         match r {
                             Ok(p) => {
                                 out.insert(files[done - 1].clone(), p);
@@ -464,9 +475,13 @@ fn preload_files(
     }
     // 顺序分支（对齐 Python 单线程路径，含 total==1 / jobs==1 / 池构建失败回退）
     for (i, path) in files.iter().enumerate() {
+        if cancel.load(Ordering::Relaxed) {
+            return Err(PakError::Manifest(PACK_CANCELLED.into()));
+        }
         let p = load_one(path, true)?;
         out.insert(path.clone(), p);
         progress(i + 1, total, err)?;
+        progress_cb(i + 1, total);
     }
     Ok(out)
 }
@@ -782,6 +797,9 @@ fn write_io_err(e: io::Error) -> PakError {
 // cmd_pack
 // ---------------------------------------------------------------------------
 
+/// GUI 取消打包时使用的可识别消息；CLI 不产生该错误。
+pub const PACK_CANCELLED: &str = "打包已取消（未写出输出）";
+
 /// 打包（FR-30~38；步骤顺序对齐 Python cmd_pack）。
 pub fn cmd_pack(
     indir: &Path,
@@ -789,6 +807,30 @@ pub fn cmd_pack(
     compress: bool,
     jobs: usize,
     err: &mut (impl Write + Send),
+) -> Result<(), PakError> {
+    let cancel = AtomicBool::new(false);
+    cmd_pack_with_control(
+        indir,
+        pak_path,
+        compress,
+        jobs,
+        err,
+        &cancel,
+        &|_, _| {},
+        &|_| {},
+    )
+}
+
+/// 带取消/进度/阶段回调的打包；CLI 不取消、不订阅进度时走 [`cmd_pack`]。
+pub fn cmd_pack_with_control(
+    indir: &Path,
+    pak_path: &Path,
+    compress: bool,
+    jobs: usize,
+    err: &mut (impl Write + Send),
+    cancel: &AtomicBool,
+    progress: &(dyn Fn(usize, usize) + Sync),
+    stage: &dyn Fn(usize),
 ) -> Result<(), PakError> {
     // 1) indir 非目录 → NotDir（os.path.isdir 语义：stat 失败按非目录）
     let is_dir = std::fs::metadata(indir).map(|m| m.is_dir()).unwrap_or(false);
@@ -810,17 +852,30 @@ pub fn cmd_pack(
         })
         .unwrap_or_default();
     // 4~5) 收集 + 预检（Python 顺序：collect 在前）
+    stage(0);
     let files = collect_files(indir)?;
     preflight(indir, "")?;
-    // 6) 预读/预压缩
-    let mut prepared = preload_files(&files, compress, jobs, err)?;
+    if cancel.load(Ordering::Relaxed) {
+        return Err(PakError::Manifest(PACK_CANCELLED.into()));
+    }
+    // 6) 预读/预压缩（进度与取消只在预处理阶段生效）
+    stage(1);
+    let mut prepared =
+        preload_files_with_control(&files, compress, jobs, err, cancel, progress)?;
+    if cancel.load(Ordering::Relaxed) {
+        return Err(PakError::Manifest(PACK_CANCELLED.into()));
+    }
     // 7) 树构建
     let mut root = build_dir(indir, &mut prepared, &order, "")?;
     // 8) mtime 恢复
     if let Some(v) = &mf {
         apply_manifest_mtime(v, &mut root)?;
     }
-    // 9) 写出
+    // 9) 写出（写前最后一次检查，保证取消时目标文件不变）
+    if cancel.load(Ordering::Relaxed) {
+        return Err(PakError::Manifest(PACK_CANCELLED.into()));
+    }
+    stage(2);
     write_pak(&mut root, pak_path, None)?;
     // 10) 汇总
     let nfiles = count_files(&root);
@@ -1129,5 +1184,41 @@ mod tests {
         std::fs::remove_file(dir.join(MANIFEST_NAME)).unwrap();
         assert!(load_manifest_value(&dir).is_none());
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn controlled_pack_cancel_keeps_target_and_no_tmp() {
+        let root = std::env::temp_dir().join(format!(
+            "wd-pak-pack-cancel-{}-{:?}",
+            std::process::id(),
+            std::thread::current().id()
+        ));
+        let _ = std::fs::remove_dir_all(&root);
+        std::fs::create_dir_all(&root).unwrap();
+        std::fs::write(root.join("a.txt"), b"aaaa").unwrap();
+        std::fs::write(root.join("b.txt"), b"bbbb").unwrap();
+        let out = root.join("out.pak");
+        std::fs::write(&out, b"original").unwrap();
+
+        let cancel = AtomicBool::new(false);
+        let mut err = Vec::new();
+        let result = cmd_pack_with_control(
+            &root,
+            &out,
+            true,
+            2,
+            &mut err,
+            &cancel,
+            &|done, _| {
+                if done >= 1 {
+                    cancel.store(true, Ordering::Relaxed);
+                }
+            },
+            &|_| {},
+        );
+        assert_eq!(result.unwrap_err().to_string(), PACK_CANCELLED);
+        assert_eq!(std::fs::read(&out).unwrap(), b"original");
+        assert!(!root.join("out.pak.tmp").exists());
+        let _ = std::fs::remove_dir_all(&root);
     }
 }

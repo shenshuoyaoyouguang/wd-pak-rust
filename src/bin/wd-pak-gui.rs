@@ -17,11 +17,16 @@ mod win {
     use std::time::Instant;
 
     use wd_pak::browse::{default_visible, sort_indices, Column, Query, SortDir, SortSpec, ViewMode};
-    use wd_pak::commands_write::{cmd_pack, cmd_replace};
+    use wd_pak::commands_write::{
+        cmd_pack_with_control, cmd_replace, PACK_CANCELLED,
+    };
     use wd_pak::config::Config;
     use wd_pak::diagnostics::{APP_VERSION, ErrorLog};
     use wd_pak::error::PakError;
-    use wd_pak::gui::check::{run_check, CheckMode, CheckOutcome, CheckProblem};
+    use wd_pak::gui::check::{
+        filter_problems, pak_fingerprint, run_check, sort_problems_by_path, CheckConclusion,
+        CheckConclusionState, CheckMode, CheckOutcome, CheckProblem, CheckProblemKind,
+    };
     use wd_pak::gui::error_text::{error_reason, error_suggestion, error_title};
     use wd_pak::gui::export::{
         default_export_name, looks_binary, preview_for, preview_hex, preview_truncate,
@@ -41,6 +46,9 @@ mod win {
     };
     use wd_pak::gui::locate::{nearest_entry_index, HighlightState};
     use wd_pak::gui::persist::{self, SessionSnapshot, TabSnapshot};
+    use wd_pak::gui::status_bar::ValidationBadge;
+    use wd_pak::gui::states::{TaskKind, TaskState};
+    use wd_pak::gui::task_panel::TaskPanel;
     use wd_pak::gui::text::{detail_text_multi, entry_text, status_text_multi, tree_entry_text};
     use wd_pak::loader::{LoadResult, Loader};
     use wd_pak::manifest::{FileStat, Manifest, MANIFEST_NAME};
@@ -88,8 +96,9 @@ mod win {
         FileTimeToLocalFileTime, GetDiskFreeSpaceExW,
     };
     use windows_sys::Win32::UI::Shell::{
-        ShellExecuteW, BROWSEINFOW, BIF_NEWDIALOGSTYLE, BIF_RETURNONLYFSDIRS, ILFree,
-        SHBrowseForFolderW, SHGetPathFromIDListW,
+        DragAcceptFiles, DragFinish, DragQueryFileW, ShellExecuteW, BROWSEINFOW, HDROP,
+        BIF_NEWDIALOGSTYLE, BIF_RETURNONLYFSDIRS, ILFree, SHBrowseForFolderW,
+        SHGetPathFromIDListW,
     };
     use windows_sys::Win32::UI::HiDpi::{
         GetDpiForSystem, GetDpiForWindow, SetProcessDpiAwarenessContext,
@@ -106,7 +115,8 @@ mod win {
         SendMessageW, SetForegroundWindow, SetTimer, SetWindowLongPtrW, SetWindowPos,
         SetWindowTextW, ShowWindow, TranslateMessage, ACCEL, BN_CLICKED, BS_AUTOCHECKBOX,
         BS_AUTORADIOBUTTON, BS_DEFPUSHBUTTON,
-        BM_GETCHECK, BM_SETCHECK, CB_ADDSTRING, CB_GETCURSEL, CB_SETCURSEL, CBS_DROPDOWNLIST,
+        BM_GETCHECK, BM_SETCHECK, BM_SETSTYLE, CB_ADDSTRING, CB_GETCURSEL, CB_SETCURSEL,
+        CBS_DROPDOWNLIST,
         CS_HREDRAW, CS_VREDRAW, CW_USEDEFAULT, EN_CHANGE, ES_AUTOHSCROLL,
         ES_AUTOVSCROLL, ES_MULTILINE, ES_READONLY, FCONTROL, FSHIFT, FVIRTKEY, GWLP_USERDATA,
         IDCANCEL, IDC_ARROW, MB_ICONERROR, MB_ICONINFORMATION, MB_ICONQUESTION, MB_ICONWARNING,
@@ -151,6 +161,8 @@ mod win {
     const REPLACE_BACKUP_ID: usize = 4005;
     const REPLACE_OK_ID: usize = 4006;
     const REPLACE_CANCEL_ID: usize = 4007;
+    const REPLACE_COPY_ISSUES_ID: usize = 4008;
+    const REPLACE_OPEN_FOLDER_ID: usize = 4009;
     const PACK_SOURCE_ID: usize = 4101;
     const PACK_SOURCE_BROWSE_ID: usize = 4102;
     const PACK_OUTPUT_ID: usize = 4103;
@@ -160,22 +172,38 @@ mod win {
     const PACK_CHECK_ID: usize = 4107;
     const PACK_START_ID: usize = 4108;
     const PACK_CLOSE_ID: usize = 4109;
+    const PACK_COPY_ISSUES_ID: usize = 4110;
+    const PACK_SAVE_ISSUES_ID: usize = 4111;
+    const PACK_BACK_ID: usize = 4112;
+    const PACK_NEXT_ID: usize = 4113;
+    const PACK_STEPS: [&str; 4] = ["源目录", "输出", "选项", "预检执行"];
     const UNPACK_DIR_ID: usize = 4201;
     const UNPACK_BROWSE_ID: usize = 4202;
     const UNPACK_OPEN_ID: usize = 4203;
     const UNPACK_CHECK_ID: usize = 4205;
     const UNPACK_START_ID: usize = 4206;
     const UNPACK_CLOSE_ID: usize = 4207;
+    const UNPACK_ACK_ID: usize = 4208;
     const CHECK_SHALLOW_ID: usize = 4301;
     const CHECK_DEEP_ID: usize = 4302;
     const CHECK_START_ID: usize = 4303;
     const CHECK_COPY_ID: usize = 4304;
     const CHECK_CLOSE_ID: usize = 4305;
     const CHECK_PROBLEMS_ID: usize = 4306;
+    const CHECK_COPY_ROW_ID: usize = 4307;
+    const CHECK_EXPORT_ID: usize = 4308;
+    const CHECK_FILTER_ID: usize = 4309;
+    const CHECK_FILTERS: [(&str, Option<CheckProblemKind>); 4] = [
+        ("全部类型", None),
+        ("越界", Some(CheckProblemKind::OffsetOutOfBounds)),
+        ("解压失败", Some(CheckProblemKind::DecompressionFailed)),
+        ("解压大小不符", Some(CheckProblemKind::SizeMismatch)),
+    ];
     const FILTER_TIMER_ID: usize = 1;
     const HIGHLIGHT_TIMER_ID: usize = 3;
     const EXPORT_PROGRESS_TIMER_ID: usize = 4;
     const WRITE_TIMER_ID: usize = 5;
+    const TASK_TIMER_ID: usize = 6;
     const ERROR_CLASS: &str = "WdPakErrorDialog";
     const EXPORT_CLASS: &str = "WdPakExportDialog";
     const PREVIEW_CLASS: &str = "WdPakPreviewDialog";
@@ -250,6 +278,7 @@ mod win {
     const TAB_MAX_DIP: i32 = 200;
     const TAB_CLOSE_DIP: i32 = 22;
     const WM_CONTEXTMENU: u32 = 0x007B;
+    const WM_DROPFILES: u32 = 0x0233;
     const TPM_LEFTALIGN: u32 = 0x0000;
     const TPM_RETURNCMD: u32 = 0x0100;
     const SS_CENTER: u32 = 0x0000_0001;
@@ -258,11 +287,23 @@ mod win {
     const PROGRESS_CLASS_NAME: &str = "WdPakLoadProgress";
     const PROGRESS_TIMER_ID: usize = 2;
     const HIT_TEXT_W: i32 = 72;
+    const LVM_GETTOPINDEX_MSG: u32 = 0x1027;
+
+    /// 当前后台任务：任务面板据此轮询进度并提供取消。
+    struct ActiveTask {
+        id: u64,
+        cancel: Arc<AtomicBool>,
+        progress: Arc<AtomicUsize>,
+        total: usize,
+        cancel_enabled: bool,
+    }
 
     /// 非活动标签的会话与最后选中项；活动标签的会话放在 `Ui::session`。
     struct TabRuntime {
         session: Option<PakSession>,
         selected: Option<String>,
+        check: CheckConclusion,
+        check_outcome: Option<CheckOutcome>,
     }
 
     struct Ui {
@@ -295,6 +336,10 @@ mod win {
         recent_menu: HMENU,
         config_read_only: bool,
         error_log: ErrorLog,
+        tasks: TaskPanel,
+        active_task: Option<ActiveTask>,
+        check: CheckConclusion,
+        check_outcome: Option<CheckOutcome>,
     }
 
     fn wide(value: &str) -> Vec<u16> {
@@ -501,6 +546,26 @@ mod win {
         )
     }
 
+    /// 非模态对话框消息循环：owner 保持可交互，用于写入向导期间继续读包。
+    unsafe fn run_modeless(dialog: HWND, owner: HWND, focus: HWND) {
+        ShowWindow(dialog, SW_SHOW);
+        SetFocus(focus);
+        let mut msg: MSG = zeroed();
+        while IsWindow(dialog) != 0 {
+            if GetMessageW(&mut msg, null_mut(), 0, 0) <= 0 {
+                break;
+            }
+            if IsDialogMessageW(dialog, &msg) != 0 {
+                continue;
+            }
+            TranslateMessage(&msg);
+            DispatchMessageW(&msg);
+        }
+        if IsWindow(owner) != 0 {
+            SetForegroundWindow(owner);
+        }
+    }
+
     /// 对话框模态消息循环；销毁后恢复 owner 的交互并带回前台。
     unsafe fn run_modal(dialog: HWND, owner: HWND, focus: HWND) {
         EnableWindow(owner, 0);
@@ -699,7 +764,7 @@ mod win {
                             activate_tab(hwnd, command - MENU_TAB_BASE);
                             return 0;
                         }
-                        MENU_EXIT => { save_state(hwnd); DestroyWindow(hwnd); return 0; }
+                        MENU_EXIT => { request_close(hwnd); return 0; }
                         MENU_ABOUT => {
                             let text = wide(&format!("wd-pak {APP_VERSION}\n问道 PAK 工具"));
                             let caption = wide("关于");
@@ -958,10 +1023,58 @@ mod win {
                         }
                         InvalidateRect(ui.list, null(), 1);
                     }
+                } else if wparam == TASK_TIMER_ID {
+                    let pointer = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut Ui;
+                    if !pointer.is_null() {
+                        let (id, done, total) = match &(*pointer).active_task {
+                            Some(active) => (
+                                active.id,
+                                active.progress.load(Ordering::Relaxed),
+                                active.total,
+                            ),
+                            None => (0, 0, 0),
+                        };
+                        if total > 0 {
+                            (*pointer).tasks.update_progress(id, done.min(total), total);
+                        }
+                        let (_client, dpi, rects) = shell_layout(hwnd);
+                        let panel = rects.task_panel.scaled(dpi);
+                        let area = RECT {
+                            left: panel.x,
+                            top: panel.y,
+                            right: panel.right(),
+                            bottom: panel.bottom(),
+                        };
+                        InvalidateRect(hwnd, &area, 0);
+                    }
                 }
                 0
             }
             WM_LBUTTONDOWN => {
+                let x = (lparam & 0xffff) as i32;
+                let y = ((lparam >> 16) & 0xffff) as i32;
+                let (_client, dpi, rects) = shell_layout(hwnd);
+                let panel = rects.task_panel.scaled(dpi);
+                if x >= panel.x && x < panel.right() && y >= panel.y && y < panel.bottom() {
+                    let pointer = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut Ui;
+                    if !pointer.is_null() {
+                        let cancel_hit = x >= panel.right() - scale(56, dpi);
+                        let cancel_enabled = (*pointer)
+                            .active_task
+                            .as_ref()
+                            .map(|active| active.cancel_enabled)
+                            .unwrap_or(false);
+                        if cancel_hit && cancel_enabled {
+                            if let Some(active) = &(*pointer).active_task {
+                                active.cancel.store(true, Ordering::Relaxed);
+                            }
+                        } else {
+                            (*pointer).tasks.toggle_collapsed();
+                        }
+                        InvalidateRect(hwnd, null(), 0);
+                    }
+                    return 0;
+                }
                 click_tab(hwnd, lparam, false);
                 0
             }
@@ -970,8 +1083,7 @@ mod win {
                 0
             }
             WM_CLOSE => {
-                save_state(hwnd);
-                DestroyWindow(hwnd);
+                request_close(hwnd);
                 0
             }
             WM_DESTROY => {
@@ -1589,6 +1701,8 @@ mod win {
         if let Some(slot) = ui.runtime.get_mut(index) {
             slot.session = ui.session.take();
             slot.selected = selected;
+            slot.check = std::mem::take(&mut ui.check);
+            slot.check_outcome = ui.check_outcome.take();
         }
         if let Some(tab) = ui.workspace.tab_mut(index) {
             tab.view.query.keyword = ui.filter.clone();
@@ -1605,7 +1719,7 @@ mod win {
             clear_view(hwnd);
             return;
         };
-        let (path, filter, session, selected) = {
+        let (path, filter, session, selected, check, check_outcome) = {
             let ui = &mut *pointer;
             let path = ui.workspace.tab(index).map(|tab| tab.path().to_path_buf());
             let filter = ui
@@ -1613,11 +1727,21 @@ mod win {
                 .tab(index)
                 .map(|tab| tab.view.query.keyword.clone())
                 .unwrap_or_default();
-            let (session, selected) = match ui.runtime.get_mut(index) {
-                Some(slot) => (slot.session.take(), slot.selected.take()),
-                None => (None, None),
+            let (session, selected, check, check_outcome) = match ui.runtime.get_mut(index) {
+                Some(slot) => (
+                    slot.session.take(),
+                    slot.selected.take(),
+                    std::mem::take(&mut slot.check),
+                    slot.check_outcome.take(),
+                ),
+                None => (
+                    None,
+                    None,
+                    CheckConclusion::new(),
+                    None,
+                ),
             };
-            (path, filter, session, selected)
+            (path, filter, session, selected, check, check_outcome)
         };
         {
             let ui = &mut *pointer;
@@ -1625,6 +1749,8 @@ mod win {
             ui.path = path;
             ui.filter = filter.clone();
             ui.detail_hidden = false;
+            ui.check = check;
+            ui.check_outcome = check_outcome;
             set_text(ui.edit, &filter);
         }
         apply_filter(hwnd);
@@ -1675,6 +1801,11 @@ mod win {
             return;
         }
         if (*pointer).workspace.tabs()[index].write_busy {
+            show_message(
+                hwnd,
+                "该标签有写入任务正在进行，完成或取消后可关闭。",
+                MB_OK | MB_ICONWARNING,
+            );
             return;
         }
         let was_active = (*pointer).workspace.active_index() == Some(index);
@@ -2129,6 +2260,268 @@ mod win {
         update_auxiliary(hwnd);
     }
 
+    /// 登记任务并置为进行中；返回任务 id（状态栏/任务面板据此计数）。
+    unsafe fn task_begin(hwnd: HWND, kind: TaskKind, target: &str) -> Option<u64> {
+        let pointer = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut Ui;
+        if pointer.is_null() {
+            return None;
+        }
+        let id = {
+            let ui = &mut *pointer;
+            let id = ui.tasks.submit(kind, target);
+            ui.tasks.update_state(id, TaskState::Running);
+            id
+        };
+        refresh_texts(hwnd);
+        InvalidateRect(hwnd, null(), 0);
+        Some(id)
+    }
+
+    /// 更新任务状态与进度；结束后刷新状态栏与任务面板。
+    unsafe fn task_update(
+        hwnd: HWND,
+        id: Option<u64>,
+        state: TaskState,
+        done: usize,
+        total: usize,
+    ) {
+        let Some(id) = id else { return };
+        let pointer = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut Ui;
+        if pointer.is_null() {
+            return;
+        }
+        {
+            let ui = &mut *pointer;
+            if total > 0 {
+                ui.tasks.update_progress(id, done, total);
+            }
+            ui.tasks.update_state(id, state);
+        }
+        refresh_texts(hwnd);
+        InvalidateRect(hwnd, null(), 0);
+    }
+
+    /// 后台任务开始：主窗口按 100 ms 轮询进度，任务面板可据此取消（G5-05）。
+    unsafe fn register_active_task(
+        main: HWND,
+        id: u64,
+        cancel: Arc<AtomicBool>,
+        progress: Arc<AtomicUsize>,
+        total: usize,
+        cancel_enabled: bool,
+    ) {
+        let pointer = GetWindowLongPtrW(main, GWLP_USERDATA) as *mut Ui;
+        if pointer.is_null() {
+            return;
+        }
+        (*pointer).active_task = Some(ActiveTask {
+            id,
+            cancel,
+            progress,
+            total,
+            cancel_enabled,
+        });
+        SetTimer(main, TASK_TIMER_ID, 100, None);
+        InvalidateRect(main, null(), 0);
+    }
+
+    unsafe fn clear_active_task(main: HWND) {
+        let pointer = GetWindowLongPtrW(main, GWLP_USERDATA) as *mut Ui;
+        if pointer.is_null() {
+            return;
+        }
+        (*pointer).active_task = None;
+        KillTimer(main, TASK_TIMER_ID);
+        InvalidateRect(main, null(), 0);
+    }
+
+    /// 同一目标的写任务已在运行 → 等待提示（G4-08）。
+    unsafe fn write_waiting(hwnd: HWND, target: &Path) -> bool {
+        let pointer = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *const Ui;
+        if pointer.is_null() {
+            return false;
+        }
+        let key = wd_pak::platform::path_key(target);
+        let busy = (*pointer).tasks.records.iter().any(|record| {
+            record.is_active()
+                && record.kind.is_write()
+                && wd_pak::platform::path_key(Path::new(record.target.as_str())) == key
+        });
+        if busy {
+            show_message(
+                hwnd,
+                "等待前一个写入任务完成。",
+                MB_OK | MB_ICONINFORMATION,
+            );
+        }
+        busy
+    }
+
+    /// 标记包标签的写入占用；关闭标签时据此拒绝（G1-06.3 / G4-08）。
+    unsafe fn set_write_busy_for_path(hwnd: HWND, path: &Path, busy: bool) {
+        let pointer = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut Ui;
+        if pointer.is_null() {
+            return;
+        }
+        let key = wd_pak::platform::path_key(path);
+        let index = (*pointer)
+            .workspace
+            .tabs()
+            .iter()
+            .position(|tab| wd_pak::platform::path_key(tab.path()) == key);
+        if let Some(index) = index {
+            (*pointer).workspace.set_write_busy(index, busy);
+            update_menu_state(hwnd);
+        }
+    }
+
+    /// 写入成功后按路径作废校验结论（活动标签与后台标签都处理）。
+    unsafe fn invalidate_check_for_path(hwnd: HWND, path: &Path) {
+        let pointer = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut Ui;
+        if pointer.is_null() {
+            return;
+        }
+        let key = wd_pak::platform::path_key(path);
+        {
+            let ui = &mut *pointer;
+            if ui
+                .path
+                .as_ref()
+                .map(|current| wd_pak::platform::path_key(current) == key)
+                .unwrap_or(false)
+            {
+                ui.check.invalidate_on_write();
+            }
+            if let Some(index) = ui
+                .workspace
+                .tabs()
+                .iter()
+                .position(|tab| wd_pak::platform::path_key(tab.path()) == key)
+            {
+                if let Some(slot) = ui.runtime.get_mut(index) {
+                    slot.check.invalidate_on_write();
+                }
+            }
+        }
+        refresh_texts(hwnd);
+        InvalidateRect(hwnd, null(), 0);
+    }
+
+    /// 关闭请求：有运行中任务时先确认（G5-07）。
+    unsafe fn request_close(hwnd: HWND) {
+        let pointer = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *const Ui;
+        let (write_busy, task_count) = if pointer.is_null() {
+            (false, 0)
+        } else {
+            let ui = &*pointer;
+            (
+                ui.tasks
+                    .records
+                    .iter()
+                    .any(|record| record.kind.is_write() && record.is_active())
+                    || ui.workspace.tabs().iter().any(|tab| tab.write_busy),
+                ui.tasks.active_count(),
+            )
+        };
+        if write_busy {
+            show_message(
+                hwnd,
+                "有写入任务正在进行，完成或取消后可退出。",
+                MB_OK | MB_ICONWARNING,
+            );
+            return;
+        }
+        if task_count > 0 {
+            let answer = MessageBoxW(
+                hwnd,
+                wide("有读取任务正在运行。退出会中断任务。\n\n确定退出吗？").as_ptr(),
+                wide("确认退出").as_ptr(),
+                MB_YESNO | MB_DEFBUTTON2 | MB_ICONWARNING,
+            );
+            if answer != 6 {
+                return;
+            }
+        }
+        save_state(hwnd);
+        DestroyWindow(hwnd);
+    }
+
+    /// 任务面板单行/多行摘要；折叠时只显示最近一条。
+    unsafe fn paint_task_panel(hwnd: HWND, hdc: HDC, area: Rect, dpi: u32) {
+        let pointer = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *const Ui;
+        if pointer.is_null() || (*pointer).font.is_null() {
+            return;
+        }
+        let ui = &*pointer;
+        let text = if ui.tasks.collapsed {
+            ui.tasks.summary_text()
+        } else if ui.tasks.records.is_empty() {
+            "任务：无".to_string()
+        } else {
+            ui.tasks
+                .records
+                .iter()
+                .rev()
+                .take(3)
+                .map(|record| {
+                    let progress = if record.progress.1 > 0 {
+                        format!("（{} / {}）", record.progress.0, record.progress.1)
+                    } else {
+                        String::new()
+                    };
+                    format!(
+                        "{} {} — {}{}",
+                        record.kind.label(),
+                        record.target,
+                        record.state.label(),
+                        progress
+                    )
+                })
+                .collect::<Vec<_>>()
+                .join("   |   ")
+        };
+        let rect = area.scaled(dpi);
+        let cancel_w = scale(56, dpi);
+        let show_cancel = ui
+            .active_task
+            .as_ref()
+            .map(|active| active.cancel_enabled)
+            .unwrap_or(false);
+        let mut bounds = RECT {
+            left: rect.x + scale(8, dpi),
+            top: rect.y,
+            right: rect.right() - scale(8, dpi) - if show_cancel { cancel_w } else { 0 },
+            bottom: rect.bottom(),
+        };
+        let mut buffer = wide(&text);
+        SelectObject(hdc, ui.font);
+        SetBkMode(hdc, TRANSPARENT as i32);
+        SetTextColor(hdc, GetSysColor(COLOR_WINDOWTEXT));
+        DrawTextW(
+            hdc,
+            buffer.as_mut_ptr(),
+            (buffer.len() - 1) as i32,
+            &mut bounds,
+            DT_SINGLELINE | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX,
+        );
+        if show_cancel {
+            let mut cancel_rect = RECT {
+                left: rect.right() - cancel_w,
+                top: rect.y,
+                right: rect.right() - scale(8, dpi),
+                bottom: rect.bottom(),
+            };
+            let mut label = wide("取消");
+            DrawTextW(
+                hdc,
+                label.as_mut_ptr(),
+                (label.len() - 1) as i32,
+                &mut cancel_rect,
+                DT_RIGHT | DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX,
+            );
+        }
+    }
+
     unsafe fn open_pak(hwnd: HWND) {
         let pointer = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *const Ui;
         let initial = if pointer.is_null() {
@@ -2188,7 +2581,7 @@ mod win {
 
     /// F5：重新读取当前包，保留筛选条件与选中项（规格 §2.4）。
     unsafe fn reload_pak(hwnd: HWND) {
-        let (path, selected) = {
+        let (path, selected, top) = {
             let pointer = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *const Ui;
             if pointer.is_null() {
                 return;
@@ -2197,6 +2590,7 @@ mod win {
             (
                 ui.path.clone(),
                 selected_entry(ui).map(|entry| entry.path.clone()),
+                SendMessageW(ui.list, LVM_GETTOPINDEX_MSG, 0, 0) as usize,
             )
         };
         let Some(path) = path else {
@@ -2212,7 +2606,17 @@ mod win {
                     return;
                 }
                 (*pointer).session = Some(*session);
+                // 重读后包文件可能已变化：指纹不同则旧校验结论作废（§2.6 规则 3）。
+                if let Some(fingerprint) = pak_fingerprint(&path) {
+                    if (*pointer).check.fingerprint.as_deref() != Some(fingerprint.as_str()) {
+                        (*pointer).check.invalidate_on_fingerprint_change();
+                    }
+                }
                 apply_filter(hwnd);
+                // 写后重读：先回到原顶部条目，再恢复选中（§2.6）。
+                if top > 0 && top < (*pointer).visible.len() {
+                    SendMessageW((*pointer).list, LVM_ENSUREVISIBLE, top, 0);
+                }
                 if let Some(selected) = selected {
                     restore_selection(hwnd, &selected);
                 }
@@ -2250,6 +2654,8 @@ mod win {
             ui.runtime.push(TabRuntime {
                 session: None,
                 selected: None,
+                check: CheckConclusion::new(),
+                check_outcome: None,
             });
             ui.workspace.activate(index);
             apply_saved_columns(ui, index);
@@ -2262,6 +2668,8 @@ mod win {
             ui.filter.clear();
             ui.detail_hidden = false;
             ui.highlight = None;
+            ui.check = CheckConclusion::new();
+            ui.check_outcome = None;
             set_text(ui.edit, "");
             index
         };
@@ -2327,6 +2735,8 @@ mod win {
             ui.runtime.push(TabRuntime {
                 session: Some(session),
                 selected: tab.selected.clone(),
+                check: CheckConclusion::new(),
+                check_outcome: None,
             });
             if let Some(tab_state) = ui.workspace.tab_mut(index) {
                 tab_state.view.query.keyword = tab.filter.clone();
@@ -3711,7 +4121,29 @@ mod win {
             persist_config(ui);
         }
 
+        let task_id = task_begin(
+            state.main,
+            TaskKind::Export,
+            &target_dir.to_string_lossy(),
+        );
         let outcome = run_export(dialog, &pak_path, items.clone());
+        let task_state = if let Some(message) = &outcome.fatal {
+            TaskState::Failed(message.clone())
+        } else if outcome.cancelled {
+            TaskState::Cancelled
+        } else if !outcome.failures.is_empty() {
+            TaskState::Failed(format!("{} 项失败", outcome.failures.len()))
+        } else {
+            TaskState::Done
+        };
+        let processed = outcome.written + outcome.skipped + outcome.failures.len();
+        task_update(
+            state.main,
+            task_id,
+            task_state,
+            processed,
+            items.len(),
+        );
         let (summary, flags) = export_summary(&items, &outcome);
         show_message(dialog, &summary, flags);
         if open_folder && outcome.written > 0 && !outcome.cancelled {
@@ -4347,6 +4779,7 @@ mod win {
         verb: String,
         cancel_enabled: bool,
         cancel_requested: bool,
+        detail: Option<Arc<Mutex<String>>>,
         outcome: *mut Option<WriteOutcome>,
     }
 
@@ -4417,12 +4850,20 @@ mod win {
                             .stage
                             .load(Ordering::Relaxed)
                             .min(state.steps.len().saturating_sub(1));
-                        let text = format!(
+                        let mut text = format!(
                             "步骤 {}/{}：{}",
                             index + 1,
                             state.steps.len(),
                             state.steps[index]
                         );
+                        if let Some(detail) = &state.detail {
+                            if let Ok(current) = detail.lock() {
+                                if !current.is_empty() {
+                                    text.push_str(" — ");
+                                    text.push_str(&current);
+                                }
+                            }
+                        }
                         set_text(state.stage_label, &text);
                     }
                     let done = state
@@ -4476,12 +4917,14 @@ mod win {
         }
     }
 
-    unsafe fn run_write_progress<F>(
+    unsafe fn run_write_progress_detail<F>(
         parent: HWND,
         verb: &str,
         total: usize,
         steps: Vec<String>,
         cancel_enabled: bool,
+        detail: Option<Arc<Mutex<String>>>,
+        track: Option<(HWND, u64)>,
         work: F,
     ) -> WriteOutcome
     where
@@ -4539,6 +4982,17 @@ mod win {
             std::thread::spawn(move || work(progress, cancel_flag, stage))
         };
 
+        if let Some((main, id)) = track {
+            register_active_task(
+                main,
+                id,
+                cancel_flag.clone(),
+                progress.clone(),
+                total,
+                cancel_enabled,
+            );
+        }
+
         let state = Box::new(WriteProgressState {
             label,
             stage_label,
@@ -4553,6 +5007,7 @@ mod win {
             verb: verb.to_string(),
             cancel_enabled,
             cancel_requested: false,
+            detail,
             outcome: &mut outcome,
         });
         SetWindowLongPtrW(dialog, GWLP_USERDATA, Box::into_raw(state) as isize);
@@ -4566,6 +5021,9 @@ mod win {
         SetTimer(dialog, WRITE_TIMER_ID, 80, None);
 
         run_modal(dialog, parent, cancel);
+        if let Some((main, _)) = track {
+            clear_active_task(main);
+        }
         outcome.unwrap_or_else(|| WriteOutcome::failure("写入被中断。"))
     }
 
@@ -4590,6 +5048,10 @@ mod win {
         backup: HWND,
         backup_label: HWND,
         risk: HWND,
+        issues_label: HWND,
+        issues: HWND,
+        copy_issues: HWND,
+        open_folder: HWND,
         ok: HWND,
         cancel: HWND,
         success: *mut bool,
@@ -4646,8 +5108,21 @@ mod win {
         y += scale(24, dpi);
         place(state.backup_label, margin, y, width, scale(22, dpi));
         y += scale(30, dpi);
-        place(state.risk, margin, y, width, scale(56, dpi));
+        place(state.risk, margin, y, width, scale(40, dpi));
+        y += scale(44, dpi);
+        place(state.issues_label, margin, y, width, scale(20, dpi));
+        y += scale(24, dpi);
         let bottom = client.bottom - margin - button_h;
+        let issues_h = (bottom - scale(10, dpi) - y).max(scale(60, dpi));
+        place(state.issues, margin, y, width, issues_h);
+        place(state.open_folder, margin, bottom, button_w, button_h);
+        place(
+            state.copy_issues,
+            margin + button_w + scale(8, dpi),
+            bottom,
+            button_w,
+            button_h,
+        );
         place(
             state.ok,
             client.right - margin - button_w,
@@ -4673,42 +5148,105 @@ mod win {
         let text = read_text(state.file_edit).trim().to_string();
         let mut delta = "请选择新文件。".to_string();
         let mut risk = String::new();
-        let mut valid = false;
-        if !text.is_empty() {
+        let mut issues: Vec<String> = Vec::new();
+        let mut new_size = 0u64;
+        let mut has_file = false;
+        if text.is_empty() {
+            issues.push("尚未选择新文件。".into());
+        } else {
             let path = PathBuf::from(&text);
             match std::fs::metadata(&path) {
                 Ok(meta) if meta.is_file() => {
-                    let size = meta.len();
-                    let diff = size as i128 - state.old_org as i128;
+                    has_file = true;
+                    new_size = meta.len();
+                    let diff = new_size as i128 - state.old_org as i128;
                     delta = format!(
                         "大小变化：{}{} 字节（当前 {} → 新 {}）",
                         if diff >= 0 { "+" } else { "" },
                         diff,
                         state.old_org,
-                        size
+                        new_size
                     );
-                    if size > u64::from(u32::MAX) {
-                        risk.push_str("新文件超过 4GB 上限，无法替换。\n");
-                    } else {
-                        valid = true;
+                    if std::fs::File::open(&path).is_err() {
+                        issues.push("新文件不可读。".into());
                     }
                 }
-                _ => delta = "新文件不存在或不是普通文件。".into(),
+                _ => {
+                    delta = "新文件不存在或不是普通文件。".into();
+                    issues.push("新文件不存在或不是普通文件。".into());
+                }
+            }
+        }
+        let entry_exists = {
+            let main_pointer = GetWindowLongPtrW(state.main, GWLP_USERDATA) as *const Ui;
+            if main_pointer.is_null() {
+                false
+            } else {
+                (*main_pointer)
+                    .session
+                    .as_ref()
+                    .map(|session| {
+                        session
+                            .entries()
+                            .iter()
+                            .any(|entry| entry.path == state.inner && !entry.is_dir())
+                    })
+                    .unwrap_or(false)
+            }
+        };
+        let writable = std::fs::OpenOptions::new()
+            .write(true)
+            .open(&state.pak_path)
+            .is_ok();
+        let precheck = replace_precheck(
+            entry_exists,
+            state.old_org,
+            new_size,
+            writable,
+            u64::from(u32::MAX),
+        );
+        for issue in &precheck.issues {
+            let line = match issue.kind {
+                ReplaceIssueKind::TargetMissing => "包内条目不存在；替换只能修改已有条目。",
+                ReplaceIssueKind::TargetNotWritable => {
+                    "目标文件被其他程序占用或不可写。"
+                }
+                ReplaceIssueKind::NewFileTooLarge | ReplaceIssueKind::SizeLimit => {
+                    "新文件或当前条目超过 4GB 上限。"
+                }
+                ReplaceIssueKind::NameInvalid => "包内路径非法。",
+            };
+            if !issues.iter().any(|existing| existing == line) {
+                issues.push(line.to_string());
             }
         }
         let bak = backup_path(&state.pak_path);
         if bak.exists() {
-            risk.push_str(&format!("同名备份将被覆盖：{}\n", bak.display()));
+            risk.push_str("同名备份将在开始时被覆盖。\n");
         }
-        if state.old_org > u64::from(u32::MAX) {
-            risk.push_str("当前条目超过 4GB 上限。\n");
-            valid = false;
-        }
-        if risk.is_empty() {
-            risk.push_str("写入完成后不可撤销，只能依赖 .bak 人工回退。");
-        }
+        risk.push_str(if is_checked(state.backup) {
+            "已启用备份：失败时原包保持不变。\n"
+        } else {
+            "未启用备份：写入完成后不可撤销。\n"
+        });
+        risk.push_str("如目标被占用，请先关闭占用该包的程序后重试。");
+        let issues_text = if issues.is_empty() {
+            "预检通过：可以替换。".to_string()
+        } else {
+            format!(
+                "预检发现 {} 个问题：\r\n{}",
+                issues.len(),
+                issues
+                    .iter()
+                    .map(|line| format!("- {line}"))
+                    .collect::<Vec<_>>()
+                    .join("\r\n")
+            )
+        };
         set_text(state.delta, &delta);
         set_text(state.risk, &risk);
+        set_text(state.issues, &issues_text);
+        let valid = has_file && issues.is_empty();
         EnableWindow(state.ok, valid as i32);
     }
 
@@ -4733,6 +5271,15 @@ mod win {
                 return;
             }
         };
+        if std::fs::File::open(&newfile).is_err() {
+            show_message(
+                dialog,
+                "新文件不可读，请检查权限或文件是否被占用。",
+                MB_OK | MB_ICONWARNING,
+            );
+            SetFocus(state.file_edit);
+            return;
+        }
         let writable = std::fs::OpenOptions::new()
             .write(true)
             .open(&state.pak_path)
@@ -4790,26 +5337,50 @@ mod win {
                 text.push_str(line);
                 text.push('\n');
             }
-            show_message(dialog, text.trim_end(), MB_OK | MB_ICONERROR);
+            copy_text(dialog, text.trim_end());
+            let text = format!("问题详情已复制到剪贴板。\n\n{}\n是否打开包所在文件夹？", text.trim_end());
+            let answer = MessageBoxW(
+                dialog,
+                wide(&text).as_ptr(),
+                wide("替换预检未通过").as_ptr(),
+                MB_YESNO | MB_ICONERROR,
+            );
+            if answer == 6 {
+                if let Some(parent) = state.pak_path.parent() {
+                    reveal_folder(parent);
+                }
+            }
             return;
         }
         let compress = is_checked(state.compress);
         let backup = is_checked(state.backup);
         let pak_path = state.pak_path.clone();
+        if write_waiting(dialog, &pak_path) {
+            return;
+        }
         let inner = state.inner.clone();
         let newfile = newfile.clone();
         let bak = backup_path(&pak_path);
-        let outcome = run_write_progress(
+        set_write_busy_for_path(state.main, &pak_path, true);
+        let task_id = task_begin(
+            state.main,
+            TaskKind::Replace,
+            &pak_path.to_string_lossy(),
+        );
+        let worker_path = pak_path.clone();
+        let outcome = run_write_progress_detail(
             dialog,
             "替换",
             0,
             vec!["备份".into(), "写入".into(), "完成".into()],
             false,
+            None,
+            task_id.map(|id| (state.main, id)),
             move |_progress, _cancel, stage| {
                 let mut log = String::new();
                 if backup {
                     stage.store(0, Ordering::Relaxed);
-                    if let Err(error) = copy_with_mtime(&pak_path, &bak) {
+                    if let Err(error) = copy_with_mtime(&worker_path, &bak) {
                         return WriteOutcome::failure(format!(
                             "备份失败：{error}\n原包未修改。"
                         ));
@@ -4818,7 +5389,7 @@ mod win {
                 }
                 stage.store(1, Ordering::Relaxed);
                 let mut err = Vec::new();
-                match cmd_replace(&pak_path, &inner, &newfile, compress, false, &mut err) {
+                match cmd_replace(&worker_path, &inner, &newfile, compress, false, &mut err) {
                     Ok(()) => {
                         stage.store(2, Ordering::Relaxed);
                         let cli = strip_hash(&String::from_utf8_lossy(&err));
@@ -4838,8 +5409,18 @@ mod win {
                 }
             },
         );
+        set_write_busy_for_path(state.main, &pak_path, false);
+        let task_state = if outcome.ok {
+            TaskState::Done
+        } else if outcome.cancelled {
+            TaskState::Cancelled
+        } else {
+            TaskState::Failed(outcome.message.clone())
+        };
+        task_update(state.main, task_id, task_state, 0, 0);
         if outcome.ok {
             *state.success = true;
+            invalidate_check_for_path(state.main, &pak_path);
             show_message(dialog, &outcome.message, MB_OK | MB_ICONINFORMATION);
             DestroyWindow(dialog);
         } else {
@@ -4858,6 +5439,46 @@ mod win {
         lparam: LPARAM,
     ) -> LRESULT {
         match msg {
+            WM_DROPFILES => {
+                let drop = wparam as HDROP;
+                let count = DragQueryFileW(drop, u32::MAX, null_mut(), 0);
+                if count > 1 {
+                    show_message(
+                        hwnd,
+                        "一次只能替换一个文件，请拖入单个文件。",
+                        MB_OK | MB_ICONWARNING,
+                    );
+                } else if count == 1 {
+                    let mut buffer = vec![0u16; 32768];
+                    let len = DragQueryFileW(
+                        drop,
+                        0,
+                        buffer.as_mut_ptr(),
+                        buffer.len() as u32,
+                    );
+                    if len > 0 {
+                        let path = PathBuf::from(String::from_utf16_lossy(
+                            &buffer[..len as usize],
+                        ));
+                        if path.is_file() {
+                            let pointer = GetWindowLongPtrW(hwnd, GWLP_USERDATA)
+                                as *mut ReplaceDialogState;
+                            if !pointer.is_null() {
+                                set_text((*pointer).file_edit, &path.to_string_lossy());
+                                update_replace_state(hwnd);
+                            }
+                        } else {
+                            show_message(
+                                hwnd,
+                                "请拖入一个文件。",
+                                MB_OK | MB_ICONWARNING,
+                            );
+                        }
+                    }
+                }
+                DragFinish(drop);
+                0
+            }
             WM_SIZE => {
                 layout_replace(hwnd);
                 0
@@ -4885,6 +5506,19 @@ mod win {
                     ) {
                         set_text(state.file_edit, &path.to_string_lossy());
                         update_replace_state(hwnd);
+                    }
+                    return 0;
+                }
+                if id == REPLACE_COPY_ISSUES_ID as i32 && code == BN_CLICKED {
+                    let text = read_text((*pointer).issues);
+                    if !text.trim().is_empty() {
+                        copy_text(hwnd, text.trim_end());
+                    }
+                    return 0;
+                }
+                if id == REPLACE_OPEN_FOLDER_ID as i32 && code == BN_CLICKED {
+                    if let Some(parent) = (*pointer).pak_path.parent() {
+                        reveal_folder(parent);
                     }
                     return 0;
                 }
@@ -4961,7 +5595,7 @@ mod win {
 
         let dpi = dpi_of(main);
         let width = scale(700, dpi);
-        let height = scale(450, dpi);
+        let height = scale(560, dpi);
         let dialog = create_centered_dialog(
             main,
             &class_name,
@@ -4974,6 +5608,7 @@ mod win {
         if dialog.is_null() {
             return;
         }
+        DragAcceptFiles(dialog, 1);
         let path_label = create_label(dialog, instance, &format!("包内路径：{}", entry.path));
         let compression = if entry.is_raw() { "RAW（原样）" } else { "LZSS" };
         let info_label = create_label(
@@ -5016,6 +5651,22 @@ mod win {
         );
         let backup_label = create_label(dialog, instance, "");
         let risk = create_label(dialog, instance, "");
+        let issues_label = create_label(dialog, instance, "预检问题：");
+        let issues = create_text_area(dialog, instance);
+        let copy_issues = create_button(
+            dialog,
+            instance,
+            "复制问题",
+            0,
+            REPLACE_COPY_ISSUES_ID,
+        );
+        let open_folder = create_button(
+            dialog,
+            instance,
+            "打开包目录",
+            0,
+            REPLACE_OPEN_FOLDER_ID,
+        );
         let ok = create_button(
             dialog,
             instance,
@@ -5037,6 +5688,10 @@ mod win {
             backup,
             backup_label,
             risk,
+            issues_label,
+            issues,
+            copy_issues,
+            open_folder,
             ok,
             cancel,
         ]) {
@@ -5056,6 +5711,10 @@ mod win {
             backup,
             backup_label,
             risk,
+            issues_label,
+            issues,
+            copy_issues,
+            open_folder,
             ok,
             cancel,
         ]);
@@ -5087,13 +5746,18 @@ mod win {
             backup,
             backup_label,
             risk,
+            issues_label,
+            issues,
+            copy_issues,
+            open_folder,
             ok,
             cancel,
             success,
         });
         SetWindowLongPtrW(dialog, GWLP_USERDATA, Box::into_raw(state) as isize);
         layout_replace(dialog);
-        run_modal(dialog, main, file_edit);
+        update_replace_state(dialog);
+        run_modeless(dialog, main, file_edit);
     }
 
     // -----------------------------------------------------------------------
@@ -5102,6 +5766,10 @@ mod win {
 
     struct PackDialogState {
         main: HWND,
+        step: usize,
+        step_label: HWND,
+        back: HWND,
+        next: HWND,
         source_label: HWND,
         source_edit: HWND,
         source_browse: HWND,
@@ -5116,10 +5784,13 @@ mod win {
         issues: HWND,
         risk: HWND,
         check: HWND,
+        copy_issues: HWND,
+        save_issues: HWND,
         start: HWND,
         close: HWND,
         checked: bool,
         success_output: *mut Option<PathBuf>,
+        verify_output: *mut bool,
     }
 
     fn dir_is_writable(dir: &Path) -> bool {
@@ -5192,74 +5863,100 @@ mod win {
         let button_w = scale(104, dpi);
         let button_h = scale(32, dpi);
         let browse_w = scale(88, dpi);
-        let mut y = scale(14, dpi);
-        place(state.source_label, margin, y, width, scale(20, dpi));
-        y += scale(22, dpi);
-        place(
-            state.source_edit,
-            margin,
-            y,
-            width - browse_w - scale(8, dpi),
-            edit_h,
-        );
-        place(
-            state.source_browse,
-            client.right - margin - browse_w,
-            y,
-            browse_w,
-            edit_h,
-        );
+        let mut y = scale(10, dpi);
+        place(state.step_label, margin, y, width, scale(24, dpi));
         y += scale(34, dpi);
-        place(state.output_label, margin, y, width, scale(20, dpi));
-        y += scale(22, dpi);
-        place(
-            state.output_edit,
-            margin,
-            y,
-            width - browse_w - scale(8, dpi),
-            edit_h,
-        );
-        place(
-            state.output_browse,
-            client.right - margin - browse_w,
-            y,
-            browse_w,
-            edit_h,
-        );
-        y += scale(34, dpi);
-        place(state.compress, margin, y, scale(230, dpi), scale(24, dpi));
-        place(
-            state.jobs_label,
-            margin + scale(250, dpi),
-            y,
-            scale(80, dpi),
-            scale(24, dpi),
-        );
-        place(
-            state.jobs_edit,
-            margin + scale(330, dpi),
-            y,
-            scale(64, dpi),
-            scale(24, dpi),
-        );
-        y += scale(30, dpi);
-        place(state.note, margin, y, width, scale(22, dpi));
-        y += scale(26, dpi);
-        place(state.stats, margin, y, width, scale(22, dpi));
-        y += scale(28, dpi);
+        match state.step {
+            0 => {
+                place(state.source_label, margin, y, width, scale(20, dpi));
+                y += scale(22, dpi);
+                place(
+                    state.source_edit,
+                    margin,
+                    y,
+                    width - browse_w - scale(8, dpi),
+                    edit_h,
+                );
+                place(
+                    state.source_browse,
+                    client.right - margin - browse_w,
+                    y,
+                    browse_w,
+                    edit_h,
+                );
+                y += scale(34, dpi);
+            }
+            1 => {
+                place(state.output_label, margin, y, width, scale(20, dpi));
+                y += scale(22, dpi);
+                place(
+                    state.output_edit,
+                    margin,
+                    y,
+                    width - browse_w - scale(8, dpi),
+                    edit_h,
+                );
+                place(
+                    state.output_browse,
+                    client.right - margin - browse_w,
+                    y,
+                    browse_w,
+                    edit_h,
+                );
+                y += scale(34, dpi);
+            }
+            2 => {
+                place(state.compress, margin, y, scale(230, dpi), scale(24, dpi));
+                place(
+                    state.jobs_label,
+                    margin + scale(250, dpi),
+                    y,
+                    scale(80, dpi),
+                    scale(24, dpi),
+                );
+                place(
+                    state.jobs_edit,
+                    margin + scale(330, dpi),
+                    y,
+                    scale(64, dpi),
+                    scale(24, dpi),
+                );
+                y += scale(34, dpi);
+            }
+            _ => {}
+        }
+        place(state.note, margin, y, width, scale(42, dpi));
+        y += scale(48, dpi);
         let bottom = client.bottom - margin - button_h;
-        let risk_h = scale(46, dpi);
-        let risk_y = bottom - scale(10, dpi) - risk_h;
-        let issues_h = (risk_y - scale(8, dpi) - y).max(scale(70, dpi));
-        place(state.issues, margin, y, width, issues_h);
-        place(state.risk, margin, risk_y, width, risk_h);
+        if state.step == 3 {
+            place(state.stats, margin, y, width, scale(22, dpi));
+            y += scale(28, dpi);
+            let risk_h = scale(46, dpi);
+            let risk_y = bottom - scale(10, dpi) - risk_h;
+            let issues_h = (risk_y - scale(8, dpi) - y).max(scale(70, dpi));
+            place(state.issues, margin, y, width, issues_h);
+            place(state.risk, margin, risk_y, width, risk_h);
+        }
+        let action_x = margin + button_w + scale(8, dpi);
+        place(state.back, margin, bottom, button_w, button_h);
+        place(state.check, action_x, bottom, button_w, button_h);
         place(
-            state.check,
-            margin,
+            state.copy_issues,
+            action_x + button_w + scale(8, dpi),
             bottom,
             button_w,
             button_h,
         );
+        place(
+            state.save_issues,
+            action_x + (button_w + scale(8, dpi)) * 2,
+            bottom,
+            button_w,
+            button_h,
+        );
+        let primary_x = client.right - margin - button_w * 2 - scale(10, dpi);
+        place(state.start, primary_x, bottom, button_w, button_h);
+        place(state.next, primary_x, bottom, button_w, button_h);
         place(
             state.close,
             client.right - margin - button_w,
@@ -5267,13 +5964,132 @@ mod win {
             button_w,
             button_h,
         );
-        place(
-            state.start,
-            client.right - margin - button_w * 2 - scale(10, dpi),
-            bottom,
-            button_w,
-            button_h,
+    }
+
+    /// 按当前步骤显示/隐藏控件并刷新步骤标题与提示。
+    unsafe fn apply_pack_step(dialog: HWND) {
+        let pointer = GetWindowLongPtrW(dialog, GWLP_USERDATA) as *mut PackDialogState;
+        if pointer.is_null() {
+            return;
+        }
+        let state = &mut *pointer;
+        let step = state.step.min(3);
+        state.step = step;
+        let show = |control: HWND, visible: bool| {
+            ShowWindow(control, if visible { SW_SHOW } else { SW_HIDE });
+        };
+        show(state.source_label, step == 0);
+        show(state.source_edit, step == 0);
+        show(state.source_browse, step == 0);
+        show(state.output_label, step == 1);
+        show(state.output_edit, step == 1);
+        show(state.output_browse, step == 1);
+        show(state.compress, step == 2);
+        show(state.jobs_label, step == 2);
+        show(state.jobs_edit, step == 2);
+        show(state.note, true);
+        show(state.stats, step == 3);
+        show(state.issues, step == 3);
+        show(state.risk, step == 3);
+        show(state.check, step == 3);
+        show(state.copy_issues, step == 3);
+        show(state.save_issues, step == 3);
+        show(state.start, step == 3);
+        show(state.next, step < 3);
+        show(state.back, step > 0);
+        show(state.step_label, true);
+        let (default_button, plain_button) = if step == 3 {
+            (state.start, state.next)
+        } else {
+            (state.next, state.start)
+        };
+        SendMessageW(
+            default_button,
+            BM_SETSTYLE,
+            BS_DEFPUSHBUTTON as usize,
+            1,
         );
+        SendMessageW(plain_button, BM_SETSTYLE, 0, 1);
+        set_text(
+            state.step_label,
+            &format!("步骤 {}/4：{}", step + 1, PACK_STEPS[step]),
+        );
+        if step < 3 {
+            let hint = match step {
+                0 => "第 1 步：选择打包源目录。扫描会跳过 _pak_manifest.json。",
+                1 => "第 2 步：填写输出 PAK。已存在的文件会在开始前确认覆盖。",
+                _ => "第 3 步：设置压缩与并行度（1–8）。修改后需要重新预检。",
+            };
+            set_text(state.note, hint);
+        }
+        layout_pack(dialog);
+    }
+
+    /// “下一步”：校验当前步骤输入；最后一步进入预检。
+    unsafe fn advance_pack_step(dialog: HWND) {
+        let pointer = GetWindowLongPtrW(dialog, GWLP_USERDATA) as *mut PackDialogState;
+        if pointer.is_null() {
+            return;
+        }
+        let (step, source, output, jobs_text) = {
+            let state = &*pointer;
+            (
+                state.step,
+                read_text(state.source_edit).trim().to_string(),
+                read_text(state.output_edit).trim().to_string(),
+                read_text(state.jobs_edit).trim().to_string(),
+            )
+        };
+        match step {
+            0 => {
+                let source = PathBuf::from(&source);
+                let is_dir = std::fs::metadata(&source)
+                    .map(|meta| meta.is_dir())
+                    .unwrap_or(false);
+                if !is_dir {
+                    show_message(
+                        dialog,
+                        "请选择存在的打包源目录。",
+                        MB_OK | MB_ICONWARNING,
+                    );
+                    SetFocus((*pointer).source_edit);
+                    return;
+                }
+            }
+            1 => {
+                if output.is_empty() {
+                    show_message(dialog, "请填写输出文件。", MB_OK | MB_ICONWARNING);
+                    SetFocus((*pointer).output_edit);
+                    return;
+                }
+                if let Some(problem) = pack_target_problem(Path::new(&output)) {
+                    show_message(dialog, &problem, MB_OK | MB_ICONWARNING);
+                    SetFocus((*pointer).output_edit);
+                    return;
+                }
+            }
+            2 => {
+                if jobs_text.parse::<usize>().is_err() {
+                    show_message(
+                        dialog,
+                        "并行度必须是 1-8 的整数。",
+                        MB_OK | MB_ICONWARNING,
+                    );
+                    SetFocus((*pointer).jobs_edit);
+                    return;
+                }
+            }
+            _ => return,
+        }
+        if step == 2 {
+            if refresh_pack_check(dialog).is_some() {
+                (*pointer).step = 3;
+                apply_pack_step(dialog);
+            }
+        } else {
+            (*pointer).step = step + 1;
+            apply_pack_step(dialog);
+        }
     }
 
     unsafe fn update_pack_state(dialog: HWND) {
@@ -5337,13 +6153,35 @@ mod win {
         let scanned: std::collections::BTreeSet<String> =
             scan.entries.iter().map(|entry| entry.rel_path.clone()).collect();
         precheck.issues.extend(manifest_mtime_issues(&source, &scanned));
+        let output = PathBuf::from(read_text(state.output_edit).trim());
+        if let Some(problem) = pack_target_problem(&output) {
+            precheck.issues.push(PackIssue {
+                kind: wd_pak::gui::pack::PackIssueKind::NotWritable,
+                path: output.display().to_string(),
+                detail: problem,
+            });
+        }
 
         let note = if scan.manifest_present {
-            "检测到 _pak_manifest.json：打包时会自动跳过，且按清单回放 order 与 mtime。"
+            let shown = scan
+                .ignored_manifest
+                .iter()
+                .take(3)
+                .cloned()
+                .collect::<Vec<_>>()
+                .join("、");
+            let more = if scan.ignored_manifest.len() > 3 {
+                format!(" 等 {} 处", scan.ignored_manifest.len())
+            } else {
+                String::new()
+            };
+            format!(
+                "检测到 {MANIFEST_NAME}（{shown}{more}）：打包时自动跳过，并按清单回放 order 与 mtime。"
+            )
         } else {
-            "未检测到 _pak_manifest.json：条目按磁盘顺序打包，mtime 使用文件当前时间。"
+            "未检测到 _pak_manifest.json：条目按磁盘顺序打包，mtime 使用文件当前时间。".into()
         };
-        set_text(state.note, note);
+        set_text(state.note, &note);
         let stats = format!(
             "文件 {} 个 / 目录 {} 个 / 源文件合计 {} 字节",
             precheck.file_count, precheck.dir_count, precheck.total_size
@@ -5385,6 +6223,14 @@ mod win {
     }
 
     unsafe fn handle_pack_start(dialog: HWND) {
+        {
+            let pointer =
+                GetWindowLongPtrW(dialog, GWLP_USERDATA) as *const PackDialogState;
+            if !pointer.is_null() && (*pointer).step != 3 {
+                advance_pack_step(dialog);
+                return;
+            }
+        }
         let Some((source, _scan, precheck)) = refresh_pack_check(dialog) else {
             return;
         };
@@ -5409,8 +6255,9 @@ mod win {
             return;
         }
         if output.exists() {
+            let size = std::fs::metadata(&output).map(|meta| meta.len()).unwrap_or(0);
             let text = format!(
-                "输出文件已存在，将被覆盖：\n{}\n\n原文件内容不可恢复，是否继续？",
+                "输出文件已存在，将被覆盖：\n{}\n大小：{size} 字节\n\n原文件内容不可恢复，是否继续？",
                 output.display()
             );
             let answer = MessageBoxW(
@@ -5447,19 +6294,44 @@ mod win {
         let total_size = precheck.total_size;
         let source_worker = source.clone();
         let output_worker = output.clone();
-        let outcome = run_write_progress(
+        if write_waiting(dialog, &output) {
+            return;
+        }
+        set_write_busy_for_path(state.main, &output, true);
+        let task_id = task_begin(
+            state.main,
+            TaskKind::Pack,
+            &output.to_string_lossy(),
+        );
+        let steps = if compress {
+            vec!["扫描源目录".into(), "压缩数据".into(), "写入 PAK".into()]
+        } else {
+            vec!["扫描源目录".into(), "写入 PAK".into()]
+        };
+        let outcome = run_write_progress_detail(
             dialog,
             "打包",
-            0,
-            vec!["扫描源目录".into(), "压缩数据".into(), "写入 PAK".into()],
-            false,
-            move |_progress, _cancel, stage| {
+            file_count,
+            steps,
+            true,
+            None,
+            task_id.map(|id| (state.main, id)),
+            move |progress, cancel, stage| {
                 let started = Instant::now();
-                stage.store(1, Ordering::Relaxed);
                 let mut err = Vec::new();
-                match cmd_pack(&source_worker, &output_worker, compress, jobs, &mut err) {
+                match cmd_pack_with_control(
+                    &source_worker,
+                    &output_worker,
+                    compress,
+                    jobs,
+                    &mut err,
+                    &cancel,
+                    &|done, total| {
+                        progress.store(done.min(total), Ordering::Relaxed);
+                    },
+                    &|index| stage.store(index, Ordering::Relaxed),
+                ) {
                     Ok(()) => {
-                        stage.store(2, Ordering::Relaxed);
                         let output_size = std::fs::metadata(&output_worker)
                             .map(|meta| meta.len())
                             .unwrap_or(0);
@@ -5476,6 +6348,11 @@ mod win {
                         );
                         WriteOutcome::success(message)
                     }
+                    Err(error) if error.to_string() == PACK_CANCELLED => WriteOutcome {
+                        ok: false,
+                        cancelled: true,
+                        message: "打包已取消：未写出输出文件，原目标保持不变。".into(),
+                    },
                     Err(error) => {
                         let log = strip_hash(&String::from_utf8_lossy(&err));
                         let detail = log.trim();
@@ -5489,7 +6366,17 @@ mod win {
                 }
             },
         );
+        set_write_busy_for_path(state.main, &output, false);
+        let task_state = if outcome.ok {
+            TaskState::Done
+        } else if outcome.cancelled {
+            TaskState::Cancelled
+        } else {
+            TaskState::Failed(outcome.message.clone())
+        };
+        task_update(state.main, task_id, task_state, 0, 0);
         if outcome.ok {
+            invalidate_check_for_path(state.main, &output);
             let answer = MessageBoxW(
                 dialog,
                 wide(&format!("{}\n\n是否打开输出目录？", outcome.message)).as_ptr(),
@@ -5501,6 +6388,13 @@ mod win {
                     reveal_folder(parent);
                 }
             }
+            let verify = MessageBoxW(
+                dialog,
+                wide("是否立即校验输出包？").as_ptr(),
+                wide("立即校验").as_ptr(),
+                MB_YESNO | MB_ICONQUESTION,
+            ) == 6;
+            *state.verify_output = verify;
             *state.success_output = Some(output.clone());
             DestroyWindow(dialog);
         } else {
@@ -5555,6 +6449,7 @@ mod win {
                             set_text(state.output_edit, &output.to_string_lossy());
                         }
                         refresh_pack_check(hwnd);
+                        apply_pack_step(hwnd);
                     }
                     return 0;
                 }
@@ -5582,11 +6477,68 @@ mod win {
                     ) {
                         set_text(state.output_edit, &path.to_string_lossy());
                         refresh_pack_check(hwnd);
+                        apply_pack_step(hwnd);
                     }
+                    return 0;
+                }
+                if id == PACK_BACK_ID as i32 && code == BN_CLICKED {
+                    let step = (*pointer).step;
+                    if step > 0 {
+                        (*pointer).step = step - 1;
+                        apply_pack_step(hwnd);
+                    }
+                    return 0;
+                }
+                if id == PACK_NEXT_ID as i32 && code == BN_CLICKED {
+                    advance_pack_step(hwnd);
                     return 0;
                 }
                 if id == PACK_CHECK_ID as i32 && code == BN_CLICKED {
                     handle_pack_check(hwnd);
+                    return 0;
+                }
+                if id == PACK_COPY_ISSUES_ID as i32 && code == BN_CLICKED {
+                    if let Some((_, _, precheck)) = refresh_pack_check(hwnd) {
+                        let text = if precheck.issues.is_empty() {
+                            "预检通过：没有阻断问题。".to_string()
+                        } else {
+                            format!(
+                                "预检问题 {} 个：\r\n{}",
+                                precheck.issues.len(),
+                                pack_issue_text(&precheck.issues)
+                            )
+                        };
+                        copy_text(hwnd, &text);
+                    }
+                    return 0;
+                }
+                if id == PACK_SAVE_ISSUES_ID as i32 && code == BN_CLICKED {
+                    if let Some((source, _, precheck)) = refresh_pack_check(hwnd) {
+                        let text = if precheck.issues.is_empty() {
+                            "预检通过：没有阻断问题。".to_string()
+                        } else {
+                            format!(
+                                "预检问题 {} 个：\r\n{}",
+                                precheck.issues.len(),
+                                pack_issue_text(&precheck.issues)
+                            )
+                        };
+                        if let Some(path) = pick_save_dialog(
+                            hwnd,
+                            "导出预检问题",
+                            "文本文件\0*.txt\0所有文件\0*.*\0",
+                            Some(source.as_path()),
+                            "pack-precheck.txt",
+                        ) {
+                            if let Err(error) = std::fs::write(&path, text) {
+                                show_message(
+                                    hwnd,
+                                    &format!("导出问题失败：\n{error}"),
+                                    MB_OK | MB_ICONERROR,
+                                );
+                            }
+                        }
+                    }
                     return 0;
                 }
                 if id == PACK_START_ID as i32 && code == BN_CLICKED {
@@ -5664,6 +6616,7 @@ mod win {
         if dialog.is_null() {
             return;
         }
+        let step_label = create_label(dialog, instance, "");
         let source_label = create_label(dialog, instance, "源目录：");
         let source_edit = create_text_field(dialog, instance, Some(""), PACK_SOURCE_ID);
         let source_browse = create_button(dialog, instance, "浏览…", 0, PACK_SOURCE_BROWSE_ID);
@@ -5684,6 +6637,28 @@ mod win {
         let issues = create_text_area(dialog, instance);
         let risk = create_label(dialog, instance, "");
         let check = create_button(dialog, instance, "预检", 0, PACK_CHECK_ID);
+        let copy_issues = create_button(
+            dialog,
+            instance,
+            "复制问题",
+            0,
+            PACK_COPY_ISSUES_ID,
+        );
+        let save_issues = create_button(
+            dialog,
+            instance,
+            "导出问题",
+            0,
+            PACK_SAVE_ISSUES_ID,
+        );
+        let back = create_button(dialog, instance, "上一步", 0, PACK_BACK_ID);
+        let next = create_button(
+            dialog,
+            instance,
+            "下一步",
+            BS_DEFPUSHBUTTON as u32,
+            PACK_NEXT_ID,
+        );
         let start = create_button(
             dialog,
             instance,
@@ -5693,6 +6668,7 @@ mod win {
         );
         let close = create_button(dialog, instance, "关闭", 0, PACK_CLOSE_ID);
         if !all_present(&[
+            step_label,
             source_label,
             source_edit,
             source_browse,
@@ -5707,6 +6683,10 @@ mod win {
             issues,
             risk,
             check,
+            copy_issues,
+            save_issues,
+            back,
+            next,
             start,
             close,
         ]) {
@@ -5714,6 +6694,7 @@ mod win {
             return;
         }
         apply_default_font(&[
+            step_label,
             source_label,
             source_edit,
             source_browse,
@@ -5728,6 +6709,10 @@ mod win {
             issues,
             risk,
             check,
+            copy_issues,
+            save_issues,
+            back,
+            next,
             start,
             close,
         ]);
@@ -5742,8 +6727,13 @@ mod win {
         EnableWindow(start, 0);
 
         let mut success_output: Option<PathBuf> = None;
+        let mut verify_output = false;
         let state = Box::new(PackDialogState {
             main,
+            step: 0,
+            step_label,
+            back,
+            next,
             source_label,
             source_edit,
             source_browse,
@@ -5758,27 +6748,42 @@ mod win {
             issues,
             risk,
             check,
+            copy_issues,
+            save_issues,
             start,
             close,
             checked: false,
             success_output: &mut success_output,
+            verify_output: &mut verify_output,
         });
         SetWindowLongPtrW(dialog, GWLP_USERDATA, Box::into_raw(state) as isize);
-        layout_pack(dialog);
-        run_modal(dialog, main, source_edit);
+        apply_pack_step(dialog);
+        run_modeless(dialog, main, source_edit);
         if let Some(output) = success_output {
-            let pointer = GetWindowLongPtrW(main, GWLP_USERDATA) as *const Ui;
-            let same = !pointer.is_null()
-                && (*pointer)
-                    .path
-                    .as_ref()
-                    .map(|path| {
-                        wd_pak::platform::path_key(path)
-                            == wd_pak::platform::path_key(&output)
-                    })
-                    .unwrap_or(false);
+            let (same, has_output) = {
+                let pointer = GetWindowLongPtrW(main, GWLP_USERDATA) as *const Ui;
+                if pointer.is_null() {
+                    (false, false)
+                } else {
+                    let same = (*pointer)
+                        .path
+                        .as_ref()
+                        .map(|path| {
+                            wd_pak::platform::path_key(path)
+                                == wd_pak::platform::path_key(&output)
+                        })
+                        .unwrap_or(false);
+                    (same, same && (*pointer).session.is_some())
+                }
+            };
             if same {
                 reload_pak(main);
+            }
+            if verify_output && !has_output {
+                open_path(main, output.clone(), OpenSource::CommandBar);
+            }
+            if verify_output {
+                open_check_dialog(main);
             }
         }
     }
@@ -5799,9 +6804,11 @@ mod win {
         issues: HWND,
         risk: HWND,
         check: HWND,
+        ack: HWND,
         start: HWND,
         close: HWND,
         checked: bool,
+        needs_ack: bool,
     }
 
     fn nearest_existing_dir(path: &Path) -> Option<PathBuf> {
@@ -5862,16 +6869,19 @@ mod win {
         place(state.browse, browse_x, y, browse_w, edit_h);
         place(state.open, open_x, y, browse_w, edit_h);
         y += scale(34, dpi);
-        place(state.note, margin, y, width, scale(22, dpi));
-        y += scale(26, dpi);
+        place(state.note, margin, y, width, scale(38, dpi));
+        y += scale(42, dpi);
         place(state.stats, margin, y, width, scale(22, dpi));
         y += scale(28, dpi);
         let bottom = client.bottom - margin - button_h;
+        let ack_h = scale(24, dpi);
+        let ack_y = bottom - scale(8, dpi) - ack_h;
         let risk_h = scale(64, dpi);
-        let risk_y = bottom - scale(10, dpi) - risk_h;
+        let risk_y = ack_y - scale(8, dpi) - risk_h;
         let issues_h = (risk_y - scale(8, dpi) - y).max(scale(70, dpi));
         place(state.issues, margin, y, width, issues_h);
         place(state.risk, margin, risk_y, width, risk_h);
+        place(state.ack, margin, ack_y, width, ack_h);
         place(state.check, margin, bottom, button_w, button_h);
         place(
             state.close,
@@ -5896,6 +6906,9 @@ mod win {
         }
         let state = &mut *pointer;
         state.checked = false;
+        state.needs_ack = false;
+        set_checked(state.ack, false);
+        ShowWindow(state.ack, SW_HIDE);
         EnableWindow(state.start, 0);
         let hint = if read_text(state.dir_edit).trim().is_empty() {
             "请选择解包输出目录。"
@@ -5952,12 +6965,23 @@ mod win {
             .map(|entry| (entry.path.clone(), u64::from(entry.org), entry.is_dir()))
             .collect();
         let base_len = out_dir.to_string_lossy().chars().count();
-        let precheck = unpack_precheck_full(&tuples, writable, free, base_len, 260);
+        let mut precheck = unpack_precheck_full(&tuples, writable, free, base_len, 260);
         let existing = entries
             .iter()
             .filter(|entry| !entry.is_dir())
             .filter(|entry| out_dir.join(&entry.path).exists())
             .count();
+        let dir_non_empty = out_dir.is_dir()
+            && std::fs::read_dir(&out_dir)
+                .map(|mut iter| iter.next().is_some())
+                .unwrap_or(false);
+        if dir_non_empty {
+            precheck.issues.push(UnpackIssue {
+                kind: UnpackIssueKind::TargetExists,
+                path: out_dir.display().to_string(),
+                detail: "目标目录非空，已有文件不会被删除".into(),
+            });
+        }
 
         let stats = format!(
             "文件 {} 个 / 目录 {} 个 / 解压后 {} 字节\n目标：{}",
@@ -5972,7 +6996,10 @@ mod win {
         let mut soft = Vec::new();
         for issue in &precheck.issues {
             let line = unpack_issue_line(issue);
-            if issue.kind == UnpackIssueKind::CaseConflict {
+            if matches!(
+                issue.kind,
+                UnpackIssueKind::CaseConflict | UnpackIssueKind::TargetExists
+            ) {
                 soft.push(line);
             } else {
                 hard.push(line);
@@ -5994,23 +7021,41 @@ mod win {
         }
         set_text(state.issues, &issues_text);
 
+        let needs_ack = existing > 0
+            || precheck.has_kind(UnpackIssueKind::CaseConflict)
+            || dir_non_empty;
+        let ack_was = is_checked(state.ack);
+        state.needs_ack = needs_ack;
+        ShowWindow(state.ack, if needs_ack { SW_SHOW } else { SW_HIDE });
+        set_checked(state.ack, needs_ack && ack_was);
+        let ack_ok = !needs_ack || (needs_ack && ack_was);
+
         let mut risk = String::new();
         if existing > 0 {
             risk.push_str(&format!(
                 "目标目录已有 {existing} 个同名文件，开始前会要求确认覆盖。\n"
             ));
         }
+        if dir_non_empty {
+            risk.push_str("目标目录非空：只写入/覆盖包内条目，不会删除其他文件。\n");
+        }
         if precheck.has_kind(UnpackIssueKind::CaseConflict) {
             risk.push_str("存在大小写冲突：后写入的条目会覆盖先写入的。\n");
         }
+        if precheck.has_kind(UnpackIssueKind::PathTooLong) {
+            risk.push_str("存在超长路径：请缩短输出目录后重新预检；不提供应用内绕过。\n");
+        }
         if !out_dir.exists() {
             risk.push_str("目标目录不存在，开始时自动创建。\n");
+        }
+        if needs_ack {
+            risk.push_str("需勾选“我已了解覆盖/冲突风险”，开始按钮才会启用。\n");
         }
         risk.push_str("解包只读取源包；取消时已写入文件保留。");
         set_text(state.risk, &risk);
 
         state.checked = !precheck.blocking();
-        EnableWindow(state.start, state.checked as i32);
+        EnableWindow(state.start, (state.checked && ack_ok) as i32);
         Some((out_dir, entries, precheck, existing))
     }
 
@@ -6023,7 +7068,7 @@ mod win {
     }
 
     unsafe fn handle_unpack_start(dialog: HWND) {
-        let Some((out_dir, entries, precheck, existing)) = refresh_unpack_check(dialog) else {
+        let Some((out_dir, entries, precheck, _existing)) = refresh_unpack_check(dialog) else {
             return;
         };
         if precheck.blocking() {
@@ -6034,25 +7079,15 @@ mod win {
             );
             return;
         }
-        let case_conflict = precheck.has_kind(UnpackIssueKind::CaseConflict);
-        if existing > 0 || case_conflict {
-            let mut text = String::new();
-            if existing > 0 {
-                text.push_str(&format!(
-                    "目标目录已有 {existing} 个同名文件，将被覆盖。\n"
-                ));
-            }
-            if case_conflict {
-                text.push_str("包内存在大小写冲突，后写入的条目会覆盖先写入的。\n");
-            }
-            text.push_str("\n是否继续解包？");
-            let answer = MessageBoxW(
-                dialog,
-                wide(&text).as_ptr(),
-                wide("确认解包").as_ptr(),
-                MB_YESNO | MB_DEFBUTTON2 | MB_ICONWARNING,
-            );
-            if answer != 6 {
+        {
+            let pointer =
+                GetWindowLongPtrW(dialog, GWLP_USERDATA) as *const UnpackDialogState;
+            if !pointer.is_null() && (*pointer).needs_ack && !is_checked((*pointer).ack) {
+                show_message(
+                    dialog,
+                    "请先勾选“我已了解覆盖/冲突风险，继续解包”。",
+                    MB_OK | MB_ICONWARNING,
+                );
                 return;
             }
         }
@@ -6086,16 +7121,28 @@ mod win {
             }
         }
         let pak_path = state.pak_path.clone();
+        if write_waiting(dialog, &out_dir) {
+            return;
+        }
         let file_count = precheck.file_count;
         let dir_count = precheck.dir_count;
         let total_entries = entries.len();
         let out_worker = out_dir.clone();
-        let outcome = run_write_progress(
+        let task_id = task_begin(
+            state.main,
+            TaskKind::Unpack,
+            &out_dir.to_string_lossy(),
+        );
+        let current = Arc::new(Mutex::new(String::new()));
+        let current_worker = current.clone();
+        let outcome = run_write_progress_detail(
             dialog,
             "解包",
             total_entries,
             vec!["准备目录".into(), "写入文件".into(), "生成清单".into()],
             true,
+            Some(current),
+            task_id.map(|id| (state.main, id)),
             move |progress, cancel, stage| {
                 let reader = match PakReader::open(&pak_path) {
                     Ok(reader) => reader,
@@ -6127,6 +7174,9 @@ mod win {
                         };
                     }
                     manifest.order.push(entry.path.clone());
+                    if let Ok(mut slot) = current_worker.lock() {
+                        *slot = entry.path.clone();
+                    }
                     let target = out_worker.join(&entry.path);
                     if entry.is_dir() {
                         if let Err(error) = std::fs::create_dir_all(&target) {
@@ -6202,7 +7252,7 @@ mod win {
                         ok: false,
                         cancelled: false,
                         message: format!(
-                            "解包未完成：成功写入 {} 个文件，失败 {} 项。\n\n{detail}{more}",
+                            "解包未完成（目录不完整）：成功写入 {} 个文件，失败 {} 项。\n\n{detail}{more}",
                             written,
                             failures.len()
                         ),
@@ -6225,13 +7275,27 @@ mod win {
                     ));
                 }
                 WriteOutcome::success(format!(
-                    "解包完成：{} 个文件 / {} 个目录\n输出：{}\n已生成 {}",
+                    "解包完成：{} 个文件 / {} 个目录\n输出：{}\n已生成 {}（用于回放 order 与 mtime，不会被打入新包）",
                     file_count,
                     dir_count,
                     out_worker.display(),
                     MANIFEST_NAME
                 ))
             },
+        );
+        let task_state = if outcome.ok {
+            TaskState::Done
+        } else if outcome.cancelled {
+            TaskState::Cancelled
+        } else {
+            TaskState::Failed(outcome.message.clone())
+        };
+        task_update(
+            state.main,
+            task_id,
+            task_state,
+            total_entries,
+            total_entries,
         );
         if outcome.ok {
             let answer = MessageBoxW(
@@ -6314,6 +7378,12 @@ mod win {
                 }
                 if id == UNPACK_CHECK_ID as i32 && code == BN_CLICKED {
                     handle_unpack_check(hwnd);
+                    return 0;
+                }
+                if id == UNPACK_ACK_ID as i32 && code == BN_CLICKED {
+                    let state = &*pointer;
+                    let ack_ok = !state.needs_ack || is_checked(state.ack);
+                    EnableWindow(state.start, (state.checked && ack_ok) as i32);
                     return 0;
                 }
                 if id == UNPACK_START_ID as i32 && code == BN_CLICKED {
@@ -6413,7 +7483,14 @@ mod win {
         let dir_edit = create_text_field(dialog, instance, Some(""), UNPACK_DIR_ID);
         let browse = create_button(dialog, instance, "浏览…", 0, UNPACK_BROWSE_ID);
         let open = create_button(dialog, instance, "打开目录", 0, UNPACK_OPEN_ID);
-        let note = create_label(dialog, instance, &format!("源包：{}", pak_path.display()));
+        let note = create_label(
+            dialog,
+            instance,
+            &format!(
+                "源包：{}\n解包会生成 {MANIFEST_NAME}（用于回放 order/mtime，不会打入新包）。",
+                pak_path.display()
+            ),
+        );
         let stats_text = format!(
             "文件 {} 个 / 目录 {} 个 / 解压后 {} 字节",
             initial_stats.0, initial_stats.1, initial_stats.2
@@ -6422,6 +7499,13 @@ mod win {
         let issues = create_text_area(dialog, instance);
         let risk = create_label(dialog, instance, "解包只读取源包；取消时已写入文件保留。");
         let check = create_button(dialog, instance, "预检", 0, UNPACK_CHECK_ID);
+        let ack = create_button(
+            dialog,
+            instance,
+            "我已了解覆盖/冲突风险，继续解包",
+            BS_AUTOCHECKBOX as u32,
+            UNPACK_ACK_ID,
+        );
         let start = create_button(
             dialog,
             instance,
@@ -6440,6 +7524,7 @@ mod win {
             issues,
             risk,
             check,
+            ack,
             start,
             close,
         ]) {
@@ -6456,11 +7541,13 @@ mod win {
             issues,
             risk,
             check,
+            ack,
             start,
             close,
         ]);
         set_text(dir_edit, &default_dir.to_string_lossy());
         EnableWindow(start, 0);
+        ShowWindow(ack, SW_HIDE);
 
         let state = Box::new(UnpackDialogState {
             main,
@@ -6474,16 +7561,18 @@ mod win {
             issues,
             risk,
             check,
+            ack,
             start,
             close,
             checked: false,
+            needs_ack: false,
         });
         SetWindowLongPtrW(dialog, GWLP_USERDATA, Box::into_raw(state) as isize);
         layout_unpack(dialog);
         if default_dir.is_dir() {
             refresh_unpack_check(dialog);
         }
-        run_modal(dialog, main, dir_edit);
+        run_modeless(dialog, main, dir_edit);
     }
 
     // -----------------------------------------------------------------------
@@ -6491,18 +7580,46 @@ mod win {
     // -----------------------------------------------------------------------
 
     struct CheckDialogState {
+        main: HWND,
         pak_path: PathBuf,
         shallow: HWND,
         deep: HWND,
         start: HWND,
         copy: HWND,
+        copy_row: HWND,
+        export: HWND,
         close: HWND,
         summary: HWND,
         list: HWND,
+        filter: HWND,
         total: usize,
         result: Option<CheckOutcome>,
+        conclusion: CheckConclusion,
         error: Option<String>,
+        filter_kind: Option<CheckProblemKind>,
+        /// None = 保持原始顺序；Some(true/false) = 按路径升/降序。
+        sort_asc: Option<bool>,
         locate_out: *mut Option<String>,
+        conclusion_out: *mut CheckConclusion,
+        outcome_out: *mut Option<CheckOutcome>,
+    }
+
+    fn check_problems(state: &CheckDialogState) -> Vec<CheckProblem> {
+        let Some(outcome) = state.result.as_ref() else {
+            return Vec::new();
+        };
+        let mut problems = filter_problems(&outcome.result.problems, state.filter_kind);
+        if let Some(ascending) = state.sort_asc {
+            sort_problems_by_path(&mut problems, ascending);
+        }
+        problems
+    }
+
+    fn unix_now() -> u64 {
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|duration| duration.as_secs())
+            .unwrap_or(0)
     }
 
     unsafe fn layout_check(hwnd: HWND) {
@@ -6518,11 +7635,18 @@ mod win {
         place(state.shallow, margin, scale(12, dpi), width, row_h);
         place(state.deep, margin, scale(38, dpi), width, row_h);
         place(state.start, margin, scale(70, dpi), scale(120, dpi), scale(30, dpi));
-        place(state.summary, margin, scale(112, dpi), width, scale(56, dpi));
+        place(state.summary, margin, scale(112, dpi), width, scale(58, dpi));
+        place(
+            state.filter,
+            margin,
+            scale(176, dpi),
+            scale(200, dpi),
+            scale(26, dpi),
+        );
 
         let button_h = scale(30, dpi);
         let bottom = client.bottom - margin - button_h;
-        let list_top = scale(176, dpi);
+        let list_top = scale(204, dpi);
         place(
             state.list,
             margin,
@@ -6532,12 +7656,17 @@ mod win {
         );
         let close_w = scale(100, dpi);
         let copy_w = scale(110, dpi);
+        let small_w = scale(100, dpi);
         place(state.close, client.right - margin - close_w, bottom, close_w, button_h);
+        let copy_x = client.right - margin - close_w - scale(8, dpi) - copy_w;
+        place(state.copy, copy_x, bottom, copy_w, button_h);
+        let row_x = copy_x - scale(8, dpi) - small_w;
+        place(state.copy_row, row_x, bottom, small_w, button_h);
         place(
-            state.copy,
-            client.right - margin - close_w - scale(8, dpi) - copy_w,
+            state.export,
+            row_x - scale(8, dpi) - small_w,
             bottom,
-            copy_w,
+            small_w,
             button_h,
         );
 
@@ -6576,48 +7705,74 @@ mod win {
             return;
         }
         let state = &mut *pointer;
-        let (summary, problems) = match (&state.result, &state.error) {
-            (_, Some(error)) => (format!("校验失败：{error}"), Vec::new()),
-            (Some(outcome), None) => {
-                let result = &outcome.result;
-                let conclusion = if outcome.cancelled {
-                    format!(
-                        "校验已取消（已处理 {}/{} 项）",
-                        outcome.processed, outcome.total
-                    )
-                } else if result.problems.is_empty() {
-                    format!(
+        let problems = check_problems(state);
+        let summary = if let Some(error) = &state.error {
+            format!("校验失败：{error}")
+        } else {
+            let mut lines = Vec::new();
+            match state.conclusion.state {
+                CheckConclusionState::Unchecked => lines.push(
+                    "尚未校验。浅校验检查 offset+size 越界；深度校验会逐条解压，耗时较长。"
+                        .to_string(),
+                ),
+                CheckConclusionState::Running => lines.push("正在校验…".into()),
+                CheckConclusionState::Passed => {
+                    let deep = state
+                        .result
+                        .as_ref()
+                        .map(|outcome| outcome.result.mode == CheckMode::Deep)
+                        .unwrap_or(false);
+                    lines.push(format!(
                         "校验通过{}",
-                        if result.mode == CheckMode::Deep {
-                            " (含全量解压)"
-                        } else {
-                            ""
-                        }
-                    )
-                } else {
-                    format!("发现问题 {} 个", result.problems.len())
-                };
-                let summary = format!(
-                    "{conclusion}\nfiles={} dirs={} rootDirSize={} fileSize={}\nstored={} org={} ratio={:.3}",
-                    result.files,
-                    result.dirs,
-                    result.root_dir_size,
-                    result.file_size,
-                    result.total_stored,
-                    result.total_org,
-                    result.ratio
-                );
-                (summary, result.problems.clone())
+                        if deep { " (含全量解压)" } else { "" }
+                    ));
+                }
+                CheckConclusionState::Problems(count) => {
+                    lines.push(format!("发现问题 {count} 个（警告：不阻断浏览与导出）"));
+                }
+                CheckConclusionState::Cancelled => {
+                    let progress = state
+                        .result
+                        .as_ref()
+                        .map(|outcome| {
+                            format!(
+                                "（已处理 {}/{} 项）",
+                                outcome.processed, outcome.total
+                            )
+                        })
+                        .unwrap_or_default();
+                    lines.push(format!("校验已取消{progress}"));
+                }
+                CheckConclusionState::Expired => lines.push(
+                    "结果已过期：包文件大小或修改时间已变化，请重新校验。".into(),
+                ),
             }
-            (None, None) => (
-                "尚未校验。浅校验检查 offset+size 越界；深度校验会逐条解压，耗时较长。"
-                    .to_string(),
-                Vec::new(),
-            ),
+            if let Some(outcome) = &state.result {
+                let result = &outcome.result;
+                lines.push(format!(
+                    "files={} dirs={} rootDirSize={} fileSize={}",
+                    result.files, result.dirs, result.root_dir_size, result.file_size
+                ));
+                lines.push(format!(
+                    "stored={} org={} ratio={:.3}",
+                    result.total_stored, result.total_org, result.ratio
+                ));
+                lines.push(format!(
+                    "attrib 分布: {}",
+                    result.attrib_distribution()
+                ));
+            }
+            lines.push(
+                "校验不检测大小写冲突与非法名，不代表可安全解包。".into(),
+            );
+            lines.join("\n")
         };
         set_text(state.summary, &summary);
         insert_check_problems(state.list, &problems);
-        EnableWindow(state.copy, state.result.is_some() as i32);
+        let has_result = state.result.is_some() as i32;
+        EnableWindow(state.copy, has_result);
+        EnableWindow(state.copy_row, has_result);
+        EnableWindow(state.export, has_result);
     }
 
     unsafe fn start_check(hwnd: HWND) {
@@ -6625,7 +7780,7 @@ mod win {
         if pointer.is_null() {
             return;
         }
-        let (mode, pak_path, total) = {
+        let (mode, pak_path, total, main) = {
             let state = &*pointer;
             (
                 if is_checked(state.shallow) {
@@ -6635,10 +7790,13 @@ mod win {
                 },
                 state.pak_path.clone(),
                 state.total,
+                state.main,
             )
         };
         {
-            let state = &*pointer;
+            let state = &mut *pointer;
+            state.error = None;
+            state.conclusion.start();
             EnableWindow(state.start, 0);
             EnableWindow(state.shallow, 0);
             EnableWindow(state.deep, 0);
@@ -6651,45 +7809,78 @@ mod win {
                 },
             );
         }
-
-        let slot: Arc<Mutex<Option<Result<CheckOutcome, String>>>> = Arc::new(Mutex::new(None));
-        let outcome = run_write_progress(
-            hwnd,
-            "校验",
-            total,
-            Vec::new(),
-            true,
-            {
-                let slot = slot.clone();
-                move |progress, cancel, _stage| match PakSession::open(&pak_path) {
-                    Ok(session) => {
-                        let result = run_check(
-                            session.entries(),
-                            session.stats().root_dir_size,
-                            session.stats().file_size,
-                            mode,
-                            &cancel,
-                            |done, total| {
-                                progress.store(done.min(total), Ordering::Relaxed);
-                            },
-                            |entry| session.read(&entry.path),
-                        );
-                        if let Ok(mut guard) = slot.lock() {
-                            *guard = Some(Ok(result));
-                        }
-                        WriteOutcome::success("校验完成")
-                    }
-                    Err(error) => {
-                        let message = error.to_string();
-                        if let Ok(mut guard) = slot.lock() {
-                            *guard = Some(Err(message.clone()));
-                        }
-                        WriteOutcome::failure(message)
-                    }
-                }
+        let task_id = task_begin(
+            main,
+            if mode == CheckMode::Deep {
+                TaskKind::DeepCheck
+            } else {
+                TaskKind::ShallowCheck
             },
+            &pak_path.to_string_lossy(),
         );
-        let stored = slot.lock().ok().and_then(|mut guard| guard.take());
+
+        let stored: Option<Result<CheckOutcome, String>> = if mode == CheckMode::Shallow {
+            // 浅校验只遍历目录表，通常瞬间完成：不弹模态进度（G5-01）。
+            match PakSession::open(&pak_path) {
+                Ok(session) => {
+                    let cancel = AtomicBool::new(false);
+                    Some(Ok(run_check(
+                        session.entries(),
+                        session.stats().root_dir_size,
+                        session.stats().file_size,
+                        mode,
+                        &cancel,
+                        |_, _| {},
+                        |entry| session.read(&entry.path),
+                    )))
+                }
+                Err(error) => Some(Err(error.to_string())),
+            }
+        } else {
+            let slot: Arc<Mutex<Option<Result<CheckOutcome, String>>>> =
+                Arc::new(Mutex::new(None));
+            let worker_path = pak_path.clone();
+            let outcome = run_write_progress_detail(
+                hwnd,
+                "校验",
+                total,
+                Vec::new(),
+                true,
+                None,
+                task_id.map(|id| (main, id)),
+                {
+                    let slot = slot.clone();
+                    move |progress, cancel, _stage| match PakSession::open(&worker_path) {
+                        Ok(session) => {
+                            let result = run_check(
+                                session.entries(),
+                                session.stats().root_dir_size,
+                                session.stats().file_size,
+                                mode,
+                                &cancel,
+                                |done, total| {
+                                    progress.store(done.min(total), Ordering::Relaxed);
+                                },
+                                |entry| session.read(&entry.path),
+                            );
+                            if let Ok(mut guard) = slot.lock() {
+                                *guard = Some(Ok(result));
+                            }
+                            WriteOutcome::success("校验完成")
+                        }
+                        Err(error) => {
+                            let message = error.to_string();
+                            if let Ok(mut guard) = slot.lock() {
+                                *guard = Some(Err(message.clone()));
+                            }
+                            WriteOutcome::failure(message)
+                        }
+                    }
+                },
+            );
+            let stored = slot.lock().ok().and_then(|mut guard| guard.take());
+            Some(stored.unwrap_or_else(|| Err(outcome.message.clone())))
+        };
 
         let pointer = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut CheckDialogState;
         if pointer.is_null() {
@@ -6707,12 +7898,34 @@ mod win {
                 state.error = Some(message.clone());
                 error_message = Some(message);
             }
-            None => {
-                state.result = None;
-                state.error = Some(outcome.message.clone());
-                error_message = Some(outcome.message.clone());
-            }
+            None => {}
         }
+        // 结论与包指纹绑定；取消保留已处理的部分结果（G5-04）。
+        if let Some(outcome) = &state.result {
+            if outcome.cancelled {
+                state.conclusion.cancel();
+            } else {
+                let fingerprint = pak_fingerprint(&pak_path);
+                state.conclusion.problems(
+                    outcome.result.problems.len(),
+                    fingerprint,
+                    unix_now(),
+                );
+            }
+        } else if state.error.is_some() {
+            state.conclusion.cancel();
+        }
+        let task_state = match (&state.error, state.result.as_ref()) {
+            (Some(message), _) => TaskState::Failed(message.clone()),
+            (None, Some(outcome)) if outcome.cancelled => TaskState::Cancelled,
+            _ => TaskState::Done,
+        };
+        let (done, done_total) = state
+            .result
+            .as_ref()
+            .map(|outcome| (outcome.processed, outcome.total))
+            .unwrap_or((0, total));
+        task_update(main, task_id, task_state, done, done_total);
         EnableWindow(state.start, 1);
         EnableWindow(state.shallow, 1);
         EnableWindow(state.deep, 1);
@@ -6751,12 +7964,89 @@ mod win {
                             }
                             return 0;
                         }
+                        CHECK_COPY_ROW_ID => {
+                            let index = SendMessageW(
+                                (*pointer).list,
+                                LVM_GETNEXTITEM,
+                                (-1isize) as usize,
+                                LVNI_SELECTED as isize,
+                            );
+                            if index >= 0 {
+                                if let Some(problem) =
+                                    check_problems(&*pointer).get(index as usize)
+                                {
+                                    copy_text(hwnd, &problem.cli_line());
+                                }
+                            } else {
+                                show_message(
+                                    hwnd,
+                                    "请先在问题表中选择一行。",
+                                    MB_OK | MB_ICONINFORMATION,
+                                );
+                            }
+                            return 0;
+                        }
+                        CHECK_EXPORT_ID => {
+                            if let Some(result) = &(*pointer).result {
+                                let report = result.report(&(*pointer).pak_path);
+                                let default_name = (*pointer)
+                                    .pak_path
+                                    .file_stem()
+                                    .map(|stem| {
+                                        format!("{}.check.txt", stem.to_string_lossy())
+                                    })
+                                    .unwrap_or_else(|| "check-report.txt".into());
+                                let initial = (*pointer)
+                                    .pak_path
+                                    .parent()
+                                    .map(|parent| parent.to_path_buf());
+                                if let Some(path) = pick_save_dialog(
+                                    hwnd,
+                                    "导出校验报告",
+                                    "文本文件\0*.txt\0所有文件\0*.*\0",
+                                    initial.as_deref(),
+                                    &default_name,
+                                ) {
+                                    match std::fs::write(&path, report) {
+                                        Ok(()) => show_message(
+                                            hwnd,
+                                            &format!("报告已导出：\n{}", path.display()),
+                                            MB_OK | MB_ICONINFORMATION,
+                                        ),
+                                        Err(error) => show_message(
+                                            hwnd,
+                                            &format!(
+                                                "导出报告失败：\n{}",
+                                                error
+                                            ),
+                                            MB_OK | MB_ICONERROR,
+                                        ),
+                                    }
+                                }
+                            }
+                            return 0;
+                        }
                         CHECK_CLOSE_ID => {
                             DestroyWindow(hwnd);
                             return 0;
                         }
                         _ => {}
                     }
+                }
+                if !pointer.is_null() && code == BN_CLICKED && id == CHECK_FILTER_ID as i32 {
+                    let current = (*pointer).filter_kind;
+                    let index = CHECK_FILTERS
+                        .iter()
+                        .position(|(_, kind)| *kind == current)
+                        .unwrap_or(0);
+                    let next = (index + 1) % CHECK_FILTERS.len();
+                    (*pointer).filter_kind = CHECK_FILTERS[next].1;
+                    set_text(
+                        (*pointer).filter,
+                        &format!("筛选：{}", CHECK_FILTERS[next].0),
+                    );
+                    refresh_check_view(hwnd);
+                    return 0;
                 }
                 if id == IDCANCEL {
                     DestroyWindow(hwnd);
@@ -6777,15 +8067,21 @@ mod win {
                             LVNI_SELECTED as isize,
                         );
                         if index >= 0 {
-                            let path = (*pointer)
-                                .result
-                                .as_ref()
-                                .and_then(|result| result.result.problems.get(index as usize))
+                            let path = check_problems(&*pointer)
+                                .get(index as usize)
                                 .map(|problem| problem.path.clone());
                             if let Some(path) = path {
                                 *(*pointer).locate_out = Some(path);
                                 DestroyWindow(hwnd);
                             }
+                        }
+                    }
+                    if header.code == LVN_COLUMNCLICK && header.hwndFrom == (*pointer).list {
+                        let info = &*(lparam as *const NMLISTVIEW);
+                        if info.iSubItem == 1 {
+                            let ascending = !matches!((*pointer).sort_asc, Some(true));
+                            (*pointer).sort_asc = Some(ascending);
+                            refresh_check_view(hwnd);
                         }
                     }
                 }
@@ -6799,7 +8095,10 @@ mod win {
                 let pointer =
                     SetWindowLongPtrW(hwnd, GWLP_USERDATA, 0) as *mut CheckDialogState;
                 if !pointer.is_null() {
-                    drop(Box::from_raw(pointer));
+                    let state = Box::from_raw(pointer);
+                    *state.conclusion_out = state.conclusion.clone();
+                    *state.outcome_out = state.result.clone();
+                    drop(state);
                 }
                 DefWindowProcW(hwnd, msg, wparam, lparam)
             }
@@ -6812,7 +8111,7 @@ mod win {
         if pointer.is_null() {
             return;
         }
-        let (pak_path, total) = {
+        let (pak_path, total, initial_check, initial_outcome) = {
             let ui = &*pointer;
             let Some(session) = ui.session.as_ref() else {
                 return;
@@ -6820,9 +8119,16 @@ mod win {
             let Some(path) = ui.path.clone() else {
                 return;
             };
-            (path, session.entries().len())
+            (
+                path,
+                session.entries().len(),
+                ui.check.clone(),
+                ui.check_outcome.clone(),
+            )
         };
         let mut locate: Option<String> = None;
+        let mut conclusion_result = initial_check.clone();
+        let mut outcome_result = initial_outcome.clone();
         let (class_name, instance) =
             register_dialog_class(CHECK_CLASS, Some(check_wndproc), COLOR_BTNFACE);
         let dpi = dpi_of(main);
@@ -6864,9 +8170,14 @@ mod win {
             WS_EX_CLIENTEDGE,
             CHECK_PROBLEMS_ID,
         );
+        let filter = create_button(dialog, instance, "筛选：全部类型", 0, CHECK_FILTER_ID);
         let copy = create_button(dialog, instance, "复制报告", 0, CHECK_COPY_ID);
+        let copy_row = create_button(dialog, instance, "复制行", 0, CHECK_COPY_ROW_ID);
+        let export = create_button(dialog, instance, "导出报告", 0, CHECK_EXPORT_ID);
         let close = create_button(dialog, instance, "关闭", 0, CHECK_CLOSE_ID);
-        if !all_present(&[shallow, deep, start, summary, list, copy, close]) {
+        if !all_present(&[
+            shallow, deep, start, summary, list, filter, copy, copy_row, export, close,
+        ]) {
             DestroyWindow(dialog);
             show_message(main, "无法创建校验控件。", MB_OK | MB_ICONERROR);
             return;
@@ -6881,27 +8192,57 @@ mod win {
             0,
             (LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER) as isize,
         );
-        apply_default_font(&[shallow, deep, start, summary, copy, close]);
+        apply_default_font(&[
+            shallow, deep, start, summary, filter, copy, copy_row, export, close,
+        ]);
         EnableWindow(copy, 0);
+        EnableWindow(copy_row, 0);
+        EnableWindow(export, 0);
 
         let state = Box::new(CheckDialogState {
-            pak_path,
+            main,
+            pak_path: pak_path.clone(),
             shallow,
             deep,
             start,
             copy,
+            copy_row,
+            export,
             close,
             summary,
             list,
+            filter,
             total,
-            result: None,
+            result: initial_outcome,
+            conclusion: initial_check,
             error: None,
+            filter_kind: None,
+            sort_asc: None,
             locate_out: &mut locate,
+            conclusion_out: &mut conclusion_result,
+            outcome_out: &mut outcome_result,
         });
         SetWindowLongPtrW(dialog, GWLP_USERDATA, Box::into_raw(state) as isize);
         layout_check(dialog);
         refresh_check_view(dialog);
         run_modal(dialog, main, shallow);
+        {
+            let pointer = GetWindowLongPtrW(main, GWLP_USERDATA) as *mut Ui;
+            if !pointer.is_null() {
+                let key = wd_pak::platform::path_key(&pak_path);
+                let same = (*pointer)
+                    .path
+                    .as_ref()
+                    .map(|current| wd_pak::platform::path_key(current) == key)
+                    .unwrap_or(false);
+                if same {
+                    (*pointer).check = conclusion_result;
+                    (*pointer).check_outcome = outcome_result;
+                    refresh_texts(main);
+                    InvalidateRect(main, null(), 0);
+                }
+            }
+        }
         if let Some(path) = locate {
             locate_path(main, &path);
         }
@@ -7003,6 +8344,11 @@ mod win {
     fn status_text(ui: &Ui) -> String {
         let selected = unsafe { selected_entries(ui) };
         let base = status_text_multi(ui.path.as_deref(), ui.session.as_ref(), &selected);
+        if ui.path.is_none() {
+            return base;
+        }
+        let badge = ValidationBadge::from_conclusion(ui.check.state).label();
+        let base = format!("{base} | {badge} | 任务 {}", ui.tasks.active_count());
         match &ui.session {
             Some(session) if !ui.filter.is_empty() => {
                 format!("{base} | 筛选中：{} / {}", ui.visible.len(), session.entries().len())
@@ -7024,6 +8370,7 @@ mod win {
         zone(hdc, rects.task_panel, dpi, COLOR_BTNFACE);
         zone(hdc, rects.status_bar, dpi, COLOR_BTNFACE);
         paint_tabs(hwnd, hdc, rects.tabs, dpi);
+        paint_task_panel(hwnd, hdc, rects.task_panel, dpi);
 
         EndPaint(hwnd, &ps);
     }
@@ -7231,6 +8578,10 @@ mod win {
             recent_menu: null_mut(),
             config_read_only: false,
             error_log: ErrorLog::default(),
+            tasks: TaskPanel::new(160),
+            active_task: None,
+            check: CheckConclusion::new(),
+            check_outcome: None,
         }))
     }
 

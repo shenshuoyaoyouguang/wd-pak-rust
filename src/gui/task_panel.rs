@@ -94,6 +94,39 @@ impl TaskPanel {
     pub fn toggle_collapsed(&mut self) {
         self.collapsed = !self.collapsed;
     }
+
+    /// 最近一条任务记录（用于折叠态摘要）。
+    pub fn latest(&self) -> Option<&TaskRecord> {
+        self.records.last()
+    }
+
+    /// 清除已结束的任务；运行中/等待中的记录保留（G5-06）。
+    pub fn clear_completed(&mut self) -> usize {
+        let before = self.records.len();
+        self.records.retain(|record| record.is_active());
+        before - self.records.len()
+    }
+
+    /// 折叠态单行文本：无任务 / 最近一条任务及进度。
+    pub fn summary_text(&self) -> String {
+        match self.latest() {
+            None => "任务：无".into(),
+            Some(record) => {
+                let progress = if record.progress.1 > 0 {
+                    format!("（{} / {}）", record.progress.0, record.progress.1)
+                } else {
+                    String::new()
+                };
+                format!(
+                    "任务：{} {} — {}{}",
+                    record.kind.label(),
+                    record.target,
+                    record.state.label(),
+                    progress
+                )
+            }
+        }
+    }
 }
 
 #[cfg(test)]
@@ -152,5 +185,20 @@ mod tests {
         assert!(!panel.collapsed);
         panel.toggle_collapsed();
         assert!(panel.collapsed);
+    }
+
+    #[test]
+    fn summary_and_clear_completed() {
+        let mut panel = TaskPanel::new(160);
+        assert_eq!(panel.summary_text(), "任务：无");
+        let done = panel.submit(TaskKind::Replace, "a.pak");
+        panel.update_state(done, TaskState::Done);
+        let running = panel.submit(TaskKind::Pack, "b.pak");
+        panel.update_state(running, TaskState::Running);
+        panel.update_progress(running, 2, 5);
+        assert_eq!(panel.summary_text(), "任务：打包 b.pak — 进行中（2 / 5）");
+        assert_eq!(panel.clear_completed(), 1);
+        assert_eq!(panel.records.len(), 1);
+        assert_eq!(panel.records[0].id, running);
     }
 }

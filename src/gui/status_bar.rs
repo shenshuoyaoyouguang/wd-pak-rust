@@ -2,6 +2,7 @@
 //!
 //! 只定义状态栏的文本投影与校验徽标状态，不涉及 Win32 控件。
 
+use crate::gui::check::CheckConclusionState;
 use crate::gui::states::ValidationState;
 use crate::gui::text::short_middle;
 
@@ -24,6 +25,17 @@ impl ValidationBadge {
             ValidationState::Passed => ValidationBadge::Passed,
             ValidationState::Problems(n) => ValidationBadge::Problems(*n),
             ValidationState::Expired => ValidationBadge::Expired,
+        }
+    }
+
+    pub fn from_conclusion(state: CheckConclusionState) -> Self {
+        match state {
+            CheckConclusionState::Passed => ValidationBadge::Passed,
+            CheckConclusionState::Problems(n) => ValidationBadge::Problems(n),
+            CheckConclusionState::Expired => ValidationBadge::Expired,
+            CheckConclusionState::Unchecked
+            | CheckConclusionState::Running
+            | CheckConclusionState::Cancelled => ValidationBadge::Unchecked,
         }
     }
 
@@ -91,6 +103,26 @@ mod tests {
         assert_eq!(
             ValidationBadge::from_state(&ValidationState::Expired),
             ValidationBadge::Expired
+        );
+    }
+
+    #[test]
+    fn badge_from_check_conclusion() {
+        assert_eq!(
+            ValidationBadge::from_conclusion(CheckConclusionState::Passed),
+            ValidationBadge::Passed
+        );
+        assert_eq!(
+            ValidationBadge::from_conclusion(CheckConclusionState::Problems(2)),
+            ValidationBadge::Problems(2)
+        );
+        assert_eq!(
+            ValidationBadge::from_conclusion(CheckConclusionState::Expired),
+            ValidationBadge::Expired
+        );
+        assert_eq!(
+            ValidationBadge::from_conclusion(CheckConclusionState::Cancelled),
+            ValidationBadge::Unchecked
         );
     }
 

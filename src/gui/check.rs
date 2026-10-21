@@ -55,6 +55,11 @@ impl CheckProblem {
         }
     }
 
+    /// 问题表的“类型”列；与 CLI 报告使用同一套标签。
+    pub fn kind_label(&self) -> &'static str {
+        self.kind.label()
+    }
+
     /// 与 CLI `check` 的问题行逐字对齐（`  {line}`）。
     pub fn cli_line(&self) -> String {
         match self.kind {
@@ -81,6 +86,20 @@ pub enum CheckConclusionState {
     Problems(usize),
     Cancelled,
     Expired,
+}
+
+impl CheckConclusionState {
+    /// 四态结论文案（未校验/运行中不属于结论）。
+    pub fn label(self) -> String {
+        match self {
+            Self::Unchecked => "未校验".into(),
+            Self::Running => "校验中".into(),
+            Self::Passed => "校验通过".into(),
+            Self::Problems(n) => format!("发现问题 {n} 个"),
+            Self::Cancelled => "校验已取消".into(),
+            Self::Expired => "结果已过期".into(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
@@ -175,6 +194,52 @@ impl CheckResult {
     pub fn passed(&self) -> bool {
         self.problems.is_empty()
     }
+
+    /// attrib 分布文本；报告与界面统计共用，保证与 CLI `check` 头部一致。
+    pub fn attrib_distribution(&self) -> String {
+        self.attribs
+            .iter()
+            .map(|(attrib, count)| format!("0x{attrib:08x}x{count}"))
+            .collect::<Vec<_>>()
+            .join(", ")
+    }
+}
+
+/// 包指纹：大小 + 修改时间（纳秒）。读取失败返回 None，调用方按“无法判定”处理。
+pub fn pak_fingerprint(path: &Path) -> Option<String> {
+    let meta = std::fs::metadata(path).ok()?;
+    let modified = meta.modified().ok()?;
+    let since = modified.duration_since(std::time::UNIX_EPOCH).ok()?;
+    Some(format!(
+        "{}:{}:{}",
+        meta.len(),
+        since.as_secs(),
+        since.subsec_nanos()
+    ))
+}
+
+/// 按问题类型筛选；`None` 表示全部。顺序保持原样。
+pub fn filter_problems(
+    problems: &[CheckProblem],
+    kind: Option<CheckProblemKind>,
+) -> Vec<CheckProblem> {
+    problems
+        .iter()
+        .filter(|problem| kind.map(|kind| problem.kind == kind).unwrap_or(true))
+        .cloned()
+        .collect()
+}
+
+/// 按包内路径排序（稳定排序，同路径保持原顺序）。
+pub fn sort_problems_by_path(problems: &mut [CheckProblem], ascending: bool) {
+    problems.sort_by(|a, b| {
+        let ordering = a.path.cmp(&b.path);
+        if ascending {
+            ordering
+        } else {
+            ordering.reverse()
+        }
+    });
 }
 
 /// 一次校验执行的结果；取消时保留已处理的部分结果。
@@ -202,13 +267,10 @@ impl CheckOutcome {
             "# stored={} org={} ratio={:.3}\n",
             result.total_stored, result.total_org, result.ratio
         ));
-        let dist = result
-            .attribs
-            .iter()
-            .map(|(attrib, count)| format!("0x{attrib:08x}x{count}"))
-            .collect::<Vec<_>>()
-            .join(", ");
-        out.push_str(&format!("# attrib 分布: {dist}\n"));
+        out.push_str(&format!(
+            "# attrib 分布: {}\n",
+            result.attrib_distribution()
+        ));
         if self.cancelled {
             out.push_str(&format!(
                 "# 校验已取消（已处理 {}/{} 项）\n",
@@ -545,6 +607,53 @@ mod tests {
         assert_eq!(outcome.processed, 1);
         assert_eq!(outcome.total, 3);
         assert_eq!(outcome.result.files, 1);
+    }
+
+    #[test]
+    fn conclusion_state_labels() {
+        assert_eq!(CheckConclusionState::Unchecked.label(), "未校验");
+        assert_eq!(CheckConclusionState::Passed.label(), "校验通过");
+        assert_eq!(
+            CheckConclusionState::Problems(4).label(),
+            "发现问题 4 个"
+        );
+        assert_eq!(CheckConclusionState::Expired.label(), "结果已过期");
+    }
+
+    #[test]
+    fn fingerprint_changes_with_content() {
+        let dir = std::env::temp_dir().join(format!(
+            "wd-pak-fp-{}-{:?}",
+            std::process::id(),
+            std::thread::current().id()
+        ));
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("a.pak");
+        std::fs::write(&path, b"one").unwrap();
+        let first = pak_fingerprint(&path).unwrap();
+        std::fs::write(&path, b"two-two").unwrap();
+        let second = pak_fingerprint(&path).unwrap();
+        assert_ne!(first, second);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn filter_and_sort_problems() {
+        let problems = vec![
+            CheckProblem::new(CheckProblemKind::DecompressionFailed, "b", "x"),
+            CheckProblem::new(CheckProblemKind::OffsetOutOfBounds, "c", "y"),
+            CheckProblem::new(CheckProblemKind::DecompressionFailed, "a", "z"),
+        ];
+        let only_decompress =
+            filter_problems(&problems, Some(CheckProblemKind::DecompressionFailed));
+        assert_eq!(only_decompress.len(), 2);
+        assert_eq!(filter_problems(&problems, None).len(), 3);
+
+        let mut sorted = only_decompress;
+        sort_problems_by_path(&mut sorted, true);
+        assert_eq!(sorted[0].path, "a");
+        sort_problems_by_path(&mut sorted, false);
+        assert_eq!(sorted[0].path, "b");
     }
 
     #[test]

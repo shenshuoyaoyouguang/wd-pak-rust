@@ -53,6 +53,29 @@ impl TaskKind {
     pub fn is_write(&self) -> bool {
         matches!(self, TaskKind::Replace | TaskKind::Pack | TaskKind::Unpack)
     }
+
+    pub fn label(&self) -> &'static str {
+        match self {
+            TaskKind::Export => "导出",
+            TaskKind::Replace => "替换",
+            TaskKind::Pack => "打包",
+            TaskKind::Unpack => "解包",
+            TaskKind::ShallowCheck => "浅校验",
+            TaskKind::DeepCheck => "深度校验",
+        }
+    }
+}
+
+impl TaskState {
+    pub fn label(&self) -> String {
+        match self {
+            TaskState::Queued => "等待中".into(),
+            TaskState::Running => "进行中".into(),
+            TaskState::Done => "已完成".into(),
+            TaskState::Failed(_) => "失败".into(),
+            TaskState::Cancelled => "已取消".into(),
+        }
+    }
 }
 
 /// 校验状态（§2.5）。
