@@ -119,20 +119,26 @@ pub struct ColumnLayout {
 }
 
 impl Default for ColumnLayout {
+    /// 默认布局跟随默认视图（树），因此类型列默认隐藏。
     fn default() -> Self {
+        Self::for_mode(ViewMode::Tree)
+    }
+}
+
+impl ColumnLayout {
+    /// 按视图模式生成默认布局：树视图隐藏类型列，列表视图显示。
+    pub fn for_mode(mode: ViewMode) -> Self {
         let mut widths = BTreeMap::new();
         let mut hidden = BTreeSet::new();
         for &col in &Column::ALL {
             widths.insert(col, col.default_width());
-            if !default_visible(col, ViewMode::List) {
+            if !default_visible(col, mode) {
                 hidden.insert(col);
             }
         }
         Self { widths, hidden }
     }
-}
 
-impl ColumnLayout {
     pub fn width(&self, col: Column) -> i32 {
         self.widths.get(&col).copied().unwrap_or(col.default_width())
     }
@@ -177,7 +183,7 @@ impl Default for ViewState {
             },
             tree: TreeState::new(),
             query: Query::default(),
-            columns: ColumnLayout::default(),
+            columns: ColumnLayout::for_mode(ViewMode::Tree),
         }
     }
 }
@@ -519,13 +525,20 @@ impl TreeState {
             let matches = query.apply(entries);
             let mut keep = BTreeSet::new();
             let mut forced = BTreeSet::new();
+            // 子树保留只在没有类型/压缩过滤时成立；否则会绕过过滤器。
+            let retain_subtree = query.kind == KindFilter::All
+                && query.compression == CompressionFilter::All;
             for &index in &matches {
                 let entry = &entries[index];
                 keep.insert(entry.path.clone());
                 if entry.is_dir() {
-                    let prefix = format!("{}/", entry.path);
-                    for child in entries.iter().filter(|e| e.path.starts_with(&prefix)) {
-                        keep.insert(child.path.clone());
+                    // 命中目录本身也要强制展开，否则保留下来的子树不会渲染。
+                    forced.insert(entry.path.clone());
+                    if retain_subtree {
+                        let prefix = format!("{}/", entry.path);
+                        for child in entries.iter().filter(|e| e.path.starts_with(&prefix)) {
+                            keep.insert(child.path.clone());
+                        }
                     }
                 }
                 let mut current = entry.path.as_str();
@@ -690,6 +703,23 @@ mod tests {
     }
 
     #[test]
+    fn column_layout_defaults_follow_view_mode() {
+        let tree = ColumnLayout::for_mode(ViewMode::Tree);
+        assert!(tree.is_hidden(Column::Type));
+        assert!(!tree.is_hidden(Column::Name));
+
+        let list = ColumnLayout::for_mode(ViewMode::List);
+        assert!(!list.is_hidden(Column::Type));
+        assert!(list.is_hidden(Column::Attrib));
+        assert!(list.is_hidden(Column::Offset));
+        assert!(list.is_hidden(Column::Ratio));
+
+        // 默认视图是树，所以 Default 也必须隐藏类型列。
+        assert!(ColumnLayout::default().is_hidden(Column::Type));
+        assert!(ViewState::default().columns.is_hidden(Column::Type));
+    }
+
+    #[test]
     fn sort_indices_orders_subset_with_dirs_first() {
         let entries = sample();
         let mut indices = vec![4, 1, 3];
@@ -755,6 +785,55 @@ mod tests {
             .map(|row| entries[row.index].path.as_str())
             .collect();
         assert_eq!(paths, vec!["a", "a/c", "a/c/d.txt"]);
+    }
+
+    #[test]
+    fn tree_project_matched_directory_is_forced_open() {
+        let entries = sample();
+        let mut tree = TreeState::new();
+        tree.collapse("a");
+        tree.collapse("a/c");
+        let query = Query {
+            keyword: "a/c".into(),
+            ..Default::default()
+        };
+        let rows = tree.project(
+            &entries,
+            SortSpec {
+                key: Column::Name,
+                dir: SortDir::Asc,
+            },
+            &query,
+        );
+        let paths: Vec<&str> = rows
+            .iter()
+            .map(|row| entries[row.index].path.as_str())
+            .collect();
+        assert_eq!(paths, vec!["a", "a/c", "a/c/d.txt"]);
+    }
+
+    #[test]
+    fn tree_project_matched_directory_does_not_bypass_kind_filter() {
+        let entries = sample();
+        let query = Query {
+            keyword: "a".into(),
+            kind: KindFilter::Dirs,
+            ..Default::default()
+        };
+        let rows = TreeState::new().project(
+            &entries,
+            SortSpec {
+                key: Column::Name,
+                dir: SortDir::Asc,
+            },
+            &query,
+        );
+        let paths: Vec<&str> = rows
+            .iter()
+            .map(|row| entries[row.index].path.as_str())
+            .collect();
+        // 目录 "a" 命中后不能把文件子项带进仅目录的结果。
+        assert_eq!(paths, vec!["a", "a/c"]);
     }
 
     #[test]
