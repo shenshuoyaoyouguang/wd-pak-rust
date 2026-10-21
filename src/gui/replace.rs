@@ -101,14 +101,9 @@ pub fn replace_precheck(
 }
 
 pub fn backup_path(pak: &Path) -> PathBuf {
-    let mut p = pak.to_path_buf();
-    let mut name = pak
-        .file_name()
-        .map(|s| s.to_string_lossy().into_owned())
-        .unwrap_or_default();
-    name.push_str(".bak");
-    p.set_file_name(name);
-    p
+    let mut name = pak.as_os_str().to_os_string();
+    name.push(".bak");
+    PathBuf::from(name)
 }
 
 #[cfg(test)]

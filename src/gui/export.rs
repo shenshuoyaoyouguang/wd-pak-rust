@@ -49,6 +49,16 @@ pub struct ExportPlan {
     pub keep_structure: bool,
 }
 
+/// 单个包内路径段是否可安全拼到导出目录下（拒绝盘符/父目录/Windows 非法字符）。
+fn is_safe_component(part: &str) -> bool {
+    !part.is_empty()
+        && part != "."
+        && part != ".."
+        && !part.chars().any(|c| "\\/:*?\"<>|".contains(c))
+        && !part.ends_with('.')
+        && !part.ends_with(' ')
+}
+
 impl ExportPlan {
     pub fn new(entries: Vec<String>, target_dir: PathBuf, keep_structure: bool) -> Self {
         Self {
@@ -58,13 +68,25 @@ impl ExportPlan {
         }
     }
 
+    /// 计算导出目标路径；不安全路径段（盘符、`..`、Windows 非法字符）会被丢弃，
+    /// 全段均不安全时回退到 `export`，保证结果始终位于 `target_dir` 之内。
     pub fn target_path(&self, inner: &str) -> PathBuf {
+        let mut out = self.target_dir.clone();
         if self.keep_structure {
-            self.target_dir.join(inner.replace('/', std::path::MAIN_SEPARATOR_STR))
-        } else {
-            self.target_dir
-                .join(Path::new(inner).file_name().unwrap_or_default())
+            for part in inner.split('/') {
+                if is_safe_component(part) {
+                    out.push(part);
+                }
+            }
+        } else if let Some(name) = Path::new(inner).file_name().and_then(|s| s.to_str()) {
+            if is_safe_component(name) {
+                out.push(name);
+            }
         }
+        if out == self.target_dir {
+            out.push("export");
+        }
+        out
     }
 }
 
@@ -252,6 +274,21 @@ mod tests {
         let plan = ExportPlan::new(vec!["a/b.txt".into()], PathBuf::from("/out"), true);
         let p = plan.target_path("a/b.txt");
         assert!(p.to_string_lossy().contains("a"));
+    }
+
+    #[test]
+    fn target_path_does_not_escape_target_dir() {
+        let root = PathBuf::from("/out");
+        let plan = ExportPlan::new(Vec::new(), root.clone(), true);
+        for inner in ["C:/evil.txt", "../evil.txt", "a/../../evil.txt"] {
+            let p = plan.target_path(inner);
+            assert!(p.starts_with(&root), "{inner} -> {}", p.display());
+        }
+        assert_eq!(plan.target_path("C:/evil.txt"), root.join("evil.txt"));
+        assert_eq!(plan.target_path("../evil.txt"), root.join("evil.txt"));
+        let flat = ExportPlan::new(Vec::new(), root.clone(), false);
+        let p = flat.target_path("C:/evil.txt");
+        assert!(p.starts_with(&root));
     }
 
     #[test]
