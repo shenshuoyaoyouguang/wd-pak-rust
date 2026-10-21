@@ -43,10 +43,10 @@ impl FocusZone {
     }
 
     /// 该区域是否可接收焦点（窄屏下部分区域可能不可见）。
-    pub fn is_available(self, width: i32, _height: i32) -> bool {
+    pub fn is_available(self, width: i32, _height: i32, overlay_visible: bool) -> bool {
         match self {
             FocusZone::Nav => true,
-            FocusZone::Detail => width >= 1100,
+            FocusZone::Detail => width >= 1100 || overlay_visible,
             FocusZone::TaskPanel => true,
             _ => true,
         }
@@ -54,11 +54,17 @@ impl FocusZone {
 }
 
 /// F6 循环：跳过不可用区域。
-pub fn cycle(start: FocusZone, forward: bool, width: i32, height: i32) -> FocusZone {
+pub fn cycle(
+    start: FocusZone,
+    forward: bool,
+    width: i32,
+    height: i32,
+    overlay_visible: bool,
+) -> FocusZone {
     let mut current = start;
     for _ in 0..FocusZone::ORDER.len() {
         current = if forward { current.next() } else { current.prev() };
-        if current.is_available(width, height) {
+        if current.is_available(width, height, overlay_visible) {
             return current;
         }
     }
@@ -81,13 +87,21 @@ mod tests {
 
     #[test]
     fn cycle_skips_unavailable_detail_on_narrow() {
-        let result = cycle(FocusZone::Content, true, 1000, 800);
+        let result = cycle(FocusZone::Content, true, 1000, 800, false);
         assert_ne!(result, FocusZone::Detail);
     }
 
     #[test]
+    fn cycle_reaches_detail_when_overlay_visible() {
+        let result = cycle(FocusZone::Content, true, 1000, 800, true);
+        assert_eq!(result, FocusZone::Detail);
+        assert!(FocusZone::Detail.is_available(1000, 800, true));
+        assert!(!FocusZone::Detail.is_available(1000, 800, false));
+    }
+
+    #[test]
     fn cycle_forward_from_command_bar() {
-        let result = cycle(FocusZone::CommandBar, true, 1280, 800);
+        let result = cycle(FocusZone::CommandBar, true, 1280, 800, false);
         assert_eq!(result, FocusZone::Nav);
     }
 }

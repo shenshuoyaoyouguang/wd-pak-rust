@@ -84,12 +84,13 @@ impl DirHistory {
     }
 
     pub fn push(&mut self, path: String) {
+        if self.entries.get(self.pos) == Some(&path) {
+            return;
+        }
         // 截断前进历史
         self.entries.truncate(self.pos + 1);
-        if self.entries.last() != Some(&path) {
-            self.entries.push(path);
-            self.pos = self.entries.len() - 1;
-        }
+        self.entries.push(path);
+        self.pos = self.entries.len() - 1;
     }
 
     pub fn can_go_back(&self) -> bool {
@@ -181,6 +182,18 @@ mod tests {
         h.push("a".into());
         h.push("a".into());
         assert_eq!(h.entries.len(), 1);
+    }
+
+    #[test]
+    fn dir_history_push_current_keeps_forward() {
+        let mut h = DirHistory::new();
+        h.push("a".into());
+        h.push("b".into());
+        h.push("c".into());
+        assert_eq!(h.go_back(), Some("b"));
+        h.push("b".into());
+        assert!(h.can_go_forward());
+        assert_eq!(h.entries, vec!["a", "b", "c"]);
     }
 
     #[test]
