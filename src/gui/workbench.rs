@@ -2,6 +2,8 @@
 //!
 //! 只定义工作台的卡片与启动模式，不涉及 Win32 控件。
 
+use crate::gui::self_check::{CheckItem, CheckState};
+
 /// 工作台卡片。
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WorkbenchCard {
@@ -29,27 +31,12 @@ pub enum StartupMode {
     Restore,
 }
 
-/// 环境自检项。
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SelfCheckItem {
-    pub name: String,
-    pub state: SelfCheckState,
-    pub detail: String,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SelfCheckState {
-    Ok,
-    Warn,
-    Failed,
-}
-
 /// 工作台状态。
 #[derive(Debug, Default, Clone)]
 pub struct WorkbenchState {
     pub startup: StartupMode,
     pub cards: Vec<WorkbenchCard>,
-    pub self_checks: Vec<SelfCheckItem>,
+    pub self_checks: Vec<CheckItem>,
     pub version: String,
 }
 
@@ -71,24 +58,20 @@ impl WorkbenchState {
         self.startup == StartupMode::FirstRun
     }
 
-    pub fn add_self_check(&mut self, name: &str, state: SelfCheckState, detail: &str) {
-        self.self_checks.push(SelfCheckItem {
-            name: name.to_string(),
-            state,
-            detail: detail.to_string(),
-        });
+    pub fn add_self_check(&mut self, name: &str, state: CheckState, detail: &str) {
+        self.self_checks.push(CheckItem::new(name, state, detail));
     }
 
     pub fn has_failed_checks(&self) -> bool {
         self.self_checks
             .iter()
-            .any(|c| c.state == SelfCheckState::Failed)
+            .any(|c| c.state == CheckState::Failed)
     }
 
     pub fn failed_count(&self) -> usize {
         self.self_checks
             .iter()
-            .filter(|c| c.state == SelfCheckState::Failed)
+            .filter(|c| c.state == CheckState::Failed)
             .count()
     }
 }
@@ -117,8 +100,8 @@ mod tests {
     #[test]
     fn self_check_tracking() {
         let mut wb = WorkbenchState::new("1.0");
-        wb.add_self_check("目录可写", SelfCheckState::Ok, "OK");
-        wb.add_self_check("长路径", SelfCheckState::Failed, "未启用");
+        wb.add_self_check("目录可写", CheckState::Ok, "OK");
+        wb.add_self_check("长路径", CheckState::Failed, "未启用");
         assert!(wb.has_failed_checks());
         assert_eq!(wb.failed_count(), 1);
     }
@@ -126,7 +109,7 @@ mod tests {
     #[test]
     fn no_failed_checks() {
         let mut wb = WorkbenchState::new("1.0");
-        wb.add_self_check("目录可写", SelfCheckState::Ok, "OK");
+        wb.add_self_check("目录可写", CheckState::Ok, "OK");
         assert!(!wb.has_failed_checks());
         assert_eq!(wb.failed_count(), 0);
     }

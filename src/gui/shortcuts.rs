@@ -42,8 +42,9 @@ impl ShortcutMap {
         }
     }
 
-    pub fn bind(&mut self, sc: Shortcut, action: &str) {
-        self.map.insert(sc, action.to_string());
+    /// 绑定快捷键，返回被覆盖的旧动作（无冲突时为 `None`）。
+    pub fn bind(&mut self, sc: Shortcut, action: &str) -> Option<String> {
+        self.map.insert(sc, action.to_string())
     }
 
     pub fn resolve(&self, sc: Shortcut) -> Option<&str> {
@@ -62,7 +63,12 @@ mod tests {
     #[test]
     fn bind_and_resolve() {
         let mut m = ShortcutMap::new();
-        m.bind(Shortcut::ctrl_key(Key::Char('o')), "open");
+        assert_eq!(m.bind(Shortcut::ctrl_key(Key::Char('o')), "open"), None);
         assert_eq!(m.resolve(Shortcut::ctrl_key(Key::Char('o'))), Some("open"));
+        assert_eq!(
+            m.bind(Shortcut::ctrl_key(Key::Char('o')), "export"),
+            Some("open".into())
+        );
+        assert_eq!(m.resolve(Shortcut::ctrl_key(Key::Char('o'))), Some("export"));
     }
 }

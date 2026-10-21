@@ -60,14 +60,16 @@ impl StatusBarState {
     /// 完整状态文本（三段）。
     pub fn full_text(&self) -> String {
         format!(
-            "{} | {} 个文件 / {} 个目录 | 存储 {} / 原始 {}（存储比 {}） | {}",
+            "{} | {} 个文件 / {} 个目录 | 存储 {} / 原始 {}（存储比 {}） | {} | 任务 {} | {}",
             self.short_path(60),
             self.files,
             self.dirs,
             self.stored,
             self.org,
             self.ratio,
-            self.selected
+            self.selected,
+            self.task_count,
+            self.validation.label()
         )
     }
 }
@@ -128,11 +130,15 @@ mod tests {
             org: 200,
             ratio: "0.500".into(),
             selected: "file.txt".into(),
+            validation: ValidationBadge::Problems(2),
+            task_count: 3,
             ..Default::default()
         };
         let text = state.full_text();
         assert!(text.contains("test.pak"));
         assert!(text.contains("16 个文件"));
         assert!(text.contains("file.txt"));
+        assert!(text.contains("任务 3"));
+        assert!(text.contains("发现问题 2"));
     }
 }
