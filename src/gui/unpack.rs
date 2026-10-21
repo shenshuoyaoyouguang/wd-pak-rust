@@ -89,7 +89,7 @@ pub fn unpack_precheck(
     unpack_precheck_full(entries, out_dir_writable, available_space, 0, path_limit)
 }
 
-/// 完整预检：`base_len` 为输出目录绝对路径长度（长路径按完整目标路径计算）。
+/// 完整预检：`base_len` 为输出目录绝对路径的 UTF-16 码元数（长路径按完整目标路径计算）。
 pub fn unpack_precheck_full(
     entries: &[(String, u64, bool)],
     out_dir_writable: bool,
@@ -138,10 +138,11 @@ pub fn unpack_precheck_full(
                 });
             }
         }
+        let path_units = path.encode_utf16().count();
         let total_len = if base_len == 0 {
-            path.chars().count()
+            path_units
         } else {
-            base_len + 1 + path.chars().count()
+            base_len + 1 + path_units
         };
         if total_len > path_limit {
             issues.push(UnpackIssue {
@@ -174,9 +175,10 @@ pub fn unpack_precheck_full(
 }
 
 /// 同层大小写冲突（`entries` 为包内路径；比较父目录与 basename）。
+/// 先按「父目录 + 小写 basename」分桶，只在同桶内比较。
 pub fn detect_case_conflicts(entries: &[(String, u64, bool)]) -> Vec<(String, String)> {
     use std::collections::HashMap;
-    let mut dirs: HashMap<String, Vec<(String, String)>> = HashMap::new();
+    let mut dirs: HashMap<String, HashMap<String, Vec<(String, String)>>> = HashMap::new();
     for (path, _, _) in entries {
         let (parent, base) = match path.rsplit_once('/') {
             Some((parent, base)) => (parent, base),
@@ -184,15 +186,15 @@ pub fn detect_case_conflicts(entries: &[(String, u64, bool)]) -> Vec<(String, St
         };
         dirs.entry(parent.to_lowercase())
             .or_default()
+            .entry(base.to_lowercase())
+            .or_default()
             .push((base.to_string(), path.clone()));
     }
     let mut out = Vec::new();
-    for names in dirs.into_values() {
+    for names in dirs.into_values().flat_map(HashMap::into_values) {
         for i in 0..names.len() {
             for j in (i + 1)..names.len() {
-                if names[i].0.to_lowercase() == names[j].0.to_lowercase()
-                    && names[i].0 != names[j].0
-                {
+                if names[i].0 != names[j].0 {
                     out.push((names[j].1.clone(), names[i].1.clone()));
                 }
             }
@@ -262,6 +264,16 @@ mod tests {
         let r = unpack_precheck_full(&entries, true, 1000, 260, 260);
         assert!(r.has_kind(UnpackIssueKind::PathTooLong));
         let r = unpack_precheck_full(&entries, true, 1000, 100, 260);
+        assert!(!r.has_kind(UnpackIssueKind::PathTooLong));
+    }
+
+    #[test]
+    fn precheck_path_length_counts_utf16_units() {
+        // "😀.txt" = 6 个 UTF-16 码元（chars() 只有 5 个，会漏报）
+        let entries = vec![("😀.txt".into(), 1u64, false)];
+        let r = unpack_precheck_full(&entries, true, 1000, 0, 5);
+        assert!(r.has_kind(UnpackIssueKind::PathTooLong));
+        let r = unpack_precheck_full(&entries, true, 1000, 0, 6);
         assert!(!r.has_kind(UnpackIssueKind::PathTooLong));
     }
 }
