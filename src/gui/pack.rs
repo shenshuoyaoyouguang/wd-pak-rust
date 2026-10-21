@@ -1,6 +1,6 @@
 //! 打包纯逻辑（G4-03/04/05）。
 
-use std::collections::HashMap;
+use std::collections::{BTreeSet, HashMap};
 use std::path::{Path, PathBuf};
 
 use crate::error::PakError;
@@ -176,7 +176,8 @@ impl PackScan {
 }
 
 /// 扫描源目录：跳过 `_pak_manifest.json`（与 CLI `_collect_files` 一致），
-/// 记录其余文件/目录与总大小；`is_dir` 采用 `metadata`（断链按文件处理）。
+/// 记录其余文件/目录与总大小；符号链接/Windows 重解析点整条跳过（不收集、不递归），
+/// `is_dir`/`size` 均取 lstat 语义（`DirEntry::file_type`/`metadata`，不跟随链接）。
 pub fn scan_dir(root: &Path) -> std::io::Result<PackScan> {
     let mut scan = PackScan {
         root: root.to_path_buf(),
@@ -197,10 +198,13 @@ fn scan_rec(dir: &Path, prefix: &str, scan: &mut PackScan) -> std::io::Result<()
             continue;
         }
         let full = entry.path();
-        let metadata = std::fs::metadata(&full);
-        let is_dir = metadata.as_ref().map(|meta| meta.is_dir()).unwrap_or(false);
+        let file_type = entry.file_type()?;
+        if file_type.is_symlink() || crate::platform::is_reparse_point(&full) {
+            continue;
+        }
+        let is_dir = file_type.is_dir();
         let rel = format!("{prefix}{name}");
-        let size = metadata.as_ref().map(|meta| meta.len()).unwrap_or(0);
+        let size = entry.metadata().map(|meta| meta.len()).unwrap_or(0);
         scan.entries.push(PackEntry {
             rel_path: rel.clone(),
             size,
@@ -222,7 +226,8 @@ pub fn validate_pack_rel_path(rel: &str) -> Result<(), PackIssue> {
 }
 
 /// manifest 中 mtime 非法的条目（`files` 值非对象时整份忽略，对齐 CLI 宽松读取）。
-pub fn manifest_mtime_issues(root: &Path) -> Vec<PackIssue> {
+/// 只校验 `scanned` 中实际存在的源路径：陈旧 manifest 条目不会被打包消费，不报告。
+pub fn manifest_mtime_issues(root: &Path, scanned: &BTreeSet<String>) -> Vec<PackIssue> {
     let Ok(text) = std::fs::read_to_string(root.join(MANIFEST_NAME)) else {
         return Vec::new();
     };
@@ -237,6 +242,9 @@ pub fn manifest_mtime_issues(root: &Path) -> Vec<PackIssue> {
     }
     let mut issues = Vec::new();
     for (rel, item) in files {
+        if !scanned.contains(rel) {
+            continue;
+        }
         let mtime = item.get("mtime");
         let valid = match mtime {
             None => true,
@@ -313,13 +321,6 @@ pub fn pack_precheck(entries: &[PackEntry], max_file_size: u64) -> PackPrecheckR
                 ..issue
             });
         }
-    }
-    if total_size > u64::from(u32::MAX) {
-        issues.push(PackIssue {
-            kind: PackIssueKind::TooLarge,
-            path: String::new(),
-            detail: "源文件总量超过 4GB 上限".into(),
-        });
     }
     PackPrecheckResult {
         issues,
@@ -453,13 +454,56 @@ mod tests {
         std::fs::create_dir_all(&root).unwrap();
         std::fs::write(
             root.join(MANIFEST_NAME),
-            br#"{"files":{"a.txt":{"mtime":4294967296},"b.txt":{"mtime":1}}}"#,
+            br#"{"files":{"a.txt":{"mtime":4294967296},"b.txt":{"mtime":1},"stale.txt":{"mtime":-1}}}"#,
         )
         .unwrap();
-        let issues = manifest_mtime_issues(&root);
+        let scanned: BTreeSet<String> = ["a.txt".to_string(), "b.txt".to_string()]
+            .into_iter()
+            .collect();
+        let issues = manifest_mtime_issues(&root, &scanned);
         assert_eq!(issues.len(), 1);
         assert_eq!(issues[0].path, "a.txt");
         assert_eq!(issues[0].kind, PackIssueKind::ManifestMtime);
+        std::fs::remove_dir_all(&root).unwrap();
+    }
+
+    #[test]
+    fn reparse_point_false_for_normal_dir() {
+        let root = std::env::temp_dir().join(format!(
+            "wd-pak-reparse-{}-{:?}",
+            std::process::id(),
+            std::thread::current().id()
+        ));
+        let _ = std::fs::remove_dir_all(&root);
+        std::fs::create_dir_all(&root).unwrap();
+        assert!(!crate::platform::is_reparse_point(&root));
+        std::fs::remove_dir_all(&root).unwrap();
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn scan_dir_skips_symlinks() {
+        use std::os::unix::fs::symlink;
+
+        let root = std::env::temp_dir().join(format!(
+            "wd-pak-pack-link-{}-{:?}",
+            std::process::id(),
+            std::thread::current().id()
+        ));
+        let _ = std::fs::remove_dir_all(&root);
+        std::fs::create_dir_all(root.join("real")).unwrap();
+        std::fs::write(root.join("real/a.txt"), b"abc").unwrap();
+        std::fs::write(root.join("file.txt"), b"defgh").unwrap();
+        symlink(root.join("real"), root.join("linkdir")).unwrap();
+        symlink(root.join("file.txt"), root.join("linkfile.txt")).unwrap();
+        let scan = scan_dir(&root).unwrap();
+        assert!(scan
+            .entries
+            .iter()
+            .all(|entry| !entry.rel_path.starts_with("link")));
+        assert_eq!(scan.file_count(), 2);
+        assert_eq!(scan.dir_count(), 1);
+        assert_eq!(scan.total_size(), 8);
         std::fs::remove_dir_all(&root).unwrap();
     }
 }

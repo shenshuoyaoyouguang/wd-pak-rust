@@ -287,16 +287,19 @@ fn check_tree(nodes: &[WriteNode]) -> Result<(), PakError> {
 /// 每层按「目录（read_dir 序）+ 文件（read_dir 序）」校验名字并检测同层大小写
 /// 冲突；`_pak_manifest.json` 名跳过校验与冲突登记，但其为**目录**时仍递归内容
 /// （对齐 os.walk 无条件递归，与 _collect_files/_build_dir 的跳过形成怪癖差异）。
+/// 符号链接/Windows 重解析点整条跳过（不校验、不递归，对齐 os.walk(followlinks=False)）。
 fn preflight(dir: &Path, prefix: &str) -> Result<(), PakError> {
     let mut dirs: Vec<(String, PathBuf)> = Vec::new();
     let mut files: Vec<String> = Vec::new();
     for entry in std::fs::read_dir(dir)? {
         let entry = entry?;
-        let name = os_name_to_str(&entry.file_name())?;
+        let file_type = entry.file_type()?;
         let full = entry.path();
-        // os.path.isdir 语义：stat 失败（断链 symlink 等）按非目录处理
-        let is_dir = std::fs::metadata(&full).map(|m| m.is_dir()).unwrap_or(false);
-        if is_dir {
+        if file_type.is_symlink() || crate::platform::is_reparse_point(&full) {
+            continue;
+        }
+        let name = os_name_to_str(&entry.file_name())?;
+        if file_type.is_dir() {
             dirs.push((name, full));
         } else {
             files.push(name);
@@ -328,18 +331,22 @@ fn preflight(dir: &Path, prefix: &str) -> Result<(), PakError> {
 /// 收集待打包文件（对齐 Python `_collect_files`）：每层 read_dir →
 /// 按名字原始字节序排序（= Python sorted(key=utf-8-surrogateescape 编码)）→
 /// 依序目录递归展开 / 文件入列表（跳过 _pak_manifest.json，含目录形态）。
+/// 符号链接/Windows 重解析点整条跳过（对齐 os.walk(followlinks=False)）。
 /// 返回顺序决定压缩进度顺序与错误报告顺序。
 fn collect_files(dir: &Path) -> Result<Vec<PathBuf>, PakError> {
     let mut items: Vec<(Vec<u8>, PathBuf, bool)> = Vec::new();
     for entry in std::fs::read_dir(dir)? {
         let entry = entry?;
+        let file_type = entry.file_type()?;
+        let full = entry.path();
+        if file_type.is_symlink() || crate::platform::is_reparse_point(&full) {
+            continue;
+        }
         if entry.file_name() == MANIFEST_NAME {
             continue;
         }
         let bytes = os_bytes(&entry.file_name());
-        let full = entry.path();
-        let is_dir = std::fs::metadata(&full).map(|m| m.is_dir()).unwrap_or(false);
-        items.push((bytes, full, is_dir));
+        items.push((bytes, full, file_type.is_dir()));
     }
     items.sort_by(|a, b| a.0.cmp(&b.0));
     let mut files = Vec::new();
