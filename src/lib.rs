@@ -20,3 +20,11 @@ pub mod pak;
 pub mod tree;pub mod manifest;        // 任务 5
 pub mod commands_read;   // 任务 5
 pub mod commands_write;  // 任务 6
+pub mod session;         // G1-04 包会话
+pub mod recent;          // G1-02.1 最近打开模型
+pub mod browse;          // G2 浏览与检索纯逻辑
+pub mod workspace;       // G1-03.1/06.1/07.1 工作区状态
+pub mod config;          // G0-06 本地状态持久化（配置模型）
+pub mod gui;             // G0 GUI
+ pub mod diagnostics;      // G0-07 自检与诊断
+ pub mod loader;           // G1-03.3 后台打开 逻辑（布局等）

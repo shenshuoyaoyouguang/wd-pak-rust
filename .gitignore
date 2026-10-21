@@ -1,4 +1,6 @@
 /target/dist
 /dist
 /target*
-.codebuddy*
+/.codebuddy/*
+!/.codebuddy/rules/
+/.omo/*

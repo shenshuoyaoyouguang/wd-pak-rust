@@ -7,9 +7,13 @@
 //! - 仅当句柄确实是控制台时才做宽字符转换，重定向到文件/管道时保持原始字节。
 
 use std::io::{self, Write};
+use std::os::windows::ffi::OsStrExt;
 use std::path::{Component, Path, PathBuf};
 
 use windows_sys::Win32::Foundation::HANDLE;
+use windows_sys::Win32::Storage::FileSystem::{
+    GetFileAttributesW, FILE_ATTRIBUTE_REPARSE_POINT, INVALID_FILE_ATTRIBUTES,
+};
 use windows_sys::Win32::System::Console::{
     GetConsoleMode, GetStdHandle, ReadConsoleW, WriteConsoleW, STD_ERROR_HANDLE,
     STD_INPUT_HANDLE, STD_OUTPUT_HANDLE,
@@ -185,6 +189,15 @@ pub fn is_sharing_violation(e: &io::Error, target: &Path) -> bool {
         Some(5) => target.exists(),
         _ => false,
     }
+}
+
+/// 路径是否为 Windows 重解析点（符号链接、目录 junction、云占位符等）。
+/// `GetFileAttributesW` 返回链接本身的属性，不跟随目标；查询失败按非重解析点处理。
+pub fn is_reparse_point(path: &Path) -> bool {
+    let mut wide: Vec<u16> = path.as_os_str().encode_wide().collect();
+    wide.push(0);
+    let attrs = unsafe { GetFileAttributesW(wide.as_ptr()) };
+    attrs != INVALID_FILE_ATTRIBUTES && attrs & FILE_ATTRIBUTE_REPARSE_POINT != 0
 }
 
 /// 对齐 ntpath.normpath：保留盘符/UNC 前缀，折叠 '.'/'..' 与重复分隔符。

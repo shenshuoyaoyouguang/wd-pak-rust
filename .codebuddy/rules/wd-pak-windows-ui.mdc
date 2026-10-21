@@ -1,0 +1,46 @@
+---
+alwaysApply: false
+description: wd-pak Windows 图形界面规划（docs/windows-ui-plan.md）的硬约束与事实来源。涉及 GUI/UI 界面设计、界面文案、交互流程、界面清单或修改该规划文档时使用。
+---
+
+# wd-pak Windows 图形界面规则
+
+## 文档定位
+
+- [windows-ui-plan.md](mdc:docs/windows-ui-plan.md) 是唯一的 GUI 规格，状态为**实施中（G0–G2 部分落地）**，进度以 [windows-ui-impl-plan.md](mdc:docs/windows-ui-impl-plan.md) §0 为准。做界面相关工作先读对应章节，不要另起一套方案。
+- [windows-plan.md](mdc:docs/windows-plan.md) 只覆盖 CLI 的 Windows 平台适配，**不是** GUI 计划；不得合并、改写或把它当作界面依据。
+- CLI 事实来源：[README.md](mdc:README.md)、[MANUAL.md](mdc:MANUAL.md)、[main.rs](mdc:src/main.rs)、[interactive.rs](mdc:src/interactive.rs)、[commands_read.rs](mdc:src/commands_read.rs)、[commands_write.rs](mdc:src/commands_write.rs)、[error.rs](mdc:src/error.rs)、[format.rs](mdc:src/format.rs)、[manifest.rs](mdc:src/manifest.rs)。
+
+## 硬约束
+
+1. GUI 只可视化既有七项能力：list、find、extract、pack、replace、cat、check。不得新增条目增删改、批量替换、目录整体导出、导出到 stdout、格式修复、加密/分卷、在线账号与云同步；前瞻内容只能写入 `docs/windows-ui-plan.md` 的「未来可扩展」。
+2. 界面文案必须以代码真实输出为准（含 `#` 前缀消息、错误原文与路径）；不得虚构错误码、成功提示或校验结论。错误对话框保留可折叠的技术详情。
+3. `check` 退出码 1 = 发现问题（警告态，不是错误），2 = 错误。CLI 文本报告最多列 50 条问题；界面可展示全量但需注明。
+4. 压缩状态由 attrib 推导：bit0 = 目录，bit31 = 原样（RAW），其余为 LZSS；**没有独立的 compressed 字段**。
+5. 打包约束：包内名打包侧按字符数 ≤ 43 校验，写入与读取侧按 **43 字节**硬限（错误文案写「43 字节」，Latin-1 多字节名可能到写入阶段才报过长）；仅 Latin-1、禁止 `/ \ NUL`、空名按「过长」报错；单文件 size/org 或整包（头 + 目录树/根表）超过 4 GB 拒绝；同层大小写冲突阻断。`_pak_manifest.json` 解包时生成、打包时跳过，并按 order 排序、回填 mtime（attrib 由压缩选项决定）。
+6. `--jobs` 默认 `min(CPU 核数, 8)`，实际并行上限 8，`1` 为顺序；`--no-compress` 走 RAW 且无压缩进度输出。
+7. `replace` 只能替换已有条目；备份固定为 `<pak>.bak` 且会覆盖同名；写入经 `.tmp` 后改名，目标被占用时报「目标文件被其他程序占用或不可写」。
+8. 平台口径沿用 [windows-plan.md](mdc:docs/windows-plan.md) 1.1：Windows 10 1809+ / Windows 11 / Server 2019+，仅 x64，MSI + 独立 exe。
+9. `check` 不检测大小写冲突与 Windows 非法文件名；不得把「校验通过」表述为「可安全解包」。
+10. `cat` 的「不存在: {inner}」与 `replace` 的「包内不存在: ...」是两条不同文案，不得合并。
+
+## 必须显式标注的假设
+
+离线单机应用、无云端账号（「账户」= 本地操作员档案 + 版本/许可）、通知 = 应用内通知中心 + 可选系统通知、启动页承担最近打开与环境自检。假设不得混入事实描述。
+
+## 文档维护
+
+- 事实以 [windows-ui-plan.md](mdc:docs/windows-ui-plan.md) §0.1 为准；本规则只保留实现边界，若两者冲突，先修规则再实施。
+- CLI 的用户可见消息、退出码、校验项、manifest 行为、`--jobs` 上限或平台约束变化时，同步更新 UI 规划的 §0.1 事实表、§3 对应流程、§4.7 错误映射、§7.1 能力映射。
+- UI 规划保持「仅功能与界面」：不写代码、伪代码、目录结构、框架或控件库选型、分步实施教程。
+- 新增界面须进入 §4.1/§4.2 清单并补齐空/加载/错误/无权限四态；新增快捷键须同时更新 §6.5 与 §6.1、§6.3 中对应菜单。
+- 术语统一：解包（extract）、包内路径、原始大小（org）、存储大小（size）、存储比（stored/org）、attrib；不要用「压缩率」指代存储比。
+
+## 快速导航
+
+- 布局与导航：§2（命令栏、导航区、标签页、列表/详情、任务面板、状态栏）
+- 功能流程：§3（3.5 导出、3.6 替换、3.7 打包、3.8 校验、3.9 解包、3.10 任务中心）
+- 界面清单与错误规范：§4
+- 窗口尺寸、多显示器、高 DPI、主题：§5
+- Windows 交互、右键、托盘、快捷键、拖放、无障碍：§6
+- CLI 能力映射与不覆盖项：§7

@@ -47,6 +47,11 @@ pub fn is_sharing_violation(_e: &io::Error, _target: &Path) -> bool {
     false
 }
 
+/// POSIX 无 Windows 重解析点概念，恒为 false。
+pub fn is_reparse_point(_path: &Path) -> bool {
+    false
+}
+
 /// 对齐 os.path.normpath：折叠 '.'/'..'/重复斜杠，保留前导 '..'，空结果回 '.'。
 pub fn normpath(p: &Path) -> PathBuf {
     let mut parts: Vec<std::ffi::OsString> = Vec::new();

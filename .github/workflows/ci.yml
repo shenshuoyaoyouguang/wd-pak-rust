@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -29,8 +30,8 @@ jobs:
       - name: 单元测试
         run: cargo test --locked --lib
 
-      - name: 自包含集成测试（格式 / LZSS 黄金向量）
-        run: cargo test --locked --test format_basic --test lzss_golden
+      - name: 自包含集成测试（格式 / LZSS / 界面逻辑）
+        run: cargo test --locked --test format_basic --test lzss_golden --test browse --test gui_layout --test recent --test session --test workspace --test config --test gui_states --test gui_text
 
   build:
     name: 编译 ${{ matrix.target }}
@@ -124,3 +125,34 @@ jobs:
           name: wd-pak-x86_64-windows
           path: out/wd-pak-x86_64-windows.exe
           if-no-files-found: error
+
+  # 差分对拍：需要预先注册带 `wd-pak-fixtures` 标签的 self-hosted Linux runner，
+  # 并在工作区上级目录准备 ../wd_pak_tool.py 与 ../release/{etc,lib_gs32}.pak。
+  # 仅手动触发，避免普通 PR 因缺少外部大包误红；L2 长测不在此 job 内。
+  differential-linux:
+    name: 差分对拍（Python 基准）
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: [self-hosted, linux, wd-pak-fixtures]
+    timeout-minutes: 60
+    env:
+      WDPAK_REQUIRE_FIXTURES: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 检查夹具与 Python
+        run: |
+          set -euo pipefail
+          for f in ../wd_pak_tool.py ../release/etc.pak ../release/lib_gs32.pak; do
+            test -f "$f" || { echo "缺少差分夹具: $f"; exit 1; }
+          done
+          if ! command -v python3 >/dev/null && ! command -v python >/dev/null; then
+            echo "缺少 Python 3"; exit 1
+          fi
+          python3 --version 2>/dev/null || python --version
+          ls -lh ../wd_pak_tool.py ../release/etc.pak ../release/lib_gs32.pak
+
+      - name: 工具链版本
+        run: rustc -vV && cargo -V
+
+      - name: 差分对拍
+        run: cargo test --locked --test golden --test read_cli --test write_cli

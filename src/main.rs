@@ -85,7 +85,11 @@ fn main() {
     let cli = Cli::parse();
     // 对齐 argparse action='version'：解析到即打印退出（先于子命令分发）
     if cli.version {
-        let _ = writeln!(wd_pak::platform::stdout(), "1.0");
+        let _ = writeln!(
+            wd_pak::platform::stdout(),
+            "{}",
+            wd_pak::diagnostics::APP_VERSION
+        );
         return;
     }
     match cli.command {
