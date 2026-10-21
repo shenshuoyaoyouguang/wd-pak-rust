@@ -1,5 +1,7 @@
 # wd-pak GUI 落地实施计划（差距驱动）
 
+> **⚠️ 历史快照（不代表当前代码状态）**：本文写于 `cfa4e72` 之前，基线为 `main @ 35ce007` + 工作区 WIP。当前布局已变为：GUI 逻辑与模块在库层 `src/gui/`，二进制只有 `src/bin/wd-pak-gui.rs`；`src/bin/gui/` 目录已不存在。文内 §1.1 的旧事实、D0.1/C2.0 的“删除 `src/bin/gui/`”决策与 Q4 仅对当时的树成立；现状以 `docs/windows-ui-impl-plan.md` 与代码为准。
+
 > **来源**：`bg_3a6d9f7a`（计划 vs 实现差距分析）+ `bg_37608775`（Win32 外壳拆分方案）
 > **基线**：`main @ 35ce007` + 工作区 WIP（3 个已修改文件 + 17 个未跟踪文件）
 > **性质**：本文档只做规划，不含实现。所有 commit 需你确认后执行（未经请求不提交）。
@@ -20,11 +22,11 @@
 | 事实 | 证据 |
 | :--- | :--- |
 | 可运行 GUI 只有一个文件 | `src/bin/wd-pak-gui.rs`（1410 行），`Cargo.toml:25-27` 唯一指定 |
-| `src/bin/gui/` 6 文件 742 行**从未编译** | 全仓无 `mod gui;`；`src/bin/` 下无 `main.rs`；`wd-pak-gui.rs:8` 只有 `mod win {` |
+| `src/bin/gui/` 6 文件 742 行**从未编译**（历史快照；该目录已不存在） | 全仓无 `mod gui;`；`src/bin/` 下无 `main.rs`；`wd-pak-gui.rs:8` 只有 `mod win {` |
 | `src/bin/gui/mod.rs:21` 是裸 `EOF` | 文件末尾字节为 `…}\nEOF`，一旦接线即语法错误 |
 | `src/gui/` 27 模块中**只有 `layout` 被 GUI 消费** | 外部引用仅 `layout`（bin+tests）与 `states`（仅 tests），其余 0 |
 | shell 只 import 4 个库模块 | `wd-pak-gui.rs:14-19`：`browse` / `error` / `gui::layout` / `session` |
-| G3/G4/G5 界面为零 | `wd-pak-gui.rs` 全文无导出/替换/打包/解包/校验界面 |
+| G3/G4/G5 界面为零（历史快照，现已不成立：G3 导出/预览与 G4 替换/打包/解包向导已接通） | 当时 `wd-pak-gui.rs` 全文无导出/替换/打包/解包/校验界面 |
 
 ### 1.2 来自分析（实施时复核）🔎
 
@@ -93,9 +95,10 @@
 | :--- | :--- | :--- | :--- | :--- |
 | C1.1 | `refactor(gui): 提取错误文案映射到 gui::error_text` | 新增 `src/gui/error_text.rs`（`error_title`/`error_reason`/`error_suggestion`）；shell 改为 `use wd_pak::gui::error_text::*` 薄封装 | 530–576 | 编译通过；`error_text` 无 `windows_sys` 依赖；人工开坏包 |
 | C1.2 | `refactor(gui): 提取文本投影到 gui::text` | 新增 `src/gui/text.rs`（`entry_text`/`attrib_text`/`detail_text`/`short_middle`/`status_text`）；shell 对应函数转调 | 930–961, 1003–1020, 1036–1087, 1089–1101, 1103–1124 | 编译通过；人工开包确认详情/状态栏**逐字不变** |
-| C1.3 | `fix(gui): 对齐 status_bar::full_text 与外壳文案` | `src/gui/status_bar.rs` 的 `full_text` 与外壳格式统一（`（存储比 …）`） | 1103–1124 | 现有 `status_bar` 测试仍过 |
 | C1.4 | `test(gui): 新增 tests/gui_text.rs 钉死文案` | 覆盖 `error_text` 各 `PakError` 分支、`entry_text` 9 列分支、`detail_text` 三态、`status_text` 边界 | — | `cargo test --test gui_text` 全绿 |
 | C1.5 | `chore(ci): 将 gui_text 加入测试清单` | 同步 `.github/workflows/ci.yml` 的测试枚举 | — | CI 执行到该测试 |
+
+> **原 C1.3（状态栏文案对齐）已移出本阶段**：阶段 1 只做纯搬移，`status_bar::full_text` 与外壳的存储比格式差异属不变量 6 明确禁止顺手统一的已知漂移；对齐属行为变更，推迟到阶段 3 单独决策并提交。
 
 **阶段验证**：`cargo test --lib --test gui_layout --test gui_states --test gui_text` 全绿；Linux `cargo build --release` 通过。
 
