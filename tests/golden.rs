@@ -14,6 +14,11 @@
 //!
 //! 不重复既有断言：LZSS 向量（lzss_golden.rs）、CLI 对拍与全量 extract 清单
 //! （read_cli.rs）、layout/replace 向量与 jobs 一致性（write_cli.rs）。
+//! 跨平台口径：Python 管道输出统一 UTF-8；Windows 上文本流归一化 CRLF 与
+//! Win32/Errno 错误前缀，`_pak_manifest.json` 归一化换行；PAK 等二进制产物
+//! 始终逐字节严格。缺少 `release/*.pak` 时相关用例显式 skip，
+//! `WDPAK_REQUIRE_FIXTURES=1` 可强制失败。
+//!
 //! 长场景（etc.pak 交互 extract / etc 整链）标 #[ignore]：
 //! `cargo test --test golden -- --ignored`
 
@@ -24,6 +29,8 @@ use std::process::{Command, Stdio};
 
 use serde_json::Value;
 use sha2::{Digest, Sha256};
+
+mod common;
 
 // ---------------------------------------------------------------------------
 // 基础辅助（与 read_cli.rs / write_cli.rs 同范式）
@@ -41,7 +48,9 @@ fn root(rel: &str) -> String {
 }
 
 fn golden(rel: &str) -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/golden").join(rel)
+    Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("tests/golden")
+        .join(rel)
 }
 
 /// 一次调用的结果：退出码 + 两个输出流（字节原样，不做编码转换）
@@ -56,8 +65,7 @@ fn run_rust(args: &[&str]) -> RunResult {
 }
 
 fn run_py(args: &[&str]) -> RunResult {
-    let out = Command::new("python3")
-        .arg(root("wd_pak_tool.py"))
+    let out = common::python_command()
         .args(args)
         .output()
         .expect("启动 Python 基准失败");
@@ -101,21 +109,28 @@ struct Pair {
     rs: PathBuf,
 }
 
-/// 建立干净的双 cwd 工作目录（/tmp/wdpak_golden_it/{tag}/py|rs）
+/// 建立干净的双 cwd 工作目录（<temp>/golden_it/{tag}/py|rs）
 fn setup_pair(tag: &str) -> Pair {
-    let base = Path::new("/tmp/wdpak_golden_it").join(tag);
+    let base = common::temp_root().join("golden_it").join(tag);
     for side in ["py", "rs"] {
         let d = base.join(side);
         let _ = fs::remove_dir_all(&d);
         fs::create_dir_all(&d).unwrap();
     }
-    Pair { py: base.join("py"), rs: base.join("rs") }
+    Pair {
+        py: base.join("py"),
+        rs: base.join("rs"),
+    }
 }
 
 /// 向 mini pak 场景的双 cwd 放置输入文件（etc_mini pak + replace 向量 newfile）
 fn place_mini_inputs(p: &Pair) {
     for side in [&p.py, &p.rs] {
-        fs::copy(golden("layout/etc_mini_nocompress.pak"), side.join("mini.pak")).unwrap();
+        fs::copy(
+            golden("layout/etc_mini_nocompress.pak"),
+            side.join("mini.pak"),
+        )
+        .unwrap();
         fs::copy(golden("replace/newfile.bin"), side.join("newfile.bin")).unwrap();
     }
 }
@@ -123,9 +138,7 @@ fn place_mini_inputs(p: &Pair) {
 /// 喂 stdin 脚本运行一个实现（交互模式 = 无子命令启动），cwd 决定产物落点
 fn run_repl(py: bool, script: &[u8], cwd: &Path) -> RunResult {
     let mut cmd = if py {
-        let mut c = Command::new("python3");
-        c.arg(root("wd_pak_tool.py"));
-        c
+        common::python_command()
     } else {
         Command::new(env!("CARGO_BIN_EXE_wd-pak"))
     };
@@ -149,17 +162,37 @@ fn run_repl(py: bool, script: &[u8], cwd: &Path) -> RunResult {
 fn assert_repl_same(p: &Pair, script: &str, artifacts: &[&str]) {
     let py = run_repl(true, script.as_bytes(), &p.py);
     let rs = run_repl(false, script.as_bytes(), &p.rs);
-    assert_eq!(rs.0, py.0, "退出码不一致: rust={:?} python={:?}", rs.0, py.0);
-    assert_eq!(rs.1, py.1, "stdout 不一致: {}", first_diff(&rs.1, &py.1));
-    let norm = |mut err: Vec<u8>, cwd: &Path| -> Vec<u8> {
-        let s = String::from_utf8_lossy(&err).replace(cwd.to_str().unwrap(), "{CWD}");
-        err.clear();
-        err.extend_from_slice(s.as_bytes());
-        err
+    assert_eq!(
+        rs.0, py.0,
+        "退出码不一致: rust={:?} python={:?}",
+        rs.0, py.0
+    );
+    let py_out = common::normalize_text(&py.1);
+    let rs_out = common::normalize_text(&rs.1);
+    assert_eq!(
+        rs_out,
+        py_out,
+        "stdout 不一致: {}",
+        first_diff(rs_out.as_bytes(), py_out.as_bytes())
+    );
+    let norm = |err: &[u8], cwd: &Path| -> String {
+        let cwd = cwd.to_string_lossy();
+        let mut s = common::normalize_text(err).replace(cwd.as_ref(), "{CWD}");
+        // OSError 的 filename 走 Python repr，Windows 反斜杠会被转义成 `\\`。
+        #[cfg(windows)]
+        {
+            s = s.replace(&cwd.replace('\\', "\\\\"), "{CWD}");
+        }
+        s
     };
-    let py_err = norm(py.2, &p.py);
-    let rs_err = norm(rs.2, &p.rs);
-    assert_eq!(rs_err, py_err, "stderr(归一化) 不一致: {}", first_diff(&rs_err, &py_err));
+    let py_err = norm(&py.2, &p.py);
+    let rs_err = norm(&rs.2, &p.rs);
+    assert_eq!(
+        rs_err,
+        py_err,
+        "stderr(归一化) 不一致: {}",
+        first_diff(rs_err.as_bytes(), py_err.as_bytes())
+    );
     for f in artifacts {
         let a = fs::read(p.py.join(f)).unwrap_or_else(|e| panic!("py 侧产物缺失 {f}: {e}"));
         let b = fs::read(p.rs.join(f)).unwrap_or_else(|e| panic!("rs 侧产物缺失 {f}: {e}"));
@@ -173,7 +206,12 @@ fn assert_tree_equal(a: &Path, b: &Path) {
         fn rec(dir: &Path, base: &Path, out: &mut Vec<String>) {
             for e in fs::read_dir(dir).unwrap() {
                 let e = e.unwrap();
-                let rel = e.path().strip_prefix(base).unwrap().to_string_lossy().into_owned();
+                let rel = e
+                    .path()
+                    .strip_prefix(base)
+                    .unwrap()
+                    .to_string_lossy()
+                    .into_owned();
                 if e.file_type().unwrap().is_dir() {
                     rec(&e.path(), base, out);
                 } else {
@@ -189,8 +227,18 @@ fn assert_tree_equal(a: &Path, b: &Path) {
     collect(b, &mut lb);
     assert_eq!(la, lb, "目录树文件清单不一致: {a:?} vs {b:?}");
     for rel in &la {
-        let x = fs::read(a.join(rel)).unwrap();
-        let y = fs::read(b.join(rel)).unwrap();
+        let mut x = fs::read(a.join(rel)).unwrap();
+        let mut y = fs::read(b.join(rel)).unwrap();
+        // 唯一由实现生成的文本产物：Python 在 Windows 文本模式下写 CRLF，
+        // Rust 固定 LF；只对 manifest 做换行归一化，其余文件仍逐字节严格。
+        let is_manifest = Path::new(rel)
+            .file_name()
+            .map(|n| n.to_string_lossy() == "_pak_manifest.json")
+            .unwrap_or(false);
+        if is_manifest {
+            x = common::normalize_manifest(&x);
+            y = common::normalize_manifest(&y);
+        }
         assert_eq!(x, y, "文件内容不一致: {rel}");
     }
 }
@@ -237,8 +285,10 @@ fn interactive_list_flows() {
     // mini pak 长格式（y/N 大小写：'y'/'Y' 均接受）
     let p = setup_pair("list");
     place_mini_inputs(&p);
-    let etc = etc_pak();
-    assert_repl_same(&p, &format!("1\n{etc}\nn\n0\n"), &[]);
+    if !common::skip_without_fixture(Path::new(&etc_pak()), "release/etc.pak") {
+        let etc = etc_pak();
+        assert_repl_same(&p, &format!("1\n{etc}\nn\n0\n"), &[]);
+    }
     assert_repl_same(&p, "1\nmini.pak\ny\n0\n", &[]);
     assert_repl_same(&p, "1\nmini.pak\nY\n0\n", &[]);
 }
@@ -247,11 +297,13 @@ fn interactive_list_flows() {
 fn interactive_check_and_find() {
     let p = setup_pair("chkfind");
     place_mini_inputs(&p);
-    let etc = etc_pak();
     // check：报告全走 stdout、`# 校验通过`
     assert_repl_same(&p, "6\nmini.pak\nn\n0\n", &[]);
     // find：匹配项走 stdout、`# 匹配 N 项` 走 stderr
-    assert_repl_same(&p, &format!("7\n{etc}\nxiangsi\n0\n"), &[]);
+    if !common::skip_without_fixture(Path::new(&etc_pak()), "release/etc.pak") {
+        let etc = etc_pak();
+        assert_repl_same(&p, &format!("7\n{etc}\nxiangsi\n0\n"), &[]);
+    }
 }
 
 #[test]
@@ -274,13 +326,14 @@ fn interactive_check_problems_exit1() {
 fn interactive_oserror_prefix_chucuo() {
     // pak 打不开 → Python FileNotFoundError（非 PakError）→ `出错: [Errno 2] ...`
     let p = setup_pair("oserr");
-    assert_repl_same(&p, "1\n/nonexist.pak\nn\n0\n", &[]);
+    place_mini_inputs(&p);
+    let missing = common::temp_str("nonexist.pak");
+    assert_repl_same(&p, &format!("1\n{missing}\nn\n0\n"), &[]);
     // 输出目录是已存在文件 → makedirs FileExistsError → `出错: [Errno 17]`
-    let etc = etc_pak();
     for side in [&p.py, &p.rs] {
         fs::write(side.join("afile"), b"x").unwrap();
     }
-    assert_repl_same(&p, &format!("2\n{etc}\nafile\n0\n"), &[]);
+    assert_repl_same(&p, "2\nmini.pak\nafile\n0\n", &[]);
 }
 
 #[test]
@@ -288,8 +341,9 @@ fn interactive_pakerror_prefix_cuowu() {
     // PakError 域：cat 不存在 / pack 非目录 / replace 包内不存在 → `错误: ...`
     let p = setup_pair("pakerr");
     place_mini_inputs(&p);
+    let missing_dir = common::temp_str("nonexist_dir");
     assert_repl_same(&p, "5\nmini.pak\nno_such.list\n\n0\n", &[]);
-    assert_repl_same(&p, "3\n/nonexist_dir\nx.pak\nn\n0\n", &[]);
+    assert_repl_same(&p, &format!("3\n{missing_dir}\nx.pak\nn\n0\n"), &[]);
     assert_repl_same(&p, "4\nmini.pak\nno_such.list\nnewfile.bin\nn\n0\n", &[]);
 }
 
@@ -298,10 +352,12 @@ fn interactive_quote_stripping() {
     // _ask 剥引号：双引号 / 单引号包裹的路径照常工作；
     // 含 ' 的路径触发 OSError 消息的 repr 引号规则（双引号包裹）
     let p = setup_pair("quote");
-    let etc = etc_pak();
-    assert_repl_same(&p, &format!("1\n\"{etc}\"\nn\n0\n"), &[]);
-    assert_repl_same(&p, "1\n'/nonexist.pak'\nn\n0\n", &[]);
-    assert_repl_same(&p, "1\n\"/non'exist.pak\"\nn\n0\n", &[]);
+    place_mini_inputs(&p);
+    assert_repl_same(&p, "1\n\"mini.pak\"\nn\n0\n", &[]);
+    let missing = common::temp_str("nonexist.pak");
+    assert_repl_same(&p, &format!("1\n'{missing}'\nn\n0\n"), &[]);
+    let quoted = common::temp_str("non'exist.pak");
+    assert_repl_same(&p, &format!("1\n\"{quoted}\"\nn\n0\n"), &[]);
 }
 
 // ---------------------------------------------------------------------------
@@ -312,21 +368,43 @@ fn interactive_quote_stripping() {
 fn interactive_cat_default_name() {
     // 回车 → out = basename(inner.replace('\\','/'))，总是落盘；`# 已导出` 走 stderr
     let p = setup_pair("catdef");
-    let etc = etc_pak();
-    assert_repl_same(&p, &format!("5\n{etc}\n100heis.list\n\n0\n"), &["100heis.list"]);
+    if !common::skip_without_fixture(Path::new(&etc_pak()), "release/etc.pak") {
+        let etc = etc_pak();
+        assert_repl_same(
+            &p,
+            &format!("5\n{etc}\n100heis.list\n\n0\n"),
+            &["100heis.list"],
+        );
+    }
     // 多级 inner：basename 取尾段（lib_gs32 的 clone/misc/mixed_agent.o → mixed_agent.o）
     let lib = root("release/lib_gs32.pak");
-    assert_repl_same(&p, &format!("5\n{lib}\nclone/misc/mixed_agent.o\n\n0\n"),
-                     &["mixed_agent.o"]);
+    if !common::skip_without_fixture(Path::new(&lib), "release/lib_gs32.pak") {
+        assert_repl_same(
+            &p,
+            &format!("5\n{lib}\nclone/misc/mixed_agent.o\n\n0\n"),
+            &["mixed_agent.o"],
+        );
+    }
 }
 
 #[test]
 fn interactive_cat_quoted_out() {
     // 保存路径带引号 → _ask 剥离后使用
     let p = setup_pair("catq");
+    if common::skip_without_fixture(Path::new(&etc_pak()), "release/etc.pak") {
+        return;
+    }
     let etc = etc_pak();
-    assert_repl_same(&p, &format!("5\n{etc}\n100heis.list\n\"out.bin\"\n0\n"), &["out.bin"]);
-    assert_repl_same(&p, &format!("5\n{etc}\n100heis.list\n'out3.bin'\n0\n"), &["out3.bin"]);
+    assert_repl_same(
+        &p,
+        &format!("5\n{etc}\n100heis.list\n\"out.bin\"\n0\n"),
+        &["out.bin"],
+    );
+    assert_repl_same(
+        &p,
+        &format!("5\n{etc}\n100heis.list\n'out3.bin'\n0\n"),
+        &["out3.bin"],
+    );
 }
 
 // ---------------------------------------------------------------------------
@@ -352,7 +430,12 @@ fn interactive_pack_flows() {
     for py in [true, false] {
         let dir = if py { &p.py } else { &p.rs };
         let (code, _, err) = run_repl(py, b"2\nmini.pak\noutdir\n0\n", dir);
-        assert_eq!(code, Some(0), "交互 extract 失败: {}", String::from_utf8_lossy(&err));
+        assert_eq!(
+            code,
+            Some(0),
+            "交互 extract 失败: {}",
+            String::from_utf8_lossy(&err)
+        );
     }
     // 源目录树一致（pack 产物对拍的前提）
     assert_tree_equal(&p.py.join("outdir"), &p.rs.join("outdir"));
@@ -385,14 +468,24 @@ fn interactive_replace_flow() {
     let p = setup_pair("repl");
     place_mini_inputs(&p);
     // y=不压缩 / n=压缩（jobs 由实现自定，产物与并行度无关）
-    assert_repl_same(&p, "4\nmini.pak\n100heis.list\nnewfile.bin\ny\n0\n",
-                     &["mini.pak", "mini.pak.bak"]);
+    assert_repl_same(
+        &p,
+        "4\nmini.pak\n100heis.list\nnewfile.bin\ny\n0\n",
+        &["mini.pak", "mini.pak.bak"],
+    );
     // 重置后再测压缩模式
     place_mini_inputs(&p);
-    assert_repl_same(&p, "4\nmini.pak\n100heis.list\nnewfile.bin\nn\n0\n",
-                     &["mini.pak", "mini.pak.bak"]);
+    assert_repl_same(
+        &p,
+        "4\nmini.pak\n100heis.list\nnewfile.bin\nn\n0\n",
+        &["mini.pak", "mini.pak.bak"],
+    );
     // 读回验证：CLI cat 二进制透明
-    let (code, out, _) = run_rust(&["cat", p.rs.join("mini.pak").to_str().unwrap(), "100heis.list"]);
+    let (code, out, _) = run_rust(&[
+        "cat",
+        p.rs.join("mini.pak").to_str().unwrap(),
+        "100heis.list",
+    ]);
     assert_eq!(code, Some(0));
     let nf = fs::read(golden("replace/newfile.bin")).unwrap();
     assert_eq!(out, nf, "replace 后 cat 读回内容 != newfile");
@@ -414,6 +507,9 @@ fn interactive_crlf_inputs() {
 #[test]
 #[ignore] // 长测：etc.pak 交互 extract 全量产物树比对，cargo test -- --ignored
 fn interactive_extract_etc_full() {
+    if common::skip_without_fixture(Path::new(&etc_pak()), "release/etc.pak") {
+        return;
+    }
     let p = setup_pair("etc_full");
     let etc = etc_pak();
     assert_repl_same(&p, &format!("2\n{etc}\netc_out\n0\n"), &[]);
@@ -428,7 +524,7 @@ fn interactive_extract_etc_full() {
 /// extract 目录树 → pack pak（mode）→ replace（--no-compress --backup）→ cat 读回。
 /// pak 参数为 golden mini pak（16 文件）或 etc.pak（2980 文件，调用方标 #[ignore]）。
 fn assert_e2e_pipeline(tag: &str, pak: &str, inner: &str, pack_no_compress: bool) {
-    let base = Path::new("/tmp/wdpak_golden_e2e").join(tag);
+    let base = common::temp_root().join("golden_e2e").join(tag);
     let _ = fs::remove_dir_all(&base);
     fs::create_dir_all(&base).unwrap();
     let nf = golden("replace/newfile.bin").to_str().unwrap().to_string();
@@ -440,24 +536,53 @@ fn assert_e2e_pipeline(tag: &str, pak: &str, inner: &str, pack_no_compress: bool
         let pak_out = base.join(format!("{side}.pak"));
         // 1) extract
         let (code, _, err) = run(&["extract", pak, outdir.to_str().unwrap()]);
-        assert_eq!(code, Some(0), "{side} extract 失败: {}", String::from_utf8_lossy(&err));
+        assert_eq!(
+            code,
+            Some(0),
+            "{side} extract 失败: {}",
+            String::from_utf8_lossy(&err)
+        );
         // 2) pack（模式由参数决定）
         let mut pack_args = vec!["pack", outdir.to_str().unwrap(), pak_out.to_str().unwrap()];
         if pack_no_compress {
             pack_args.push("--no-compress");
         }
         let (code, _, err) = run(&pack_args);
-        assert_eq!(code, Some(0), "{side} pack 失败: {}", String::from_utf8_lossy(&err));
+        assert_eq!(
+            code,
+            Some(0),
+            "{side} pack 失败: {}",
+            String::from_utf8_lossy(&err)
+        );
         // 3) replace --no-compress --backup（备份语义恒定）
         let bak = format!("{}.bak", pak_out.display());
-        let (code, _, err) = run(&["replace", pak_out.to_str().unwrap(), inner, &nf,
-                                    "--no-compress", "--backup"]);
-        assert_eq!(code, Some(0), "{side} replace 失败: {}", String::from_utf8_lossy(&err));
+        let (code, _, err) = run(&[
+            "replace",
+            pak_out.to_str().unwrap(),
+            inner,
+            &nf,
+            "--no-compress",
+            "--backup",
+        ]);
+        assert_eq!(
+            code,
+            Some(0),
+            "{side} replace 失败: {}",
+            String::from_utf8_lossy(&err)
+        );
         // 4) cat 读回 == newfile
         let (code, data, _) = run(&["cat", pak_out.to_str().unwrap(), inner]);
         assert_eq!(code, Some(0), "{side} cat 读回失败");
-        assert_eq!(data, fs::read(&nf).unwrap(), "{side} cat 读回内容 != newfile");
-        vec![file_sha256(&pak_out), file_sha256(Path::new(&bak)), sha256_hex(&data)]
+        assert_eq!(
+            data,
+            fs::read(&nf).unwrap(),
+            "{side} cat 读回内容 != newfile"
+        );
+        vec![
+            file_sha256(&pak_out),
+            file_sha256(Path::new(&bak)),
+            sha256_hex(&data),
+        ]
     };
     let py = run_chain(true);
     let rs = run_chain(false);
@@ -472,13 +597,20 @@ fn assert_e2e_pipeline(tag: &str, pak: &str, inner: &str, pack_no_compress: bool
 #[test]
 fn e2e_mini_pipeline() {
     // mini pak（16 文件，压缩 pack）：快链路
-    assert_e2e_pipeline("mini", golden("layout/etc_mini_nocompress.pak").to_str().unwrap(),
-                        "100heis.list", false);
+    assert_e2e_pipeline(
+        "mini",
+        golden("layout/etc_mini_nocompress.pak").to_str().unwrap(),
+        "100heis.list",
+        false,
+    );
 }
 
 #[test]
 #[ignore] // 长测：etc.pak 2980 文件全链（双实现各一次全量解压 + 打包），-- --ignored
 fn e2e_etc_full_pipeline() {
+    if common::skip_without_fixture(Path::new(&etc_pak()), "release/etc.pak") {
+        return;
+    }
     // etc.pak：no-compress pack（Python 压缩 80MB 过慢；压缩产物一致性已由
     // write_cli roundtrip 与 golden layout 向量覆盖）
     assert_e2e_pipeline("etc", &etc_pak(), "100heis.list", true);
@@ -490,15 +622,22 @@ fn e2e_etc_full_pipeline() {
 
 #[test]
 fn golden_index_files_complete() {
-    let idx: Value = serde_json::from_str(
-        &fs::read_to_string(golden("golden_index.json")).unwrap(),
-    )
-    .unwrap();
+    let idx: Value =
+        serde_json::from_str(&fs::read_to_string(golden("golden_index.json")).unwrap()).unwrap();
     let v = idx.get("vectors").unwrap();
 
     // 1) 各 section 的 index / manifest / data_dir 引用存在
-    for section in ["extract", "decompress", "compress_cases", "compress_files", "layout", "replace"] {
-        let s = v.get(section).unwrap_or_else(|| panic!("缺 section {section}"));
+    for section in [
+        "extract",
+        "decompress",
+        "compress_cases",
+        "compress_files",
+        "layout",
+        "replace",
+    ] {
+        let s = v
+            .get(section)
+            .unwrap_or_else(|| panic!("缺 section {section}"));
         for key in ["manifest", "index"] {
             if let Some(f) = s.get(key).and_then(Value::as_str) {
                 assert!(golden(f).is_file(), "golden_index 声明的文件缺失: {f}");
@@ -515,14 +654,17 @@ fn golden_index_files_complete() {
         .lines()
         .filter(|l| !l.trim().is_empty())
         .count();
-    assert_eq!(lines as u64, v["extract"]["lines"].as_u64().unwrap(), "extract 清单行数漂移");
+    assert_eq!(
+        lines as u64,
+        v["extract"]["lines"].as_u64().unwrap(),
+        "extract 清单行数漂移"
+    );
 
     // 3) decompress：small 项的 stored_file / out_file 外部向量存在
     //    （large 项由 pak offset/size 现场抽取，无外部文件），数量 = small + large
-    let d: Value = serde_json::from_str(
-        &fs::read_to_string(golden("lzss_decompress_cases.json")).unwrap(),
-    )
-    .unwrap();
+    let d: Value =
+        serde_json::from_str(&fs::read_to_string(golden("lzss_decompress_cases.json")).unwrap())
+            .unwrap();
     let mut n = 0u64;
     for group in ["small", "large"] {
         for c in d[group].as_array().unwrap() {
@@ -534,13 +676,15 @@ fn golden_index_files_complete() {
             n += 1;
         }
     }
-    assert_eq!(n, v["decompress"]["small"].as_u64().unwrap() + v["decompress"]["large"].as_u64().unwrap());
+    assert_eq!(
+        n,
+        v["decompress"]["small"].as_u64().unwrap() + v["decompress"]["large"].as_u64().unwrap()
+    );
 
     // 4) compress_files：每项的 in_file / out_file（内联项无此字段）存在，数量相符
-    let cf: Value = serde_json::from_str(
-        &fs::read_to_string(golden("lzss_compress_files.json")).unwrap(),
-    )
-    .unwrap();
+    let cf: Value =
+        serde_json::from_str(&fs::read_to_string(golden("lzss_compress_files.json")).unwrap())
+            .unwrap();
     let files = cf["files"].as_array().unwrap();
     for f in files {
         for key in ["in_file", "out_file"] {
@@ -549,25 +693,27 @@ fn golden_index_files_complete() {
             }
         }
     }
-    assert_eq!(files.len() as u64, v["compress_files"]["count"].as_u64().unwrap());
+    assert_eq!(
+        files.len() as u64,
+        v["compress_files"]["count"].as_u64().unwrap()
+    );
 
     // 5) layout：input_dir 与 paks 存在（paks 相对 layout/ 目录）
-    let lay: Value = serde_json::from_str(
-        &fs::read_to_string(golden("layout/layout.json")).unwrap(),
-    )
-    .unwrap();
+    let lay: Value =
+        serde_json::from_str(&fs::read_to_string(golden("layout/layout.json")).unwrap()).unwrap();
     let input_dir = lay["input_dir"].as_str().unwrap();
     assert!(golden(input_dir).is_dir(), "layout 源目录缺失: {input_dir}");
     for p in v["layout"]["paks"].as_array().unwrap() {
         let f = p.as_str().unwrap();
-        assert!(golden("layout").join(f).is_file(), "layout pak 向量缺失: layout/{f}");
+        assert!(
+            golden("layout").join(f).is_file(),
+            "layout pak 向量缺失: layout/{f}"
+        );
     }
 
     // 6) replace：每 case 的 newfile 存在，数量相符
-    let rp: Value = serde_json::from_str(
-        &fs::read_to_string(golden("replace/replace.json")).unwrap(),
-    )
-    .unwrap();
+    let rp: Value =
+        serde_json::from_str(&fs::read_to_string(golden("replace/replace.json")).unwrap()).unwrap();
     let cases = rp["cases"].as_array().unwrap();
     for c in cases {
         let f = c["newfile"].as_str().unwrap();
