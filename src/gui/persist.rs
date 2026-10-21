@@ -10,6 +10,14 @@ use crate::config::{Config, LoadOutcome};
 
 pub const SESSION_VERSION: u32 = 1;
 
+/// 配置文件加载状态：缺失、存在但不可读（只读模式）、正常。
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ConfigLoadState {
+    Missing,
+    ReadOnly,
+    Ok,
+}
+
 /// 单个标签的会话快照；只存路径与浏览状态，不存包内容。
 #[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub struct TabSnapshot {
@@ -51,8 +59,8 @@ pub fn paths() -> (PathBuf, PathBuf) {
     (directory.join("config.json"), directory.join("session.json"))
 }
 
-/// 读取配置；返回值中的 `bool` 表示配置文件此前是否存在（首次运行判定）。
-pub fn load_config(path: &Path) -> (Config, Option<String>, bool) {
+/// 读取配置；返回加载状态（缺失 / 只读 / 正常），供首次运行与只读模式判定。
+pub fn load_config(path: &Path) -> (Config, Option<String>, ConfigLoadState) {
     match std::fs::read_to_string(path) {
         Ok(text) => {
             let (config, outcome) = Config::from_json(&text);
@@ -62,15 +70,15 @@ pub fn load_config(path: &Path) -> (Config, Option<String>, bool) {
                     Some(reason)
                 }
             };
-            (config, reason, true)
+            (config, reason, ConfigLoadState::Ok)
         }
         Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
-            (Config::default(), None, false)
+            (Config::default(), None, ConfigLoadState::Missing)
         }
         Err(error) => (
             Config::default(),
             Some(format!("读取配置失败: {error}")),
-            false,
+            ConfigLoadState::ReadOnly,
         ),
     }
 }
@@ -92,16 +100,32 @@ fn write_atomic(path: &Path, text: &str) -> std::io::Result<()> {
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent)?;
     }
-    let temporary = path.with_extension("json.tmp");
+    let temporary = temp_path(path);
     std::fs::write(&temporary, text)?;
     match std::fs::rename(&temporary, path) {
         Ok(()) => Ok(()),
         Err(error) => {
-            // Windows 上目标存在时改名可能失败；删除旧文件后重试一次。
-            let _ = std::fs::remove_file(path);
-            std::fs::rename(&temporary, path).map_err(|_| error)
+            // Windows 上目标存在时改名失败；复制会覆盖旧文件，失败则保留旧文件。
+            match std::fs::copy(&temporary, path) {
+                Ok(_) => {
+                    let _ = std::fs::remove_file(&temporary);
+                    Ok(())
+                }
+                Err(_) => {
+                    let _ = std::fs::remove_file(&temporary);
+                    Err(error)
+                }
+            }
         }
     }
+}
+
+fn temp_path(path: &Path) -> PathBuf {
+    let name = path
+        .file_name()
+        .map(|value| value.to_string_lossy().into_owned())
+        .unwrap_or_else(|| "config.json".into());
+    path.with_file_name(format!(".{name}.{}.tmp", std::process::id()))
 }
 
 #[cfg(test)]
@@ -142,8 +166,8 @@ mod tests {
     #[test]
     fn config_roundtrip_reports_existing_file() {
         let path = unique("config");
-        let (missing, reason, existed) = load_config(&path);
-        assert!(!existed);
+        let (missing, reason, state) = load_config(&path);
+        assert_eq!(state, ConfigLoadState::Missing);
         assert!(reason.is_none());
         assert_eq!(missing, Config::default());
 
@@ -152,11 +176,37 @@ mod tests {
         config.touch_recent(r"C:\tmp\a.pak", 42);
         save_config(&path, &config).unwrap();
 
-        let (loaded, reason, existed) = load_config(&path);
+        let (loaded, reason, state) = load_config(&path);
         let _ = std::fs::remove_file(&path);
-        assert!(existed);
+        assert_eq!(state, ConfigLoadState::Ok);
         assert!(reason.is_none());
         assert_eq!(loaded.ui.recent_limit, 7);
         assert_eq!(loaded.recent.len(), 1);
+    }
+
+    #[test]
+    fn config_load_state_read_only_for_unreadable_existing_path() {
+        let path = unique("config-dir");
+        std::fs::create_dir(&path).unwrap();
+        let (config, reason, state) = load_config(&path);
+        let _ = std::fs::remove_dir(&path);
+        assert_eq!(state, ConfigLoadState::ReadOnly);
+        assert!(reason.is_some());
+        assert_eq!(config, Config::default());
+    }
+
+    #[test]
+    fn save_config_overwrites_existing_file() {
+        let path = unique("config-overwrite");
+        let mut config = Config::default();
+        save_config(&path, &config).unwrap();
+        config.ui.recent_limit = 3;
+        save_config(&path, &config).unwrap();
+
+        let (loaded, reason, state) = load_config(&path);
+        let _ = std::fs::remove_file(&path);
+        assert_eq!(state, ConfigLoadState::Ok);
+        assert!(reason.is_none());
+        assert_eq!(loaded.ui.recent_limit, 3);
     }
 }
