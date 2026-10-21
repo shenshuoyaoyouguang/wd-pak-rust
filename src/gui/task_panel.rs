@@ -61,9 +61,12 @@ impl TaskPanel {
         id
     }
 
-    /// 按 ID 更新任务状态。
+    /// 按 ID 更新任务状态；已结束的任务不再接受状态变更。
     pub fn update_state(&mut self, id: u64, state: TaskState) {
         if let Some(rec) = self.records.iter_mut().find(|r| r.id == id) {
+            if rec.is_terminal() {
+                return;
+            }
             rec.state = state;
         }
     }
@@ -129,6 +132,18 @@ mod tests {
         panel.update_state(id, TaskState::Done);
         assert_eq!(panel.active_count(), 0);
         assert!(!panel.has_write_task());
+    }
+
+    #[test]
+    fn terminal_task_ignores_state_updates() {
+        let mut panel = TaskPanel::new(160);
+        let id = panel.submit(TaskKind::Export, "a.pak");
+        panel.update_state(id, TaskState::Done);
+        panel.update_state(id, TaskState::Running);
+        assert_eq!(panel.records[0].state, TaskState::Done);
+
+        panel.update_state(id, TaskState::Cancelled);
+        assert_eq!(panel.records[0].state, TaskState::Done);
     }
 
     #[test]

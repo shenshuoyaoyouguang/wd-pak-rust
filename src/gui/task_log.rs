@@ -24,11 +24,17 @@ impl TaskLogEntry {
     }
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct TaskLog {
     pub entries: Vec<TaskLogEntry>,
     pub max_entries: usize,
     pub auto_scroll: bool,
+}
+
+impl Default for TaskLog {
+    fn default() -> Self {
+        Self::new(0)
+    }
 }
 
 impl TaskLog {
@@ -97,6 +103,15 @@ mod tests {
         log.push(TaskLogEntry::new(2, LogLevel::Error, "b"));
         assert_eq!(log.filter(Some(LogLevel::Error)).len(), 1);
         assert_eq!(log.filter(None).len(), 2);
+    }
+
+    #[test]
+    fn default_matches_new_zero() {
+        let default = TaskLog::default();
+        let explicit = TaskLog::new(0);
+        assert_eq!(default.max_entries, explicit.max_entries);
+        assert_eq!(default.auto_scroll, explicit.auto_scroll);
+        assert_eq!(default.entries, explicit.entries);
     }
 
     #[test]
