@@ -63,22 +63,23 @@ impl PakReader {
     /// 深度优先遍历（对应 Python `walk`）：返回 (relpath, 节点) 列表。
     /// relpath 以 '/' 连接，目录条目先于其子项（Python rel + '/' 前缀拼接）。
     pub fn walk(&self) -> Vec<(String, &TreeNode)> {
-        fn rec<'a>(
-            nodes: &'a [TreeNode],
-            prefix: &str,
-            out: &mut Vec<(String, &'a TreeNode)>,
-        ) {
+        let mut out = Vec::new();
+        self.walk_with_progress(|rel, node| out.push((rel.to_string(), node)));
+        out
+    }
+
+    /// 与 [`Self::walk`] 相同的深度优先顺序，但逐条目回调，不先物化整个列表。
+    pub fn walk_with_progress<'a, F: FnMut(&str, &'a TreeNode)>(&'a self, mut f: F) {
+        fn rec<'a, F: FnMut(&str, &'a TreeNode)>(nodes: &'a [TreeNode], prefix: &str, f: &mut F) {
             for node in nodes {
                 let rel = format!("{prefix}{}", latin1(&node.entry.name));
-                out.push((rel.clone(), node));
+                f(&rel, node);
                 if let NodePayload::Dir(children) = &node.payload {
-                    rec(children, &format!("{rel}/"), out);
+                    rec(children, &format!("{rel}/"), f);
                 }
             }
         }
-        let mut out = Vec::new();
-        rec(&self.root, "", &mut out);
-        out
+        rec(&self.root, "", &mut f);
     }
 
     /// 按包内路径查找（对应 Python `find`）：去除首尾 `/`、`\`→`/`、逐段匹配；

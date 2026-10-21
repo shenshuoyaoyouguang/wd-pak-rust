@@ -75,65 +75,31 @@ pub struct PakSession {
 impl PakSession {
     /// 打开并解析包；错误原样沿用 CLI 的错误类型与文案。
     pub fn open(path: &Path) -> Result<Self, PakError> {
-        // 与 CLI 同一条打开路径：I/O 错误带上文件路径（否则 GUI 只显示 `[Win32 2] …`）。
-        let reader = crate::commands_read::open_pak(path)?;
-        let (mut files, mut dirs) = (0usize, 0usize);
-        let (mut total_stored, mut total_org) = (0u64, 0u64);
-        let mut attribs: BTreeMap<u32, usize> = BTreeMap::new();
-        let mut entries = Vec::new();
-        for (rel, node) in reader.walk() {
-            if node.is_dir() {
-                dirs += 1;
-            } else {
-                files += 1;
-                total_stored += node.entry.size as u64;
-                total_org += node.entry.org as u64;
-                *attribs.entry(node.entry.attrib).or_insert(0) += 1;
-            }
-            let e = &node.entry;
-            entries.push(SessionEntry {
-                path: rel,
-                attrib: e.attrib,
-                offset: e.offset,
-                size: e.size,
-                org: e.org,
-                mtime: e.mtime,
-            });
-        }
-        let root_dir_size = reader.root_size;
-        let file_size = reader.file_size;
-        let ratio = total_stored as f64 / total_org.max(1) as f64;
-        let fingerprint = fingerprint_of(&std::fs::metadata(path)?);
-        Ok(Self {
-            path: path.to_path_buf(),
-            fingerprint,
-            reader,
-            entries,
-            stats: SessionStats {
-                files,
-                dirs,
-                root_dir_size,
-                file_size,
-                total_stored,
-                total_org,
-                ratio,
-                attribs,
-            },
-        })
+        Self::open_with_progress(path, |_| {}, None)
     }
 
-    /// 打开并解析包，支持进度回调（每处理一条目调用一次）。
+    /// 打开并解析包，支持进度回调（每处理一条目调用一次）与可选取消标志。
+    ///
+    /// `progress` 收到已处理条目数；`cancel` 置位时在遍历期间提前返回错误，
+    /// 调用方（如后台加载器）通常丢弃该错误并自行按取消处理。
     pub fn open_with_progress(
         path: &Path,
         mut progress: impl FnMut(usize),
+        cancel: Option<&std::sync::atomic::AtomicBool>,
     ) -> Result<Self, PakError> {
+        use std::sync::atomic::Ordering;
+
         let reader = crate::commands_read::open_pak(path)?;
         let (mut files, mut dirs) = (0usize, 0usize);
         let (mut total_stored, mut total_org) = (0u64, 0u64);
         let mut attribs: BTreeMap<u32, usize> = BTreeMap::new();
         let mut entries = Vec::new();
-        let mut count = 0usize;
-        for (rel, node) in reader.walk() {
+        let mut cancelled = false;
+        reader.walk_with_progress(|rel, node| {
+            if cancelled || cancel.is_some_and(|flag| flag.load(Ordering::Relaxed)) {
+                cancelled = true;
+                return;
+            }
             if node.is_dir() {
                 dirs += 1;
             } else {
@@ -144,15 +110,17 @@ impl PakSession {
             }
             let e = &node.entry;
             entries.push(SessionEntry {
-                path: rel,
+                path: rel.to_string(),
                 attrib: e.attrib,
                 offset: e.offset,
                 size: e.size,
                 org: e.org,
                 mtime: e.mtime,
             });
-            count += 1;
-            progress(count);
+            progress(entries.len());
+        });
+        if cancelled {
+            return Err(PakError::Io(std::io::Error::other("加载已取消")));
         }
         let root_dir_size = reader.root_size;
         let file_size = reader.file_size;
