@@ -72,7 +72,10 @@ impl ValidationState {
     pub fn is_terminal(&self) -> bool {
         matches!(
             self,
-            ValidationState::Passed | ValidationState::Problems(_) | ValidationState::Cancelled
+            ValidationState::Passed
+                | ValidationState::Problems(_)
+                | ValidationState::Cancelled
+                | ValidationState::Expired
         )
     }
 
@@ -98,8 +101,11 @@ impl ValidationState {
 
     /// 指纹变化后标为过期（§2.6 规则 3）。
     pub fn invalidate_on_fingerprint_change(&mut self) {
-        if matches!(self, ValidationState::Passed | ValidationState::Problems(_)) {
-            *self = ValidationState::Expired;
+        match self {
+            ValidationState::Passed | ValidationState::Problems(_) | ValidationState::Running => {
+                *self = ValidationState::Expired;
+            }
+            _ => {}
         }
     }
 }

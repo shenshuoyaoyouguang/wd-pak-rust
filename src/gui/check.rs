@@ -64,30 +64,48 @@ impl CheckConclusion {
         self.state = CheckConclusionState::Running;
     }
 
-    pub fn pass(&mut self, fingerprint: Option<String>) {
+    pub fn pass(&mut self, fingerprint: Option<String>, now: u64) {
+        if !matches!(self.state, CheckConclusionState::Running) {
+            return;
+        }
         self.state = CheckConclusionState::Passed;
         self.fingerprint = fingerprint;
+        self.checked_at = Some(now);
     }
 
-    pub fn problems(&mut self, count: usize, fingerprint: Option<String>) {
-        self.state = CheckConclusionState::Problems(count);
+    pub fn problems(&mut self, count: usize, fingerprint: Option<String>, now: u64) {
+        if !matches!(self.state, CheckConclusionState::Running) {
+            return;
+        }
+        // 零问题等价于通过，与 `ValidationState::complete` 保持一致。
+        self.state = if count == 0 {
+            CheckConclusionState::Passed
+        } else {
+            CheckConclusionState::Problems(count)
+        };
         self.fingerprint = fingerprint;
+        self.checked_at = Some(now);
     }
 
     pub fn cancel(&mut self) {
+        if !matches!(self.state, CheckConclusionState::Running) {
+            return;
+        }
         self.state = CheckConclusionState::Cancelled;
     }
 
     pub fn expire(&mut self) {
         if matches!(
             self.state,
-            CheckConclusionState::Passed | CheckConclusionState::Problems(_)
+            CheckConclusionState::Running
+                | CheckConclusionState::Passed
+                | CheckConclusionState::Problems(_)
         ) {
             self.state = CheckConclusionState::Expired;
         }
     }
 
-    /// 写入会改变包内容：已有结论一律作废（未校验/进行中/已作废保持不变）。
+    /// 写入会改变包内容：已有结论一律作废（未校验/已作废保持不变）。
     pub fn invalidate_on_write(&mut self) {
         self.expire();
     }
@@ -145,7 +163,7 @@ pub fn deep_check_entry(
 ) -> Vec<CheckProblem> {
     let mut out = Vec::new();
     if is_raw {
-        if stored.len() != org_size {
+        if stored.len() < org_size {
             out.push(CheckProblem::new(
                 CheckProblemKind::SizeMismatch,
                 path,
@@ -193,10 +211,41 @@ mod tests {
         let mut c = CheckConclusion::new();
         c.start();
         assert_eq!(c.state, CheckConclusionState::Running);
-        c.pass(Some("fp".into()));
+        c.pass(Some("fp".into()), 100);
         assert_eq!(c.state, CheckConclusionState::Passed);
+        assert_eq!(c.checked_at, Some(100));
         c.invalidate_on_write();
         assert_eq!(c.state, CheckConclusionState::Expired);
+    }
+
+    #[test]
+    fn conclusion_zero_problems_is_passed() {
+        let mut c = CheckConclusion::new();
+        c.start();
+        c.problems(0, Some("fp".into()), 7);
+        assert_eq!(c.state, CheckConclusionState::Passed);
+        assert_eq!(c.checked_at, Some(7));
+    }
+
+    #[test]
+    fn conclusion_ignores_completion_after_cancel() {
+        let mut c = CheckConclusion::new();
+        c.start();
+        c.cancel();
+        c.pass(Some("fp".into()), 1);
+        assert_eq!(c.state, CheckConclusionState::Cancelled);
+        assert_eq!(c.checked_at, None);
+    }
+
+    #[test]
+    fn conclusion_write_during_running_expires_and_blocks_completion() {
+        let mut c = CheckConclusion::new();
+        c.start();
+        c.invalidate_on_write();
+        assert_eq!(c.state, CheckConclusionState::Expired);
+        c.problems(2, Some("fp".into()), 3);
+        assert_eq!(c.state, CheckConclusionState::Expired);
+        assert_eq!(c.checked_at, None);
     }
 
     #[test]
@@ -211,5 +260,11 @@ mod tests {
     fn deep_check_raw_mismatch() {
         let probs = deep_check_entry("a", true, &[1, 2], 3);
         assert!(!probs.is_empty());
+    }
+
+    #[test]
+    fn deep_check_raw_trailing_bytes_accepted() {
+        let probs = deep_check_entry("a", true, &[1, 2, 3, 4], 3);
+        assert!(probs.is_empty());
     }
 }
