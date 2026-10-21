@@ -5,22 +5,22 @@ pub fn scale_px(value: i32, dpi: u32) -> i32 {
 }
 
 pub fn unscale_px(value: i32, dpi: u32) -> i32 {
+    // dpi 未知（0）时不做缩放：未缩放的输入原样返回。
+    if dpi == 0 {
+        return value;
+    }
     (value as i64 * 96 / dpi as i64) as i32
 }
 
-pub fn scale_percent(dpi: u32) -> u32 {
-    (dpi * 100) / 96
-}
+pub use crate::diagnostics::scale_percent;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct DpiBreakpoint {
-    pub min_width: i32,
     pub collapsed_nav: bool,
 }
 
 pub fn breakpoint_for(width: i32) -> DpiBreakpoint {
     DpiBreakpoint {
-        min_width: width,
         collapsed_nav: width < 1100,
     }
 }
@@ -37,6 +37,16 @@ mod tests {
     #[test]
     fn scale_percent_150() {
         assert_eq!(scale_percent(144), 150);
+    }
+
+    #[test]
+    fn scale_percent_falls_back_to_100_for_unknown_dpi() {
+        assert_eq!(scale_percent(0), 100);
+    }
+
+    #[test]
+    fn unscale_unknown_dpi_is_identity() {
+        assert_eq!(unscale_px(150, 0), 150);
     }
 
     #[test]

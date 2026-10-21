@@ -11,14 +11,14 @@ pub struct AboutInfo {
 }
 
 impl AboutInfo {
-    pub fn new(version: &str) -> Self {
+    pub fn new(version: &str, dpi: u32, path_support: bool) -> Self {
         Self {
             app_name: "wd-pak".into(),
             version: version.to_string(),
             build: "release".into(),
             system: "Windows".into(),
-            dpi: 96,
-            path_support: true,
+            dpi,
+            path_support,
         }
     }
 
@@ -50,8 +50,10 @@ mod tests {
 
     #[test]
     fn about_summary() {
-        let a = AboutInfo::new("1.0");
+        let a = AboutInfo::new("1.0", 144, true);
         assert_eq!(a.summary(), "wd-pak 1.0 (release)");
+        assert_eq!(a.dpi, 144);
+        assert!(a.path_support);
     }
 
     #[test]

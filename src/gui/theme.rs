@@ -61,10 +61,17 @@ impl SemanticColor {
             (SemanticColor::Window, EffectiveTheme::Dark) => (32, 32, 32),
             (SemanticColor::WindowText, EffectiveTheme::Light) => (0, 0, 0),
             (SemanticColor::WindowText, EffectiveTheme::Dark) => (240, 240, 240),
+            (SemanticColor::ButtonFace, EffectiveTheme::Light) => (240, 240, 240),
+            (SemanticColor::ButtonFace, EffectiveTheme::Dark) => (48, 48, 48),
+            (SemanticColor::ButtonText, EffectiveTheme::Light) => (0, 0, 0),
+            (SemanticColor::ButtonText, EffectiveTheme::Dark) => (240, 240, 240),
+            (SemanticColor::Highlight, EffectiveTheme::Light) => (0, 120, 215),
+            (SemanticColor::Highlight, EffectiveTheme::Dark) => (0, 90, 160),
+            (SemanticColor::HighlightText, EffectiveTheme::Light) => (255, 255, 255),
+            (SemanticColor::HighlightText, EffectiveTheme::Dark) => (240, 240, 240),
             (SemanticColor::Warning, _) => (255, 193, 7),
             (SemanticColor::Error, _) => (220, 53, 69),
             (SemanticColor::Success, _) => (40, 167, 69),
-            _ => (128, 128, 128),
         }
     }
 }
@@ -106,6 +113,22 @@ mod tests {
         let light = SemanticColor::Window.rgb(EffectiveTheme::Light);
         let dark = SemanticColor::Window.rgb(EffectiveTheme::Dark);
         assert_ne!(light, dark);
+    }
+
+    #[test]
+    fn legacy_semantic_colors_differ_by_theme() {
+        for color in [
+            SemanticColor::ButtonFace,
+            SemanticColor::ButtonText,
+            SemanticColor::Highlight,
+            SemanticColor::HighlightText,
+        ] {
+            assert_ne!(
+                color.rgb(EffectiveTheme::Light),
+                color.rgb(EffectiveTheme::Dark),
+                "{color:?} 在明暗主题下应有区分度"
+            );
+        }
     }
 
     #[test]
