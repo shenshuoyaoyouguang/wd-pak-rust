@@ -19,6 +19,7 @@ mod win {
     use wd_pak::browse::{default_visible, sort_indices, Column, Query, SortDir, SortSpec, ViewMode};
     use wd_pak::commands_write::{cmd_pack, cmd_replace};
     use wd_pak::config::Config;
+    use wd_pak::diagnostics::{APP_VERSION, ErrorLog};
     use wd_pak::error::PakError;
     use wd_pak::gui::error_text::{error_reason, error_suggestion, error_title};
     use wd_pak::gui::export::{
@@ -282,6 +283,8 @@ mod win {
         config_path: PathBuf,
         session_path: PathBuf,
         recent_menu: HMENU,
+        config_read_only: bool,
+        error_log: ErrorLog,
     }
 
     fn wide(value: &str) -> Vec<u16> {
@@ -687,7 +690,7 @@ mod win {
                         }
                         MENU_EXIT => { save_state(hwnd); DestroyWindow(hwnd); return 0; }
                         MENU_ABOUT => {
-                            let text = wide("wd-pak 1.0\n问道 PAK 工具");
+                            let text = wide(&format!("wd-pak {APP_VERSION}\n问道 PAK 工具"));
                             let caption = wide("关于");
                             MessageBoxW(hwnd, text.as_ptr(), caption.as_ptr(), MB_OK);
                             return 0;
@@ -1766,7 +1769,7 @@ mod win {
             ui.config.window.width = ((rect.right - rect.left) * 96) / dpi as i32;
             ui.config.window.height = ((rect.bottom - rect.top) * 96) / dpi as i32;
         }
-        let _ = persist::save_config(&ui.config_path, &ui.config);
+        persist_config(ui);
         let _ = persist::save_session(&ui.session_path, &snapshot);
     }
 
@@ -1775,6 +1778,13 @@ mod win {
             .duration_since(std::time::UNIX_EPOCH)
             .map(|duration| duration.as_secs())
             .unwrap_or(0)
+    }
+
+    fn persist_config(ui: &Ui) {
+        if ui.config_read_only {
+            return;
+        }
+        persist_config(ui);
     }
 
     unsafe fn record_recent(hwnd: HWND, path: &std::path::Path) {
@@ -1786,7 +1796,7 @@ mod win {
             let ui = &mut *pointer;
             ui.config
                 .touch_recent(&path.to_string_lossy(), now_seconds());
-            let _ = persist::save_config(&ui.config_path, &ui.config);
+            persist_config(ui);
         }
         rebuild_recent_menu(hwnd);
     }
@@ -1866,7 +1876,7 @@ mod win {
         {
             let ui = &mut *pointer;
             ui.config.clear_recent();
-            let _ = persist::save_config(&ui.config_path, &ui.config);
+            persist_config(ui);
             rebuild_recent_menu(hwnd);
         }
     }
@@ -2513,6 +2523,9 @@ mod win {
         let reason = error_reason(error);
         let suggestion = format!("建议: {}", error_suggestion(error));
         let details = error.to_string();
+        if let Some(ui) = (GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut Ui).as_mut() {
+            ui.error_log.record(now_seconds(), &title, &details);
+        }
 
         let (class_name, instance) =
             register_dialog_class(ERROR_CLASS, Some(error_wndproc), COLOR_WINDOW);
@@ -3618,7 +3631,7 @@ mod win {
         {
             let ui = &mut *(GetWindowLongPtrW(state.main, GWLP_USERDATA) as *mut Ui);
             ui.config.last_export_dir = Some(target_dir.to_string_lossy().into_owned());
-            let _ = persist::save_config(&ui.config_path, &ui.config);
+            persist_config(ui);
         }
 
         let outcome = run_export(dialog, &pak_path, items.clone());
@@ -5244,7 +5257,9 @@ mod win {
             }
         };
         let mut precheck = pack_precheck(&scan.entries, u64::from(u32::MAX));
-        precheck.issues.extend(manifest_mtime_issues(&source));
+        let scanned: std::collections::BTreeSet<String> =
+            scan.entries.iter().map(|entry| entry.rel_path.clone()).collect();
+        precheck.issues.extend(manifest_mtime_issues(&source, &scanned));
 
         let note = if scan.manifest_present {
             "检测到 _pak_manifest.json：打包时会自动跳过，且按清单回放 order 与 mtime。"
@@ -5346,7 +5361,7 @@ mod win {
                 if !ui.is_null() {
                     (*ui).config.last_pack_dir =
                         Some(source.to_string_lossy().into_owned());
-                    let _ = persist::save_config(&(*ui).config_path, &(*ui).config);
+                    persist_config(&*ui);
                 }
             }
         }
@@ -6716,6 +6731,8 @@ mod win {
             config_path: PathBuf::new(),
             session_path: PathBuf::new(),
             recent_menu: null_mut(),
+            config_read_only: false,
+            error_log: ErrorLog::default(),
         }))
     }
 
@@ -6760,7 +6777,9 @@ mod win {
             // §5.1：窗口尺寸存 DIP，按系统 DPI 换算成物理像素。
             let system_dpi = GetDpiForSystem();
             let (config_path, session_path) = persist::paths();
-            let (config, config_reason, had_config) = persist::load_config(&config_path);
+            let (config, config_reason, config_state) = persist::load_config(&config_path);
+            let had_config = matches!(config_state, persist::ConfigLoadState::Ok);
+            let config_read_only = matches!(config_state, persist::ConfigLoadState::ReadOnly);
             let (x, y) = if had_config {
                 (
                     scale(config.window.x, system_dpi),
@@ -6848,6 +6867,7 @@ mod win {
             ui.config_path = config_path;
             ui.session_path = session_path;
             ui.recent_menu = recent_menu;
+            ui.config_read_only = config_read_only;
             let edit = ui.edit;
             SetWindowLongPtrW(hwnd, GWLP_USERDATA, Box::into_raw(ui) as isize);
             layout_controls(hwnd);
@@ -6894,11 +6914,12 @@ mod win {
             UpdateWindow(hwnd);
             SetFocus(edit);
             if let Some(reason) = config_reason {
-                show_message(
-                    hwnd,
-                    &format!("配置已回退默认值：{reason}"),
-                    MB_OK | MB_ICONWARNING,
-                );
+                let text = if config_read_only {
+                    format!("配置不可读，已用默认值且不会保存：{reason}")
+                } else {
+                    format!("配置已回退默认值：{reason}")
+                };
+                show_message(hwnd, &text, MB_OK | MB_ICONWARNING);
             }
 
             let arguments: Vec<PathBuf> = std::env::args_os().skip(1).map(PathBuf::from).collect();
