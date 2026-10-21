@@ -2,6 +2,8 @@
 //!
 //! 只定义搜索条件与筛选状态，不涉及 Win32 控件。
 
+pub use crate::browse::{CompressionFilter, KindFilter};
+
 /// 搜索范围。
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum SearchScope {
@@ -10,31 +12,24 @@ pub enum SearchScope {
     Directory,
 }
 
-/// 类型筛选。
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum KindFilter {
-    #[default]
-    All,
-    Files,
-    Dirs,
-}
-
-/// 压缩方式筛选。
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum CompressionFilter {
-    #[default]
-    All,
-    Lzss,
-    Raw,
-}
-
 /// 搜索条件。
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SearchQuery {
     pub keyword: String,
     pub scope: SearchScope,
     pub kind: KindFilter,
     pub compression: CompressionFilter,
+}
+
+impl Default for SearchQuery {
+    fn default() -> Self {
+        Self {
+            keyword: String::new(),
+            scope: SearchScope::Package,
+            kind: KindFilter::All,
+            compression: CompressionFilter::All,
+        }
+    }
 }
 
 impl SearchQuery {
