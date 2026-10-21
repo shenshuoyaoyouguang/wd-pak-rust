@@ -4,10 +4,15 @@
 //! 便于在无 Windows 机器上测试。
 
 use std::fs;
+use std::io;
 use std::path::Path;
+use std::sync::atomic::{AtomicU64, Ordering};
 
 /// 界面显示的版本：规范要求原样显示 `1.0`（`docs/windows-ui-plan.md` §805），
-/// 与 `Cargo.toml` 的包版本（1.0.0）解耦，此处为唯一来源。
+/// 与 `Cargo.toml` 的包版本（1.0.0）解耦。
+///
+/// CLI（`main.rs` 的 `--version`）与 GUI 关于对话框共用的唯一显示版本来源；
+/// 修改显示版本只需改本常量。
 pub const APP_VERSION: &str = "1.0";
 
 /// 诊断里保留的最近错误条数。
@@ -29,7 +34,7 @@ pub struct ErrorRecord {
     pub detail: String,
 }
 
-/// 最近错误日志；最新在前，超出上限淘汰最旧的。
+/// 最近错误日志；按 `at` 降序（最新在前），超出上限淘汰 `at` 最旧的。
 #[derive(Debug)]
 pub struct ErrorLog {
     limit: usize,
@@ -44,6 +49,9 @@ impl ErrorLog {
         }
     }
 
+    /// 记录一条错误；按时间戳排序而非到达顺序，乱序时间戳不会破坏
+    /// [`ErrorLog::items`] / [`ErrorLog::last`] 的「最新在前」约定。
+    /// 同一时间戳保持稳定顺序，后到者排在前。
     pub fn record(&mut self, at: u64, title: &str, detail: &str) {
         self.items.insert(
             0,
@@ -53,6 +61,8 @@ impl ErrorLog {
                 detail: detail.to_string(),
             },
         );
+        // 稳定排序：插入在前的新记录在同时间戳中保持最新。
+        self.items.sort_by(|a, b| b.at.cmp(&a.at));
         self.items.truncate(self.limit);
     }
 
@@ -81,6 +91,9 @@ pub fn scale_percent(dpi: u32) -> u32 {
 }
 
 /// 默认目录是否可写；探针文件用完即删，失败时给出可读原因。
+///
+/// 探针使用「进程 id + 进程内计数」的唯一名字并以 `create_new` 独占创建：
+/// 既不会截断或删除已存在的同名文件，也只删除本次调用实际创建的文件。
 pub fn dir_writable(dir: &Path) -> (bool, String) {
     if let Err(error) = fs::create_dir_all(dir) {
         return (
@@ -88,14 +101,33 @@ pub fn dir_writable(dir: &Path) -> (bool, String) {
             format!("无法创建目录 {}: {}", dir.display(), error),
         );
     }
-    let probe = dir.join(format!(".wd_pak_write_probe_{}", std::process::id()));
-    match fs::write(&probe, b"") {
-        Ok(()) => {
-            let _ = fs::remove_file(&probe);
-            (true, String::new())
+    static NEXT_PROBE: AtomicU64 = AtomicU64::new(0);
+    for _ in 0..16 {
+        let serial = NEXT_PROBE.fetch_add(1, Ordering::Relaxed);
+        let probe = dir.join(format!(
+            ".wd_pak_write_probe_{}_{}",
+            std::process::id(),
+            serial
+        ));
+        match fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&probe)
+        {
+            Ok(file) => {
+                drop(file);
+                let _ = fs::remove_file(&probe);
+                return (true, String::new());
+            }
+            // 名字被历史残留占用：换下一个序号重试，绝不截断已有文件。
+            Err(error) if error.kind() == io::ErrorKind::AlreadyExists => continue,
+            Err(error) => return (false, format!("{} 不可写: {}", dir.display(), error)),
         }
-        Err(error) => (false, format!("{} 不可写: {}", dir.display(), error)),
     }
+    (
+        false,
+        format!("{} 不可写: 无法创建唯一的探针文件", dir.display()),
+    )
 }
 
 /// 系统长路径支持；`probe` 收到一条超过 260 字符的临时路径，由调用方实际创建。
@@ -122,5 +154,48 @@ mod tests {
     #[test]
     fn app_version_is_display_spec_value() {
         assert_eq!(APP_VERSION, "1.0");
+    }
+
+    #[test]
+    fn error_log_orders_by_timestamp_not_arrival() {
+        let mut log = ErrorLog::new(3);
+        log.record(100, "旧", "");
+        log.record(300, "新", "");
+        log.record(200, "中", "");
+
+        let ats: Vec<u64> = log.items().iter().map(|item| item.at).collect();
+        assert_eq!(ats, vec![300, 200, 100]);
+        assert_eq!(log.last().unwrap().title, "新");
+
+        // 迟到的更旧记录被淘汰，而不是挤掉最新记录。
+        log.record(50, "迟到", "");
+        assert_eq!(log.items().len(), 3);
+        assert!(log.items().iter().all(|item| item.at >= 100));
+        assert!(!log.items().iter().any(|item| item.title == "迟到"));
+    }
+
+    #[test]
+    fn dir_writable_preserves_existing_files_and_cleans_probe() {
+        let dir = std::env::temp_dir().join(format!(
+            "wd_pak_diag_probe_{}_{:?}",
+            std::process::id(),
+            std::thread::current().id()
+        ));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        let existing = dir.join(format!(".wd_pak_write_probe_{}", std::process::id()));
+        std::fs::write(&existing, b"keep me").unwrap();
+
+        let (ok, detail) = dir_writable(&dir);
+        assert!(ok, "{detail}");
+        assert_eq!(std::fs::read(&existing).unwrap(), b"keep me");
+        let existing_name = existing.file_name().unwrap().to_string_lossy().into_owned();
+        let leftovers: Vec<String> = std::fs::read_dir(&dir)
+            .unwrap()
+            .map(|entry| entry.unwrap().file_name().to_string_lossy().into_owned())
+            .filter(|name| name != &existing_name)
+            .collect();
+        assert!(leftovers.is_empty(), "探针未清理: {leftovers:?}");
+        let _ = std::fs::remove_dir_all(&dir);
     }
 }
